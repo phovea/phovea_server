@@ -9,14 +9,14 @@ import config
 
 parser = argparse.ArgumentParser(description='Caleydo Web Server')
 parser.add_argument('--multithreaded' ,action='store_true', help='multi threaded using gevent')
-parser.add_argument('--port', '-p', type=int, default=config.getint('port','caleydo.web'), help='server port')
-parser.add_argument('--address', '-a', default=config.get('address','caleydo.web'), help='server address')
+parser.add_argument('--port', '-p', type=int, default=config.getint('port','caleydo_web'), help='server port')
+parser.add_argument('--address', '-a', default=config.get('address','caleydo_web'), help='server address')
 parser.add_argument('--use_reloader', action='store_true', help='whether to automatically reload the server')
 args = parser.parse_args()
 
 
 #append the plugin directories as primary lookup path
-sys.path.extend(config.getlist('pluginDirs','caleydo'))
+sys.path.extend(config.getlist('pluginDirs','caleydo_server'))
 
 def run_server():
   """
@@ -39,7 +39,7 @@ def run_server():
   #create a dispatcher for all the applications
   application = dispatcher.PathDispatcher(mainapp.default_app(), applications)
 
-  if args.multithreaded or config.getboolean('multithreaded','caleydo.web'):
+  if args.multithreaded or config.getboolean('multithreaded','caleydo_server'):
     print 'run multi-threaded'
     from geventwebsocket.handler import WebSocketHandler
     from gevent.wsgi import WSGIServer
@@ -49,7 +49,7 @@ def run_server():
   else:
     print 'run single-threaded'
     from werkzeug.serving import run_simple
-    run_simple(args.address, args.port, application, use_reloader=args.use_reloader or config.getboolean('use_reloader','caleydo.web'))
+    run_simple(args.address, args.port, application, use_reloader=args.use_reloader or config.getboolean('use_reloader','caleydo_server'))
   #app.debug = True
   #print >>sy.stderr, 'map', app.url_map
   #app.run(host='0.0.0.0')

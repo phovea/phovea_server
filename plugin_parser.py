@@ -4,15 +4,13 @@ import os
 import os.path
 from collections import OrderedDict
 
-bower_file = 'bower.json'
-pip_file = 'requirements.txt'
-bower_components_url = '/bower_components'
-bower_components = 'bower_components'
-metadata_file = '/package.json'
+import config
+
+cc = config.view('caleydo_server')
 
 def _replace_variables(s):
   variables = {
-    'baseUrl': bower_components_url
+    'baseUrl': cc.bower_components_url
   }
   def match(m):
     if m.group(1) in variables:
@@ -84,15 +82,10 @@ class Plugin(object):
     self.folder = os.path.join(plugindir, p)
 
 class PluginMetaData(object):
-  def __init__(self, cc):
-    ccc = cc.view('caleydo')
-    ccw = ccc.view('web')
-    self.baseDir = ccc.clientDir
-    self.config_file = self.baseDir + 'plugins/config-gen.js'
-    self.baseServerDir = ccc.serverDir
-    self.bower_dependencies = OrderedDict({})
-    self.pip_dependencies = OrderedDict({})
-    self.ignored_bower_dependencies = ['requirejs', 'require-css']
+  def __init__(self):
+    ccw = config.view('caleydo_web')
+    self.baseDir = cc.dir
+    self.ignored_bower_dependencies = []
 
     self.plugins = []
     self.caleydo_client_plugins = []
@@ -123,23 +116,6 @@ class PluginMetaData(object):
       plugins = [ plugins ]
     self.caleydo_server_plugins.extend(plugins)
 
-  def _add_bower(self, dependencies, d):
-    for k,v in dependencies.iteritems():
-      if k in self.bower_dependencies:
-        old = self.bower_dependencies[k]
-        if (type(old) is not list and old == v) or (type(old) is list and v in old):
-          pass
-        elif type(old) is list:
-          old.append(v)
-        else:
-          self.bower_dependencies[k] = [old, v]
-      else:
-        self.bower_dependencies[k] = v
-    _extend(self.bower_dependencies, dependencies)
-
-  def _add_pip(self, dependencies, d):
-    _extend(self.pip_dependencies, dependencies)
-
   def _add_requirejs_config(self, rconfig, d):
     _extend(self.requirejs_config, rconfig)
 
@@ -148,52 +124,29 @@ class PluginMetaData(object):
       self.ignored_bower_dependencies.extend(rconfig['ignore'])
 
   def add_plugin(self, plugindir, d):
-    metadata_file_abs = plugindir + d + metadata_file
+    metadata_file_abs = plugindir + d + cc.metadata_file
     if not os.path.exists(metadata_file_abs):
       return
     print 'add plugin ' + metadata_file_abs
     with open(metadata_file_abs, 'r') as f:
       metadata = json.load(f)
       self.plugins.append(Plugin(plugindir, d, metadata))
-      if 'dependencies' in metadata:
-        self._add_bower(metadata['dependencies'], d)
       if 'caleydo' in metadata:
         c = metadata['caleydo']
         if 'plugins' in c:
-          self._add_client_extension(c['plugins'])
-        if 'python-server-plugins' in c:
-          self._add_server_extension(c['python-server-plugins'])
+          pp = c['plugins']
+          if 'web' in pp:
+            self._add_client_extension(pp['web'])
+          if 'python' in c:
+            self._add_server_extension(pp['python'])
         if 'requirejs-config' in c:
           self._add_requirejs_config(c['requirejs-config'], d)
         if 'requirejs-bower' in c:
           self._config_requirejs_bower(c['requirejs-bower'], d)
-        if 'python-pip' in c:
-          self._add_pip(c['python-pip'], d)
 
-
-  def dump_bower(self):
-    b = self.baseDir + bower_file
-    if os.path.isfile(b):
-      with open(self.baseDir + bower_file, 'r') as f:
-        bower = json.load(f)
-    else:
-      bower = OrderedDict({
-       "name": "caleydo-web",
-       "version": "0.0.0",
-      })
-    bower['dependencies'] = _resolve_conflicts(self.bower_dependencies)
-    with open(self.baseDir + bower_file,'w') as f:
-      f.write(json.dumps(bower, indent=2))
-
-  def dump_pip(self):
-    with open(self.baseServerDir + pip_file, 'w') as f:
-      for key, value in self.pip_dependencies.iteritems():
-          f.write(key)
-          f.write(value)
-          f.write('\n')
 
   def _add_bower_requirejs_config(self, d):
-    metadata_file_abs = self.baseDir + bower_components + '/' + d + '/.bower.json'
+    metadata_file_abs = self.baseDir + cc.bower_components + '/' + d + '/.bower.json'
     print 'add bower dependency ' + metadata_file_abs
     with open(metadata_file_abs, 'r') as f:
       metadata = json.load(f)
@@ -202,15 +155,15 @@ class PluginMetaData(object):
       if type(script) is list:
         script = script[0]
       if re.match(r'.*\.js$', script):
-        value = bower_components_url + '/' + d + '/' + script[:len(script) - 3]
+        value = cc.bower_components_url + '/' + d + '/' + script[:len(script) - 3]
         self.requirejs_config['paths'][d] = value
       elif re.match(r'.*\.css$', script):
-        value = self.requirejs_config['map']['*']['css'] + '!' + bower_components_url + '/' + d + '/' + script[:len(script) - 4]
+        value = self.requirejs_config['map']['*']['css'] + '!' + cc.bower_components_url + '/' + d + '/' + script[:len(script) - 4]
         self.requirejs_config['map']['*'][d] = value
 
   def derive_bower_requirejs_config(self):
     print 'derive bower config'
-    for d in _list_dirs(self.baseDir + bower_components):
+    for d in _list_dirs(self.baseDir + cc.bower_components):
       if d in self.ignored_bower_dependencies:
         continue
       self._add_bower_requirejs_config(d)
@@ -229,21 +182,14 @@ class PluginMetaData(object):
   def server_extensions(self):
     return _resolve_server_config(self.caleydo_server_plugins)
 
-  def dump_config(self):
-    full = self.to_config_file()
-    with open(self.config_file, 'w') as f:
-      f.write(full)
-    print self.config_file + ' saved'
-
   def parse_dirs(self, plugindirs):
     for d in plugindirs:
       for f in _list_dirs(d):
           self.add_plugin(d, f)
 
 def parse():
-  import config as cc
-  p = PluginMetaData(cc)
-  p.parse_dirs(cc.getlist('pluginDirs','caleydo'))
+  p = PluginMetaData()
+  p.parse_dirs(cc.getlist('pluginDirs'))
   p.derive_bower_requirejs_config()
 
   return p

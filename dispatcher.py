@@ -1,6 +1,16 @@
 from threading import Lock
 from werkzeug.wsgi import pop_path_info, get_path_info
 
+import config
+cc = config.view('caleydo_server')
+
+def add_no_cache_header(response):
+  #  response.headers['Last-Modified'] = datetime.now()
+  response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+  response.headers['Pragma'] = 'no-cache'
+  response.headers['Expires'] = '-1'
+  return response
+
 class ApplicationProxy(object):
   """
   helper class for different applications defined by a namespace and a loader function
@@ -18,8 +28,10 @@ class ApplicationProxy(object):
     if self._impl is not None:
       return self._impl
     self._impl = self.loader()
-    if hasattr(self._impl, 'debug'):
+    if cc.debug and hasattr(self._impl, 'debug'):
       self._impl.debug=True
+    if cc.nocache and hasattr(self._impl, 'after_request'):
+      self._impl.after_request(add_no_cache_header)
     return self._impl
 
   def match(self, path):

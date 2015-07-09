@@ -6,14 +6,6 @@ import config
 
 app = Flask(__name__)
 
-@app.after_request
-def add_header(response):
-#  response.headers['Last-Modified'] = datetime.now()
-  response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
-  response.headers['Pragma'] = 'no-cache'
-  response.headers['Expires'] = '-1'
-  return response
-
 @app.route('/')
 def index():
   apps = [o.id for o in plugin.plugins() if os.path.exists(os.path.join(o.folder, 'index.html'))]
@@ -54,7 +46,7 @@ def gencore():
 #deliver bower
 @app.route('/bower_components/<path:path>')
 def bowercomponents(path):
-  return send_from_directory(config.get('clientDir','caleydo') + 'bower_components/', path)
+  return send_from_directory('_bower_components/', path)
 
 #alternative name redirects
 @app.route('/<string:app>/plugins/<path:path>')
@@ -66,7 +58,7 @@ def deliver(path):
   print path
   if path.endswith('/'):
     path += 'index.html'
-  for d in config.getlist('pluginDirs','caleydo'):
+  for d in config.getlist('pluginDirs','caleydo_server'):
     d = os.path.abspath(d)
     dpath = safe_join(d, path)
     if os.path.exists(dpath):

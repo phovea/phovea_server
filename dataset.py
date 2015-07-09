@@ -53,7 +53,7 @@ def _list_format_csv(data):
     yield delimiter.join(['ID','Name','FQName','Type','Size','Entry'])
     for d in data:
       yield '\n'
-      yield delimiter.join([str(d['id']), d['name'], d['fqname'], d['type'], ','.join(str(d) for d in d['size']), caleydo.util.to_json(d)])
+      yield delimiter.join([str(d['id']), d['name'], d['fqname'], d['type'], ','.join(str(d) for d in d['size']), util.to_json(d)])
   return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=dataset.csv'})
 
 @app.route('/')

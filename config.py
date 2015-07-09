@@ -1,7 +1,7 @@
 __author__ = 'Samuel Gratzl'
-
-
+import os
 import configparser
+
 _c = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 
 def __getattr__(item):
@@ -63,11 +63,10 @@ class CaleydoConfigSection(object):
     return CaleydoConfigSection(self._expand(section))
 
 
-_c.read('config.ini')
+if os.path.exists('config.ini'):
+  _c.read('config.ini')
 
 def merge_plugin_configs(plugins):
-  import os
-  import configparser
   for plugin in plugins:
     config_file = os.path.join(plugin.folder, 'config.ini')
     if os.path.exists(config_file):

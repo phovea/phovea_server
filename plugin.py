@@ -6,10 +6,10 @@ _registry = None
 def _get_registry():
   global _registry
   if _registry is None:
-    import caleydo.plugin_parser as pp
+    import plugin_parser as pp
     metadata = pp.parse()
-    import caleydo.config
-    caleydo.config.merge_plugin_configs(metadata.plugins)
+    import config
+    config.merge_plugin_configs(metadata.plugins)
     _registry = Registry(metadata.plugins, metadata.server_extensions, metadata)
   return _registry
 
@@ -47,6 +47,7 @@ class AExtensionDesc(object):
     self.id = desc['id']
     self.name = self.id
     self.factory = 'create'
+    self.file = 'main'
     self.version = '1.0'
     self.description = ''
     #copy all values
@@ -61,7 +62,7 @@ class ExtensionDesc(AExtensionDesc):
     super(ExtensionDesc, self).__init__(desc)
 
     if not hasattr(self, 'module'):
-      self.module = self.folder
+      self.module = self.folder + '/' + self.file
 
     #from js notation to python notation
     self.module = self.module.replace('/','.')
