@@ -21,11 +21,10 @@
   		  "gevent-websocket": ">=0.9.5",
   		  "numpy": ">=1.8.2"
   		},
-  		"apt": {
+  		"debian": {
   		  "python-numpy": "",
   		  "python-scipy": "",
-  		  "python-matplotlib": "",
-  		  "libhdf5-serial-dev": ""
+  		  "python-matplotlib": ""
   		}
   	}
   }
