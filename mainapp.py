@@ -1,8 +1,8 @@
 from flask import Flask,Response,redirect,send_from_directory,safe_join,request
 import os
 import os.path
-import caleydo.plugin
-import caleydo.config
+import plugin
+import config
 
 app = Flask(__name__)
 
@@ -16,7 +16,7 @@ def add_header(response):
 
 @app.route('/')
 def index():
-  apps = [o.id for o in caleydo.plugin.plugins() if os.path.exists(os.path.join(o.folder, 'index.html'))]
+  apps = [o.id for o in plugin.plugins() if os.path.exists(os.path.join(o.folder, 'index.html'))]
   if len(apps) == 1:
     return redirect('/' + apps[0] + '/')
   #generate a list of all known one
@@ -30,7 +30,7 @@ def index():
 def genconfig():
   #for which app main file
   application = request.args.get('app', None)
-  reg = caleydo.plugin.metadata().to_requirejs_config_file(application)
+  reg = plugin.metadata().to_requirejs_config_file(application)
 
   #to specify the mime type even if it is a text
   return Response(response=reg, status=200, mimetype='application/javascript')
@@ -54,7 +54,7 @@ def gencore():
 #deliver bower
 @app.route('/bower_components/<path:path>')
 def bowercomponents(path):
-  return send_from_directory(caleydo.config.get('clientDir','caleydo') + 'bower_components/', path)
+  return send_from_directory(config.get('clientDir','caleydo') + 'bower_components/', path)
 
 #alternative name redirects
 @app.route('/<string:app>/plugins/<path:path>')
@@ -66,7 +66,7 @@ def deliver(path):
   print path
   if path.endswith('/'):
     path += 'index.html'
-  for d in caleydo.config.getlist('pluginDirs','caleydo'):
+  for d in config.getlist('pluginDirs','caleydo'):
     d = os.path.abspath(d)
     dpath = safe_join(d, path)
     if os.path.exists(dpath):

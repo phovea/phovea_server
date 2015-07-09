@@ -2,14 +2,12 @@ import os
 import os.path
 import sys
 import argparse
-import json
 
 sys.path.append('plugins/')
 print os.getcwd()
-import caleydo.config as config
+import config
 
 parser = argparse.ArgumentParser(description='Caleydo Web Server')
-parser.add_argument('--dependencyOnly', action='store_true', help='just create the dependencies descriptions (bower, pip)')
 parser.add_argument('--multithreaded' ,action='store_true', help='multi threaded using gevent')
 parser.add_argument('--port', '-p', type=int, default=config.getint('port','caleydo.web'), help='server port')
 parser.add_argument('--address', '-a', default=config.get('address','caleydo.web'), help='server address')
@@ -25,18 +23,18 @@ def run_server():
   runs the webserver
   """
   #set configured registry
-  import caleydo.plugin
+  import plugin
 
   import dispatcher
   import mainapp
 
   #helper to plugin in function scope
-  def loader(plugin):
-    print 'add application: ' + plugin.id + ' at namespace: ' + plugin.namespace
-    return lambda: plugin.load().factory()
+  def loader(p):
+    print 'add application: ' + p.id + ' at namespace: ' + p.namespace
+    return lambda: p.load().factory()
 
   #create a path dispatcher
-  applications = { p.namespace : loader(p) for p in caleydo.plugin.list('namespace') }
+  applications = { p.namespace : loader(p) for p in plugin.list('namespace') }
 
   #create a dispatcher for all the applications
   application = dispatcher.PathDispatcher(mainapp.default_app(), applications)
@@ -56,17 +54,6 @@ def run_server():
   #print >>sy.stderr, 'map', app.url_map
   #app.run(host='0.0.0.0')
 
-def dump_config():
-  """
-  just dumps the config to create the bower and pip requirements
-  """
-  import caleydo.plugin_parser
-  p = caleydo.plugin_parser.parse()
-  p.dump_bower()
-  p.dump_pip()
 
 if __name__ == '__main__':
-  if args.dependencyOnly:
-    dump_config()
-  else:
-    run_server()
+  run_server()
