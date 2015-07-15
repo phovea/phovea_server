@@ -66,18 +66,29 @@ class CaleydoConfigSection(object):
 if os.path.exists('config.ini'):
   _c.read('config.ini')
 
+def _merge_config(config_file, plugin_id):
+  c = configparser.ConfigParser(interpolation=configparser.Interpolation())
+  c.read(config_file)
+  for section in c.sections():
+    #magic name 'module' like a top level section
+    fullname = plugin_id+'.'+section if section != 'module' else plugin_id
+    if fullname not in _c:
+      _c.add_section(fullname)
+    sec = _c[fullname]
+    for k,v in c.items(section):
+      if k not in sec: #update with defaults
+        sec[k] = v
+
+_own_config = os.path.dirname(os.path.abspath(__file__)) + '/config.ini'
+if os.path.exists(_own_config):
+  _merge_config(_own_config, 'caleydo_server')
+
+_web_config = os.path.dirname(os.path.abspath(__file__)) + '/../caleydo_web/config.ini'
+if os.path.exists(_web_config):
+  _merge_config(_web_config, 'caleydo_web')
+
 def merge_plugin_configs(plugins):
   for plugin in plugins:
     config_file = os.path.join(plugin.folder, 'config.ini')
     if os.path.exists(config_file):
-      c = configparser.ConfigParser(interpolation=configparser.Interpolation())
-      c.read(config_file)
-      for section in c.sections():
-        #magic name 'module' like a top level section
-        fullname = plugin.id+'.'+section if section != 'module' else plugin.id
-        if fullname not in _c:
-          _c.add_section(fullname)
-        sec = _c[fullname]
-        for k,v in c.items(section):
-          if k not in sec: #update with defaults
-            sec[k] = v
+      _merge_config(config_file, plugin.id)

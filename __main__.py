@@ -9,11 +9,10 @@ import config
 
 parser = argparse.ArgumentParser(description='Caleydo Web Server')
 parser.add_argument('--multithreaded' ,action='store_true', help='multi threaded using gevent')
-parser.add_argument('--port', '-p', type=int, default=config.getint('port','caleydo_web'), help='server port')
-parser.add_argument('--address', '-a', default=config.get('address','caleydo_web'), help='server address')
+parser.add_argument('--port', '-p', type=int, default=config.getint('port','caleydo_server'), help='server port')
+parser.add_argument('--address', '-a', default=config.get('address','caleydo_server'), help='server address')
 parser.add_argument('--use_reloader', action='store_true', help='whether to automatically reload the server')
 args = parser.parse_args()
-
 
 #append the plugin directories as primary lookup path
 sys.path.extend(config.getlist('pluginDirs','caleydo_server'))
