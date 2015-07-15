@@ -1,11 +1,109 @@
 {
-  "name" : "caleydo_server",
+  "name": "caleydo_server",
   "version": "0.0.1",
   "peerDependencies": {
   },
   "caleydo": {
     "plugins": {
       "python": [
+        {
+          "type": "namespace",
+          "id": "caledyo-dataset",
+          "file": "dataset",
+          "namespace": "/api/dataset",
+          "factory": "create_dataset"
+        },
+        {
+          "type": "namespace",
+          "id": "caledyo-idtype",
+          "file": "dataset",
+          "namespace": "/api/idtype",
+          "factory": "create_idtype"
+        },
+        {
+          "type": "dataset-specific-handler",
+          "id": "handler-table",
+          "file": "dataset_specific",
+          "datatype": "table",
+          "factory": "add_table_handler"
+        },
+        {
+          "type": "dataset-specific-handler",
+          "id": "handler-matrix",
+          "file": "dataset_specific",
+          "datatype": "matrix",
+          "factory": "add_matrix_handler"
+        },
+        {
+          "type": "dataset-specific-handler",
+          "id": "handler-vector",
+          "file": "dataset_specific",
+          "datatype": "vector",
+          "factory": "add_vector_handler"
+        },
+        {
+          "type": "table-formatter",
+          "id": "formatter-json",
+          "file": "dataset_specific",
+          "format": "json",
+          "factory": "format_json"
+        },
+        {
+          "type": "table-formatter",
+          "id": "formatter-csv",
+          "file": "dataset_specific",
+          "format": "csv",
+          "factory": "format_csv"
+        },
+        {
+          "type": "matrix-formatter",
+          "id": "formatter-json",
+          "file": "dataset_specific",
+          "format": "json",
+          "factory": "format_json"
+        },
+        {
+          "type": "matrix-formatter",
+          "id": "formatter-csv",
+          "file": "dataset_specific",
+          "format": "csv",
+          "factory": "format_csv"
+        },
+        {
+          "type": "matrix-formatter",
+          "id": "formatter-image",
+          "file": "dataset_specific",
+          "format": "png",
+          "factory": "format_image"
+        },
+        {
+          "type": "matrix-formatter",
+          "id": "formatter-image",
+          "file": "dataset_specific",
+          "format": "jpeg",
+          "factory": "format_image"
+        },
+        {
+          "type": "matrix-formatter",
+          "id": "formatter-image",
+          "file": "dataset_specific",
+          "format": "jpg",
+          "factory": "format_image"
+        },
+        {
+          "type": "vector-formatter",
+          "id": "formatter-json",
+          "file": "dataset_specific",
+          "format": "json",
+          "factory": "format_json"
+        },
+        {
+          "type": "vector-formatter",
+          "id": "formatter-csv",
+          "file": "dataset_specific",
+          "format": "csv",
+          "factory": "format_csv"
+        },
         {
           "type": "dataset-provider",
           "id": "dataset-csv",
@@ -14,19 +112,19 @@
       ]
     },
     "dependencies": {
-  		"python": {
-  		  "Flask": ">=0.10.1",
-  		  "flask-restplus": ">=0.4.0",
-  		  "gevent": ">=1.0.2",
-  		  "gevent-websocket": ">=0.9.5",
-  		  "numpy": ">=1.8.2",
+      "python": {
+        "Flask": ">=0.10.1",
+        "flask-restplus": ">=0.4.0",
+        "gevent": ">=1.0.2",
+        "gevent-websocket": ">=0.9.5",
+        "numpy": ">=1.8.2",
         "configparser": ">=3.3.0r2"
-  		},
-  		"debian": {
-  		  "python-numpy": "",
-  		  "python-scipy": "",
-  		  "python-matplotlib": ""
-  		}
-  	}
+      },
+      "debian": {
+        "python-numpy": "",
+        "python-scipy": "",
+        "python-matplotlib": ""
+      }
+    }
   }
 }

@@ -80,6 +80,7 @@ class Plugin(object):
     self.name = desc.get('name', p)
     self.version = desc.get('version', '0.0.1')
     self.folder = os.path.join(plugindir, p)
+    self.folder_name = p
 
 class PluginMetaData(object):
   def __init__(self):
@@ -97,24 +98,38 @@ class PluginMetaData(object):
       'deps': [ccw.mainFile],
       'config': OrderedDict()
     }
-    self.requirejs_config['config'][ccw.configPrefix + 'caleydo/main'] = {
+    self.requirejs_config['config'][ccw.configPrefix + 'caleydo_web/main'] = {
       'apiUrl': ccw.apiPrefix,
       'apiJSONSuffix': ccw.apiSuffix
     }
-    self.requirejs_config['config'][ccw.configPrefix + 'caleydo/plugin'] = {
+    self.requirejs_config['config'][ccw.configPrefix + 'caleydo_web/plugin'] = {
       'baseUrl': ccw.baseUrl,
       'plugins': self.caleydo_client_plugins
     }
 
-  def _add_client_extension(self, plugins):
+  def _add_client_extension(self, plugins, plugin_desc):
     if type(plugins) is not list:
       plugins = [ plugins ]
-    self.caleydo_client_plugins.extend(plugins)
+    def fill(p):
+      p['folder'] = plugin_desc.folder_name
+      if 'version' not in p:
+        p['version'] = plugin_desc.version
+      if 'name' not in p:
+        p['name'] = plugin_desc.name
+      return p
+    self.caleydo_client_plugins.extend(map(fill, plugins))
 
-  def _add_server_extension(self, plugins):
+  def _add_server_extension(self, plugins, plugin_desc):
     if type(plugins) is not list:
       plugins = [ plugins ]
-    self.caleydo_server_plugins.extend(plugins)
+    def fill(p):
+      p['folder'] = plugin_desc.folder_name
+      if 'version' not in p:
+        p['version'] = plugin_desc.version
+      if 'name' not in p:
+        p['name'] = plugin_desc.name
+      return p
+    self.caleydo_server_plugins.extend(map(fill, plugins))
 
   def _add_requirejs_config(self, rconfig, d):
     _extend(self.requirejs_config, rconfig)
@@ -130,15 +145,16 @@ class PluginMetaData(object):
     print 'add plugin ' + metadata_file_abs
     with open(metadata_file_abs, 'r') as f:
       metadata = json.load(f)
-      self.plugins.append(Plugin(plugindir, d, metadata))
+      p = Plugin(plugindir, d, metadata)
+      self.plugins.append(p)
       if 'caleydo' in metadata:
         c = metadata['caleydo']
         if 'plugins' in c:
           pp = c['plugins']
           if 'web' in pp:
-            self._add_client_extension(pp['web'])
-          if 'python' in c:
-            self._add_server_extension(pp['python'])
+            self._add_client_extension(pp['web'], p)
+          if 'python' in pp:
+            self._add_server_extension(pp['python'], p)
         if 'requirejs-config' in c:
           self._add_requirejs_config(c['requirejs-config'], d)
         if 'requirejs-bower' in c:

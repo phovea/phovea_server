@@ -46,7 +46,7 @@ def gencore():
 #deliver bower
 @app.route('/bower_components/<path:path>')
 def bowercomponents(path):
-  return send_from_directory('_bower_components/', path)
+  return send_from_directory(os.path.abspath(config.get('bower_components','caleydo_server')), path)
 
 #alternative name redirects
 @app.route('/<string:app>/plugins/<path:path>')
