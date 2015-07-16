@@ -91,4 +91,6 @@ def merge_plugin_configs(plugins):
   for plugin in plugins:
     config_file = os.path.join(plugin.folder, 'config.ini')
     if os.path.exists(config_file):
+      print 'merging: ',config_file, plugin.id
       _merge_config(config_file, plugin.id)
+  print _c.sections()

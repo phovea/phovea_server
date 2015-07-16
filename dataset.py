@@ -1,7 +1,7 @@
 import flask
-import plugin
-import range
-import util
+import caleydo_server.plugin
+import caleydo_server.range
+import caleydo_server.util
 
 app = flask.Flask(__name__)
 app_idtype = flask.Flask(__name__)
@@ -12,7 +12,7 @@ _providers_r = None
 def _providers():
   global _providers_r
   if _providers_r is None:
-    _providers_r = [p.load().factory() for p in plugin.list('dataset-provider')]
+    _providers_r = [p.load().factory() for p in caleydo_server.plugin.list('dataset-provider')]
   return _providers_r
 
 _dataset_r = None
@@ -33,7 +33,7 @@ def list_datasets():
   return _datasets()
 
 def _list_format_json(data):
-  return util.jsonify(data)
+  return caleydo_server.util.jsonify(data)
 
 def _list_format_treejson(data):
   r = dict()
@@ -45,7 +45,7 @@ def _list_format_treejson(data):
         act[level] = dict()
       act = act[level]
     act[d['name']] = d
-  return util.jsonify(r, indent=1)
+  return caleydo_server.util.jsonify(r, indent=1)
 
 def _list_format_csv(data):
   delimiter = flask.request.args.get('f_delimiter',';')
@@ -53,7 +53,7 @@ def _list_format_csv(data):
     yield delimiter.join(['ID','Name','FQName','Type','Size','Entry'])
     for d in data:
       yield '\n'
-      yield delimiter.join([str(d['id']), d['name'], d['fqname'], d['type'], ','.join(str(d) for d in d['size']), util.to_json(d)])
+      yield delimiter.join([str(d['id']), d['name'], d['fqname'], d['type'], ','.join(str(d) for d in d['size']), caleydo_server.util.to_json(d)])
   return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=dataset.csv'})
 
 @app.route('/')
@@ -78,7 +78,7 @@ def _get_dataset(dataset_id):
   r = flask.request.args.get('range', None)
   if r is not None:
     r = range.parse(r)
-  return util.jsonify(d.asjson(r))
+  return caleydo_server.util.jsonify(d.asjson(r))
 
 def _dataset_getter(dataset_id, dataset_type):
   if dataset_id < 0:
@@ -91,7 +91,7 @@ def _dataset_getter(dataset_id, dataset_type):
   return t
 
 #add all specific handler
-for handler in plugin.list('dataset-specific-handler'):
+for handler in caleydo_server.plugin.list('dataset-specific-handler'):
   p = handler.load()
   p(app, _dataset_getter)
 
@@ -108,7 +108,7 @@ def list_idtypes():
 
 @app_idtype.route('/')
 def _list_idtypes():
-  return util.jsonify(list_idtypes())
+  return caleydo_server.util.jsonify(list_idtypes())
 
 
 def create_idtype():

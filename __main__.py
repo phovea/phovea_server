@@ -5,24 +5,24 @@ import argparse
 
 sys.path.append('plugins/')
 print os.getcwd()
-import config
+import caleydo_server.config
 
 parser = argparse.ArgumentParser(description='Caleydo Web Server')
 parser.add_argument('--multithreaded' ,action='store_true', help='multi threaded using gevent')
-parser.add_argument('--port', '-p', type=int, default=config.getint('port','caleydo_server'), help='server port')
-parser.add_argument('--address', '-a', default=config.get('address','caleydo_server'), help='server address')
+parser.add_argument('--port', '-p', type=int, default=caleydo_server.config.getint('port','caleydo_server'), help='server port')
+parser.add_argument('--address', '-a', default=caleydo_server.config.get('address','caleydo_server'), help='server address')
 parser.add_argument('--use_reloader', action='store_true', help='whether to automatically reload the server')
 args = parser.parse_args()
 
 #append the plugin directories as primary lookup path
-sys.path.extend(config.getlist('pluginDirs','caleydo_server'))
+sys.path.extend(caleydo_server.config.getlist('pluginDirs','caleydo_server'))
 
 def run_server():
   """
   runs the webserver
   """
   #set configured registry
-  import plugin
+  import caleydo_server.plugin
 
   import dispatcher
   import mainapp
@@ -33,12 +33,12 @@ def run_server():
     return lambda: p.load().factory()
 
   #create a path dispatcher
-  applications = { p.namespace : loader(p) for p in plugin.list('namespace') }
+  applications = { p.namespace : loader(p) for p in caleydo_server.plugin.list('namespace') }
 
   #create a dispatcher for all the applications
   application = dispatcher.PathDispatcher(mainapp.default_app(), applications)
 
-  if args.multithreaded or config.getboolean('multithreaded','caleydo_server'):
+  if args.multithreaded or caleydo_server.config.getboolean('multithreaded','caleydo_server'):
     print 'run multi-threaded'
     from geventwebsocket.handler import WebSocketHandler
     from gevent.wsgi import WSGIServer
@@ -48,7 +48,7 @@ def run_server():
   else:
     print 'run single-threaded'
     from werkzeug.serving import run_simple
-    run_simple(args.address, args.port, application, use_reloader=args.use_reloader or config.getboolean('use_reloader','caleydo_server'))
+    run_simple(args.address, args.port, application, use_reloader=args.use_reloader or caleydo_server.config.getboolean('use_reloader','caleydo_server'))
   #app.debug = True
   #print >>sy.stderr, 'map', app.url_map
   #app.run(host='0.0.0.0')

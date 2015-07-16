@@ -1,15 +1,13 @@
-from werkzeug import import_string, cached_property
-
 #will be injected
 _registry = None
 
 def _get_registry():
   global _registry
   if _registry is None:
-    import plugin_parser as pp
+    import _plugin_parser as pp
     metadata = pp.parse()
-    import config
-    config.merge_plugin_configs(metadata.plugins)
+    import caleydo_server.config
+    caleydo_server.config.merge_plugin_configs(metadata.plugins)
     _registry = Registry(metadata.plugins, metadata.server_extensions, metadata)
   return _registry
 
@@ -60,6 +58,7 @@ class ExtensionDesc(AExtensionDesc):
   """
   def __init__(self, desc):
     super(ExtensionDesc, self).__init__(desc)
+    self._impl = None
 
     if not hasattr(self, 'module'):
       self.module = self.folder + '/' + self.file
@@ -67,20 +66,18 @@ class ExtensionDesc(AExtensionDesc):
     #from js notation to python notation
     self.module = self.module.replace('/','.')
 
-  @cached_property
-  def load_impl(self):
-    m = import_string(self.module)
-    print 'importing', self.module
-    if hasattr(m,'_plugin_initialize'): #init method
-      #import inspect
-      #inspect.getcallargs()
-      m._plugin_initialize()
-      pass
-
-    return Extension(self, m)
-
   def load(self):
-    return self.load_impl
+    if self._impl is None:
+      import importlib
+      print 'importing', self.module
+      m = importlib.import_module(self.module)
+      if hasattr(m,'_plugin_initialize'): #init method
+        #import inspect
+        #inspect.getcallargs()
+        m._plugin_initialize()
+
+      self._impl = Extension(self, m)
+    return self._impl
 
 class PreLoadedExtensionDesc(AExtensionDesc):
   def __init__(self, desc, impl):

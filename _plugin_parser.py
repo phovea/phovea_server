@@ -4,9 +4,9 @@ import os
 import os.path
 from collections import OrderedDict
 
-import config
+import caleydo_server.config
 
-cc = config.view('caleydo_server')
+cc = caleydo_server.config.view('caleydo_server')
 
 def _replace_variables(s):
   variables = {
@@ -84,7 +84,7 @@ class Plugin(object):
 
 class PluginMetaData(object):
   def __init__(self):
-    ccw = config.view('caleydo_web')
+    ccw = caleydo_server.config.view('caleydo_web')
     self.baseDir = cc.dir
     self.ignored_bower_dependencies = []
 

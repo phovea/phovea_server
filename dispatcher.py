@@ -1,8 +1,8 @@
 from threading import Lock
 from werkzeug.wsgi import pop_path_info, get_path_info
 
-import config
-cc = config.view('caleydo_server')
+import caleydo_server.config
+cc = caleydo_server.config.view('caleydo_server')
 
 def add_no_cache_header(response):
   #  response.headers['Last-Modified'] = datetime.now()

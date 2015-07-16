@@ -2,7 +2,7 @@ __author__ = 'Samuel Gratzl'
 
 import json
 import flask
-import plugin
+import caleydo_server.plugin
 
 class JSONExtensibleEncoder(json.JSONEncoder):
   """
@@ -11,7 +11,7 @@ class JSONExtensibleEncoder(json.JSONEncoder):
   def __init__(self, *args, **kwargs):
     super(JSONExtensibleEncoder, self).__init__(*args, **kwargs)
 
-    self.encoders = [p.load().factory() for p in plugin.list('json-encoder')]
+    self.encoders = [p.load().factory() for p in caleydo_server.plugin.list('json-encoder')]
 
   def default(self, o):
     for encoder in self.encoders:

@@ -2,7 +2,7 @@ __author__ = 'Samuel Gratzl'
 
 import flask
 import range as ranges
-from util import jsonify
+from caleydo_server.util import jsonify
 import caleydo_server.plugin
 
 
@@ -74,7 +74,7 @@ def resolve_formatter(type, format):
   for p in caleydo_server.plugin.list(type+'-formatter'):
     if p.format == format:
       return p.load()
-  flask.abort(400,'unknown format "{0}" possible formats are: {1}'.format(format, ','.join((p.format for p in plugin.list(type+'-formatter')))))
+  flask.abort(400,'unknown format "{0}" possible formats are: {1}'.format(format, ','.join((p.format for p in caleydo_server.plugin.list(type+'-formatter')))))
 
 def _add_handler(app, dataset_getter, type):
   def desc_gen(dataset_id):

@@ -287,5 +287,5 @@ def create():
   """
   entry point of this plugin
   """
-  import plugin
-  return StaticFileProvider(plugin.plugins())
+  import caleydo_server.plugin
+  return StaticFileProvider(caleydo_server.plugin.plugins())
