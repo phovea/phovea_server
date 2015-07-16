@@ -109,6 +109,11 @@
           "type": "dataset-provider",
           "id": "dataset-csv",
           "file": "dataset_csv"
+        },
+        {
+          "type": "json-encoder",
+          "id": "numpy",
+          "file": "json_encoder"
         }
       ]
     },
