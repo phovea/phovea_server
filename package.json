@@ -8,14 +8,14 @@
       "python": [
         {
           "type": "namespace",
-          "id": "caledyo-dataset",
+          "id": "caleydo-dataset",
           "file": "dataset",
           "namespace": "/api/dataset",
           "factory": "create_dataset"
         },
         {
           "type": "namespace",
-          "id": "caledyo-idtype",
+          "id": "caleydo-idtype",
           "file": "dataset",
           "namespace": "/api/idtype",
           "factory": "create_idtype"
