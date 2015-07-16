@@ -112,6 +112,8 @@ class PluginMetaData(object):
       plugins = [ plugins ]
     def fill(p):
       p['folder'] = plugin_desc.folder_name
+      if 'id' not in p:
+        p['id'] = plugin_desc.id
       if 'version' not in p:
         p['version'] = plugin_desc.version
       if 'name' not in p:
@@ -124,6 +126,8 @@ class PluginMetaData(object):
       plugins = [ plugins ]
     def fill(p):
       p['folder'] = plugin_desc.folder_name
+      if 'id' not in p:
+        p['id'] = plugin_desc.id
       if 'version' not in p:
         p['version'] = plugin_desc.version
       if 'name' not in p:

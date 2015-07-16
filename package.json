@@ -2,6 +2,7 @@
   "name": "caleydo_server",
   "version": "0.0.1",
   "peerDependencies": {
+    "caleydo_mapping": "*"
   },
   "caleydo": {
     "plugins": {

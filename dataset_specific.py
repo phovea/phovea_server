@@ -3,7 +3,7 @@ __author__ = 'Samuel Gratzl'
 import flask
 import range as ranges
 from util import jsonify
-import plugin
+import caleydo_server.plugin
 
 
 
@@ -71,7 +71,7 @@ def format_image(dataset, range, args):
   return flask.send_file(b, mimetype='image/'+format.replace('jpg','jpeg'))
 
 def resolve_formatter(type, format):
-  for p in plugin.list(type+'-formatter'):
+  for p in caleydo_server.plugin.list(type+'-formatter'):
     if p.format == format:
       return p.load()
   flask.abort(400,'unknown format "{0}" possible formats are: {1}'.format(format, ','.join((p.format for p in plugin.list(type+'-formatter')))))

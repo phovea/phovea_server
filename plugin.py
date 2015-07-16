@@ -70,10 +70,11 @@ class ExtensionDesc(AExtensionDesc):
   @cached_property
   def load_impl(self):
     m = import_string(self.module)
-
-    if hasattr(m,'__init__'): #init method
+    print 'importing', self.module
+    if hasattr(m,'_plugin_initialize'): #init method
       #import inspect
       #inspect.getcallargs()
+      m._plugin_initialize()
       pass
 
     return Extension(self, m)

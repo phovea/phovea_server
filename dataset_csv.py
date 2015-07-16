@@ -5,9 +5,9 @@ import numpy as np
 
 
 def assign_ids(ids, idtype):
-  import plugin
+  import caleydo_server.plugin
 
-  manager = plugin.lookup('idmanager')
+  manager = caleydo_server.plugin.lookup('idmanager')
   return np.array(manager(ids, idtype))
 
 
