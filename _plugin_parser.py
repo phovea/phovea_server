@@ -8,10 +8,7 @@ import caleydo_server.config
 
 cc = caleydo_server.config.view('caleydo_server')
 
-def _replace_variables(s):
-  variables = {
-    'baseUrl': cc.bower_components_url
-  }
+def _replace_variables(s, variables):
   def match(m):
     if m.group(1) in variables:
       return variables[m.group(1)]
@@ -30,15 +27,15 @@ def _unpack_python_eval(s):
   return eval(m.group(1))
 
 
-def _resolve_client_config(config):
-  config = _replace_variables(config)
+def _resolve_client_config(config, vars):
+  config = _replace_variables(config, vars)
   config = _unpack_eval(config)
   return config
 
-def _resolve_server_config(d):
+def _resolve_server_config(d, vars = {}):
   import six
   if isinstance(d, six.string_types): #not a string
-    return _unpack_python_eval(_replace_variables(d))
+    return _unpack_python_eval(_replace_variables(d, vars))
   elif type(d) == list:
     return [_resolve_server_config(i) for i in d]
   elif type(d) == dict or type(d) == OrderedDict:
@@ -84,28 +81,20 @@ class Plugin(object):
 
 class PluginMetaData(object):
   def __init__(self):
-    ccw = caleydo_server.config.view('caleydo_web')
-    self.baseDir = cc.dir
-    self.ignored_bower_dependencies = []
 
     self.plugins = []
     self.caleydo_client_plugins = []
     self.caleydo_server_plugins = []
+
+    self.baseDir = cc.dir
+    self.ignored_bower_dependencies = []
+
     self.requirejs_config = {
-      'baseUrl': ccw.baseUrl,
       'paths': OrderedDict(),
       'map': OrderedDict(),
-      'deps': [ccw.mainFile],
       'config': OrderedDict()
     }
-    self.requirejs_config['config'][ccw.configPrefix + 'caleydo_web/main'] = {
-      'apiUrl': ccw.apiPrefix,
-      'apiJSONSuffix': ccw.apiSuffix
-    }
-    self.requirejs_config['config'][ccw.configPrefix + 'caleydo_web/plugin'] = {
-      'baseUrl': ccw.baseUrl,
-      'plugins': self.caleydo_client_plugins
-    }
+    self._bower_configs = None
 
   def _add_client_extension(self, plugins, plugin_desc):
     if type(plugins) is not list:
@@ -165,7 +154,7 @@ class PluginMetaData(object):
           self._config_requirejs_bower(c['requirejs-bower'], d)
 
 
-  def _add_bower_requirejs_config(self, d):
+  def _add_bower_requirejs_config(self, d, scripts, cssfiles):
     metadata_file_abs = self.baseDir + cc.bower_components + '/' + d + '/.bower.json'
     print 'add bower dependency ' + metadata_file_abs
     with open(metadata_file_abs, 'r') as f:
@@ -175,27 +164,64 @@ class PluginMetaData(object):
       if type(script) is list:
         script = script[0]
       if re.match(r'.*\.js$', script):
-        value = cc.bower_components_url + '/' + d + '/' + script[:len(script) - 3]
-        self.requirejs_config['paths'][d] = value
+        scripts[d] = d + '/' + script[:len(script) - 3]
       elif re.match(r'.*\.css$', script):
-        value = self.requirejs_config['map']['*']['css'] + '!' + cc.bower_components_url + '/' + d + '/' + script[:len(script) - 4]
-        self.requirejs_config['map']['*'][d] = value
+        cssfiles[d] = d + '/' + script[:len(script) - 4]
 
   def derive_bower_requirejs_config(self):
     print 'derive bower config'
+    scripts = dict()
+    cssfiles = dict()
     for d in _list_dirs(self.baseDir + cc.bower_components):
       if d in self.ignored_bower_dependencies:
         continue
-      self._add_bower_requirejs_config(d)
+      self._add_bower_requirejs_config(d, scripts, cssfiles)
 
-  def to_requirejs_config_file(self, mainFile=None):
-    bak = self.requirejs_config['deps']
-    if mainFile is not None:
-      self.requirejs_config['deps'] = [ mainFile ]
+    self._bower_configs = scripts, cssfiles
+
+  def to_requirejs_config_file(self, main_file=None, base_url=None):
+    ccw = caleydo_server.config.view('caleydo_web')
+
+    if main_file is None:
+      main_file = ccw.mainFile
+    if base_url is None:
+      base_url = ccw.baseUrl
+
+    c = {
+      'baseUrl': base_url,
+      'paths': OrderedDict(),
+      'map': OrderedDict(),
+      'deps': [ main_file ],
+      'config': OrderedDict()
+    }
+    #extend with the stored one
+    _extend(c, self.requirejs_config)
+
+    #inject caleydo registry information
+    c['config'][ccw.configPrefix + 'caleydo_web/main'] = {
+      'apiUrl': ccw.apiPrefix,
+      'apiJSONSuffix': ccw.apiSuffix
+    }
+    c['config'][ccw.configPrefix + 'caleydo_web/plugin'] = {
+      'baseUrl': base_url,
+      'plugins': self.caleydo_client_plugins
+    }
+
+    #inject bower dependencies
+    for d,script in self._bower_configs[0].iteritems():
+      value = base_url+ccw.bower_components_url + '/' + script
+      c['paths'][d] = value
+    for d,css in self._bower_configs[1].iteritems():
+      value = self.requirejs_config['map']['*']['css'] + '!' + base_url+ccw.bower_components_url + '/' + css
+      c['map']['*'][d] = value
+
     c = json.dumps(self.requirejs_config, indent=2)
-    c = _resolve_client_config(c)
+    variables = {
+    'baseUrl': base_url+ccw.bower_components_url
+    }
+    c = _resolve_client_config(c, variables)
+
     full = '/*global require */\r\nrequire.config(' + c + ');'
-    self.requirejs_config['deps'] = bak
     return full
 
   @property

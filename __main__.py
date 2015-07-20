@@ -53,6 +53,10 @@ def run_server():
   #print >>sy.stderr, 'map', app.url_map
   #app.run(host='0.0.0.0')
 
+def generate_files():
+  import mainapp
+  mainapp.dump_generated_files()
+
 
 if __name__ == '__main__':
   run_server()
