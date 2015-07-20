@@ -17,27 +17,28 @@ args = parser.parse_args()
 #append the plugin directories as primary lookup path
 sys.path.extend(caleydo_server.config.getlist('pluginDirs','caleydo_server'))
 
-def run_server():
-  """
-  runs the webserver
-  """
-  #set configured registry
-  import caleydo_server.plugin
 
-  import dispatcher
-  import mainapp
+#set configured registry
+import caleydo_server.plugin
 
-  #helper to plugin in function scope
-  def loader(p):
-    print 'add application: ' + p.id + ' at namespace: ' + p.namespace
-    return lambda: p.load().factory()
+import dispatcher
+import mainapp
 
-  #create a path dispatcher
-  applications = { p.namespace : loader(p) for p in caleydo_server.plugin.list('namespace') }
+#helper to plugin in function scope
+def loader(p):
+  print 'add application: ' + p.id + ' at namespace: ' + p.namespace
+  return lambda: p.load().factory()
 
-  #create a dispatcher for all the applications
-  application = dispatcher.PathDispatcher(mainapp.default_app(), applications)
+#create a path dispatcher
+applications = { p.namespace : loader(p) for p in caleydo_server.plugin.list('namespace') }
 
+#create a dispatcher for all the applications
+application = dispatcher.PathDispatcher(mainapp.default_app(), applications)
+from werkzeug.contrib.fixers import ProxyFix
+
+application = ProxyFix(application)
+
+if __name__ == '__main__':
   if args.multithreaded or caleydo_server.config.getboolean('multithreaded','caleydo_server'):
     print 'run multi-threaded'
     from geventwebsocket.handler import WebSocketHandler
@@ -49,14 +50,5 @@ def run_server():
     print 'run single-threaded'
     from werkzeug.serving import run_simple
     run_simple(args.address, args.port, application, use_reloader=args.use_reloader or caleydo_server.config.getboolean('use_reloader','caleydo_server'))
-  #app.debug = True
-  #print >>sy.stderr, 'map', app.url_map
-  #app.run(host='0.0.0.0')
-
-def generate_files():
-  import mainapp
-  mainapp.dump_generated_files()
-
-
-if __name__ == '__main__':
-  run_server()
+else:
+  print 'run as embedded version'
