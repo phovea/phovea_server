@@ -38,7 +38,7 @@ from werkzeug.contrib.fixers import ProxyFix
 
 application = ProxyFix(application)
 
-if __name__ == '__main__':
+def run():
   if args.multithreaded or caleydo_server.config.getboolean('multithreaded','caleydo_server'):
     print 'run multi-threaded'
     from geventwebsocket.handler import WebSocketHandler
@@ -50,5 +50,9 @@ if __name__ == '__main__':
     print 'run single-threaded'
     from werkzeug.serving import run_simple
     run_simple(args.address, args.port, application, use_reloader=args.use_reloader or caleydo_server.config.getboolean('use_reloader','caleydo_server'))
+
+if __name__ == '__main__':
+  print 'run as standalone version'
+  run()
 else:
   print 'run as embedded version'
