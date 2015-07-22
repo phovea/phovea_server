@@ -4,7 +4,7 @@
     "${dir}plugins/",
     "${dir}static/"
   ],
-  "dataDir": "${dir}/data",
+  "dataDir": "${dir}/_data",
   "use_reloader": false,
   "multithreaded": false,
 
