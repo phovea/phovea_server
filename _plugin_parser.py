@@ -215,9 +215,9 @@ class PluginMetaData(object):
       value = self.requirejs_config['map']['*']['css'] + '!' + base_url+ccw.bower_components_url + '/' + css
       c['map']['*'][d] = value
 
-    c = json.dumps(self.requirejs_config, indent=2)
+    c = json.dumps(c, indent=2)
     variables = {
-    'baseUrl': base_url+ccw.bower_components_url
+      'baseUrl': base_url+ccw.bower_components_url
     }
     c = _resolve_client_config(c, variables)
 
