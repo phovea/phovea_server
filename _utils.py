@@ -30,7 +30,7 @@ def replace_variables(s, variables):
 def replace_nested_variables(obj, lookup):
   if type(obj) is list:
     return [replace_nested_variables(o, lookup) for o in obj]
-  elif type(obj) is basestring:
+  elif isinstance(obj, basestring):
     return replace_variables_f(obj, lookup)
   return obj
 

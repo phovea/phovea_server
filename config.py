@@ -14,7 +14,7 @@ def get(item, section=None, default=None):
   act = _c
   for p in keys[0:-1]:
     act = act.get(p, {})
-  v = act.get(keys[keys.length-1],None)
+  v = act.get(keys[len(keys)-1],None)
 
   def resolve(x):
     if '.' in x: #assume absolute
@@ -22,8 +22,7 @@ def get(item, section=None, default=None):
     else:
       return act.get(x, None)
 
-  if v is not None and type(v) is str:
-    v = replace_nested_variables(v, resolve)
+  v = replace_nested_variables(v, resolve)
 
   return v if v is not None else default
 
@@ -33,20 +32,20 @@ def set(item, value, section=None):
   act = _c
   for p in keys[0:-1]:
     act = act.get(p, {})
-  act[keys[keys.length-1]] = value
+  act[keys[len(keys)-1]] = value
 
-def getint(item, section=None):
-  return int(get(item, section))
+def getint(item, section=None, default=0):
+  return int(get(item, section, default))
 
-def getfloat(item, section=None):
-  return float(get(item, section))
+def getfloat(item, section=None, default=0):
+  return float(get(item, section, default))
 
-def getboolean(item, section=None):
-  return bool(get(item, section))
+def getboolean(item, section=None, default=False):
+  return bool(get(item, section, default))
 
-def getlist(item, section=None, separator='\n'):
-  v = get(item, section)
-  return v.split(separator) if v is not None else []
+def getlist(item, section=None, separator='\n', default=[]):
+  v = get(item, section, default)
+  return v if type(v) is list else v.split(separator)
 
 def view(section):
   return CaleydoConfigSection(section)
