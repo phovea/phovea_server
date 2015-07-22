@@ -3,39 +3,22 @@ import json
 import os
 import os.path
 from collections import OrderedDict
+from _utils import *
 
 import caleydo_server.config
 
 cc = caleydo_server.config.view('caleydo_server')
 
-def _replace_variables(s, variables):
-  def match(m):
-    if m.group(1) in variables:
-      return variables[m.group(1)]
-    print 'cant resolve ' + m.group(1)
-    return '$unresolved$'
-
-  return re.sub(r'\$\{(.*)\}', match, s)
-
-def _unpack_eval(s):
-  return re.sub(r'eval!(.*)', '\1', s)
-
-def _unpack_python_eval(s):
-  m = re.search(r'eval!(.*)', s)
-  if m is None:
-    return s
-  return eval(m.group(1))
-
 
 def _resolve_client_config(config, vars):
-  config = _replace_variables(config, vars)
-  config = _unpack_eval(config)
+  config = replace_variables(config, vars)
+  config = unpack_eval(config)
   return config
 
 def _resolve_server_config(d, vars = {}):
   import six
   if isinstance(d, six.string_types): #not a string
-    return _unpack_python_eval(_replace_variables(d, vars))
+    return unpack_python_eval(replace_variables(d, vars))
   elif type(d) == list:
     return [_resolve_server_config(i) for i in d]
   elif type(d) == dict or type(d) == OrderedDict:

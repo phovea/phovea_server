@@ -127,7 +127,7 @@
         "gevent": ">=1.0.2",
         "gevent-websocket": ">=0.9.5",
         "numpy": ">=1.8.2",
-        "configparser": ">=3.3.0r2"
+        "json-cfg": ">=0.3.4"
       },
       "debian": {
         "python-numpy": "",

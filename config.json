@@ -1,0 +1,20 @@
+{
+  "dir": "./",
+  "pluginDirs": [
+    "${dir}plugins/",
+    "${dir}static/"
+  ],
+  "dataDir": "${dir}/data",
+  "use_reloader": false,
+  "multithreaded": false,
+
+  "debug": true,
+  "nocache": true,
+
+
+  "bower_components": "_bower_components",
+  "metadata_file": "/package.json",
+
+  "port": 9000,
+  "address": "0.0.0.0"
+}

@@ -1,33 +1,52 @@
 __author__ = 'Samuel Gratzl'
 import os
-import configparser
+import jsoncfg
+from _utils import *
 
-_c = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+_c = {}
 
 def __getattr__(item):
   return get(item)
 
-def _expand(section=None):
-  return 'DEFAULT' if section is None else section
+def get(item, section=None, default=None):
+  key = item if section is None else section+'.'+item
+  keys = key.split('.')
+  act = _c
+  for p in keys[0:-1]:
+    act = act.get(p, {})
+  v = act.get(keys[keys.length-1],None)
 
-def get(item, section=None):
-  return _c[_expand(section)][item]
+  def resolve(x):
+    if '.' in x: #assume absolute
+      return get(x)
+    else:
+      return act.get(x, None)
+
+  if v is not None and type(v) is str:
+    v = replace_nested_variables(v, resolve)
+
+  return v if v is not None else default
 
 def set(item, value, section=None):
-  _c[_expand(section)][item]=value
+  key = item if section is None else section+'.'+item
+  keys = key.split('.')
+  act = _c
+  for p in keys[0:-1]:
+    act = act.get(p, {})
+  act[keys[keys.length-1]] = value
 
 def getint(item, section=None):
-  return _c[_expand(section)].getint(item)
+  return int(get(item, section))
 
 def getfloat(item, section=None):
-  return _c[_expand(section)].getfloat(item)
+  return float(get(item, section))
 
 def getboolean(item, section=None):
-  return _c[_expand(section)].getboolean(item)
+  return bool(get(item, section))
 
 def getlist(item, section=None, separator='\n'):
-  v = _c[_expand(section)][item].strip()
-  return v.split(separator)
+  v = get(item, section)
+  return v.split(separator) if v is not None else []
 
 def view(section):
   return CaleydoConfigSection(section)
@@ -62,35 +81,31 @@ class CaleydoConfigSection(object):
   def view(self, section):
     return CaleydoConfigSection(self._expand(section))
 
-
-if os.path.exists('config.ini'):
-  _c.read('config.ini')
-
+_c = {}
 def _merge_config(config_file, plugin_id):
-  c = configparser.ConfigParser(interpolation=configparser.Interpolation())
-  c.read(config_file)
-  for section in c.sections():
-    #magic name 'module' like a top level section
-    fullname = plugin_id+'.'+section if section != 'module' else plugin_id
-    if fullname not in _c:
-      _c.add_section(fullname)
-    sec = _c[fullname]
-    for k,v in c.items(section):
-      if k not in sec: #update with defaults
-        sec[k] = v
+  c = jsoncfg.load(config_file)
+  extend(_c, { plugin_id : c })
 
-_own_config = os.path.dirname(os.path.abspath(__file__)) + '/config.ini'
+_own_config = os.path.dirname(os.path.abspath(__file__)) + '/config.json'
 if os.path.exists(_own_config):
   _merge_config(_own_config, 'caleydo_server')
 
-_web_config = os.path.dirname(os.path.abspath(__file__)) + '/../caleydo_web/config.ini'
+_web_config = os.path.dirname(os.path.abspath(__file__)) + '/../caleydo_web/config.json'
 if os.path.exists(_web_config):
   _merge_config(_web_config, 'caleydo_web')
 
+if os.path.exists('config.json'):
+  extend(_c, jsoncfg.load('config.json'))
+
 def merge_plugin_configs(plugins):
+
+  global _c
+  _c = {}
   for plugin in plugins:
-    config_file = os.path.join(plugin.folder, 'config.ini')
+    config_file = os.path.join(plugin.folder, 'config.json')
     if os.path.exists(config_file):
       print 'merging: ',config_file, plugin.id
       _merge_config(config_file, plugin.id)
-  print _c.sections()
+  #override with more important settings
+  if os.path.exists('config.json'):
+    extend(_c, jsoncfg.load('config.json'))
