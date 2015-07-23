@@ -2,7 +2,6 @@
   "name": "caleydo_server",
   "version": "0.0.1",
   "dependencies": {
-    "caleydo_mapping": "*"
   },
   "peerDependencies": {
     "caleydo_mapping": "*"

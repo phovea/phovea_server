@@ -11,6 +11,13 @@ def add_no_cache_header(response):
   response.headers['Expires'] = '-1'
   return response
 
+
+def init_app(app):
+  if cc.debug and hasattr(app, 'debug'):
+    app.debug = True
+  if cc.nocache and hasattr(app, 'after_request'):
+    app.after_request(add_no_cache_header)
+
 class ApplicationProxy(object):
   """
   helper class for different applications defined by a namespace and a loader function
@@ -28,10 +35,7 @@ class ApplicationProxy(object):
     if self._impl is not None:
       return self._impl
     self._impl = self.loader()
-    if cc.debug and hasattr(self._impl, 'debug'):
-      self._impl.debug=True
-    if cc.nocache and hasattr(self._impl, 'after_request'):
-      self._impl.after_request(add_no_cache_header)
+    init_app(self._impl)
     return self._impl
 
   def match(self, path):
@@ -43,6 +47,8 @@ class PathDispatcher(object):
   """
   def __init__(self, default_app, applications):
     self.default_app = default_app
+    init_app(default_app)
+
     self.applications = [ ApplicationProxy(key,value) for key,value in applications.iteritems()]
     #print self.applications
     self.lock = Lock()
