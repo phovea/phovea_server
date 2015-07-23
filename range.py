@@ -158,7 +158,7 @@ class RangeElem(object):
 
 class Range1D(object):
   def __init__(self, arg=None):
-    if type(arg) is list:
+    if isinstance(arg, list):
       self._elems = arg
     elif isinstance(arg, Range1D):
       self._elems = arg._elems
@@ -234,9 +234,9 @@ class Range1D(object):
     def convert(p):
       if isinstance(p, basestring):
         return RangeElem.parse(p)
-      elif type(p) == int:
+      elif isinstance(p, int):
         return RangeElem.single(p)
-      elif type(p) == list:
+      elif isinstance(p, list):
         return RangeElem.range(p[0], p[1], p[2])
       return p
 
@@ -605,7 +605,7 @@ class Range(object):
       d = self[i]
       nex = filter_dim(i+1)
       s = size[i] if len(size) > i else 0
-      return lambda elem : d.filter(elem, s, nex) if type(elem) is list else elem
+      return lambda elem : d.filter(elem, s, nex) if isinstance(elem, list) else elem
     f = filter_dim(0)
     return f(data)
 
@@ -667,7 +667,7 @@ def range(*args):
   if len(args) == 0:
     return all()
   r = Range()
-  if type(args[0]) is list:
+  if isinstance(args[0], list):
     for i,arr in enumerate(args):
       if len(arr) == 0:
         continue
@@ -681,7 +681,7 @@ def join(*args):
   if len(args) == 0:
     return all()
   r = Range()
-  if type(args[0]) is list:
+  if isinstance(args[0], list):
     args= args[0]
   r.dims = [r[0] for r in args]
   return r
@@ -690,9 +690,9 @@ def from_list(*args):
   if len(args) == 0:
     return all()
   r = Range()
-  if type(args[0]) is list and type(args[0][0]) is Range1D:
+  if isinstance(args[0], list) and type(args[0][0]) is Range1D:
     r.dims = args[0]
-  elif type(args[0]) is list: #array mode
+  elif isinstance(args[0], list): #array mode
     for i,arr in enumerate(args):
       if type(arr) is Range1D:
         r[i] = arr

@@ -5,7 +5,7 @@ import re
 # extend a dictionary recursivly
 def extend(target, w):
   for k,v in w.iteritems():
-    if type(v) is dict:
+    if isinstance(v,dict):
       if k not in target:
         target[k] = extend({}, v)
       else:
@@ -28,7 +28,7 @@ def replace_variables(s, variables):
   return replace_variables_f(s, lambda x: variables.get(x, None))
 
 def replace_nested_variables(obj, lookup):
-  if type(obj) is list:
+  if isinstance(obj, list):
     return [replace_nested_variables(o, lookup) for o in obj]
   elif isinstance(obj, basestring):
     return replace_variables_f(obj, lookup)

@@ -23,6 +23,7 @@ def get(item, section=None, default=None):
       return act.get(x, None)
 
   v = replace_nested_variables(v, resolve)
+  #print key, v
 
   return v if v is not None else default
 
@@ -45,7 +46,7 @@ def getboolean(item, section=None, default=False):
 
 def getlist(item, section=None, separator='\n', default=[]):
   v = get(item, section, default)
-  return v if type(v) is list else v.split(separator)
+  return v if isinstance(v, list) else v.split(separator)
 
 def view(section):
   return CaleydoConfigSection(section)
@@ -59,7 +60,7 @@ class CaleydoConfigSection(object):
 
   def _expand(self, section=None):
     if self._section is None:
-      return section if section is not None else 'DEFAULT'
+      return section
     return self._section+('.'+section if section is not None else '')
 
   def get(self, item, section=None):

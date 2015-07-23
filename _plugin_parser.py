@@ -19,9 +19,9 @@ def _resolve_server_config(d, vars = {}):
   import six
   if isinstance(d, six.string_types): #not a string
     return unpack_python_eval(replace_variables(d, vars))
-  elif type(d) == list:
+  elif isinstance(d,list):
     return [_resolve_server_config(i) for i in d]
-  elif type(d) == dict or type(d) == OrderedDict:
+  elif isinstance(d, dict):
     for k,v in d.items():
       d[k] = _resolve_server_config(v)
     return d
@@ -30,7 +30,7 @@ def _resolve_server_config(d, vars = {}):
 # extend a dictionary recursivly
 def _extend(target, w):
   for k,v in w.iteritems():
-    if type(v) is dict:
+    if isinstance(v, dict):
       if k not in target:
         target[k] = _extend({}, v)
       else:
@@ -47,7 +47,7 @@ def _list_dirs(dd):
 def _resolve_conflicts(dependencies):
   r = dict()
   for k,v in dependencies.iteritems():
-    if type(v) is list:
+    if isinstance(v, list):
       print 'resolving versions of ',k,v,'->', ' '.join(v)
       r[k] = ' '.join(v)
     else:
@@ -80,7 +80,7 @@ class PluginMetaData(object):
     self._bower_configs = None
 
   def _add_client_extension(self, plugins, plugin_desc):
-    if type(plugins) is not list:
+    if not isinstance(plugins, list):
       plugins = [ plugins ]
     def fill(p):
       p['folder'] = plugin_desc.folder_name
@@ -94,7 +94,7 @@ class PluginMetaData(object):
     self.caleydo_client_plugins.extend(map(fill, plugins))
 
   def _add_server_extension(self, plugins, plugin_desc):
-    if type(plugins) is not list:
+    if not isinstance(plugins, list):
       plugins = [ plugins ]
     def fill(p):
       p['folder'] = plugin_desc.folder_name
@@ -144,7 +144,7 @@ class PluginMetaData(object):
       metadata = json.load(f)
     if 'main' in metadata:
       script = metadata['main']
-      if type(script) is list:
+      if isinstance(script, list):
         script = script[0]
       if re.match(r'.*\.js$', script):
         scripts[d] = d + '/' + script[:len(script) - 3]
