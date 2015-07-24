@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function sedeasy {
-  sed "s/$(echo $1 | sed -e 's/\([[\/.*]\|\]\)/\\&/g')/$(echo $2 | sed -e 's/[\/&]/\\&/g')/g" $3 > $4
+  sed -i "s/$(echo $1 | sed -e 's/\([[\/.*]\|\]\)/\\&/g')/$(echo $2 | sed -e 's/[\/&]/\\&/g')/g" $3
 }
 
 function install_apt_dependencies {
@@ -36,23 +36,30 @@ function create_server_config {
   set -vx #to turn echoing on and
   cd ${wd}
 
-  sedeasy /var/www/caleydo_app ${wd} gunicorn_start.in.sh gunicorn_start.sh
-  sedeasy caleydo_app ${name} gunicorn_start.sh gunicorn_start.sh
+  cp gunicorn_start.in.sh gunicorn_start.sh
+  sedeasy /var/www/caleydo_app ${wd} gunicorn_start.sh
+  sedeasy caleydo_app ${name} gunicorn_start.sh
   chmod +x gunicorn_start.sh
 
 
-  sedeasy /var/www/caleydo_app ${wd} supervisor.in.conf supervisor.conf
-  sedeasy caleydo_app ${name} supervisor.conf supervisor.conf
+  cp supervisor.in.conf supervisor.conf
+  sedeasy /var/www/caleydo_app ${wd} supervisor.conf
+  sedeasy caleydo_app ${name} supervisor.conf
 
   #create the supervisor config
   sudo ln -s ${wd}/supervisor.conf /etc/supervisor/conf.d/${name}.conf
+  #reread the list of elements
+  sudo supervisorctl reread
+  sudo supervisorctl update
 
   #create the nginx config and enable the site
   if [ -d /etc/nginx ] ; then
-    sedeasy /var/www/caleydo_app ${wd} nginx.in.conf nginx.conf
-    sedeasy caleydo_app ${name} nginx.conf nginx.conf
+    cp nginx.in.conf nginx.conf
+    sedeasy /var/www/caleydo_app ${wd} nginx.conf
+    sedeasy caleydo_app ${name} nginx.conf
     sudo ln -s ${wd}/nginx.conf /etc/nginx/sites-available/${name}
     sudo ln -s ${wd}/nginx.conf /etc/nginx/sites-enabled/${name}
+    sudo service nginx restart
   fi
 }
 
