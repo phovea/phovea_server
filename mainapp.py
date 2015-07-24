@@ -17,6 +17,10 @@ def index():
   text.append('</li></body></html>')
   return '\n'.join(text)
 
+@app.route('/apps.html')
+def apps():
+  return index()
+
 #deliver config
 @app.route('/config-gen.js')
 def genconfig():
@@ -81,8 +85,11 @@ def dump_generated_files(target_dir, application, context):
     f.write(generate_config(application, context))
   with open(os.path.join(target_dir,'caleydo_web.js'),'w') as f :
     f.write(generate_wrapper(application, context))
+  index_content = index()
   with open(os.path.join(target_dir,'index.html'),'w') as f :
-    f.write(index())
+    f.write(index_content)
+  with open(os.path.join(target_dir,'apps.html'),'w') as f :
+    f.write(index_content)
 
 
 def default_app():
