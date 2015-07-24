@@ -35,8 +35,20 @@ function create_server_config {
   pip install gunicorn setproctitle
   set -vx #to turn echoing on and
   cd ${wd}
-  sedeasy caleydo_web $1 caleydo_web_nginx.in.conf caleydo_web_nginx.conf
-  sedeasy caleydo_web $1 caleydo_web_uwsgi.in.ini caleydo_web_uwsgi.ini
+
+  sedeasy caleydo_web $1 gunicorn_start.in.sh gunicorn_start.sh
+  chmod +x gunicorn_start.sh
+
+  sedeasy caleydo_web $1 supervisor.in.conf supervisor.conf
+  #create the supervisor config
+  sudo ln -s ${wd}/supervisor.conf /etc/supervisor/conf.d/${name}.conf
+
+  #create the nginx config and enable the site
+  if [ -d /etc/nginx ] ; then
+    sedeasy caleydo_web $1 nginx.in.conf nginx.conf
+    sudo ln -s ${wd}/nginx.conf /etc/nginx/sites-available/${name}
+    sudo ln -s ${wd}/nginx.conf /etc/nginx/sites-enabled/${name}
+  fi
 }
 
 function create_virtualenv {
@@ -58,7 +70,7 @@ function deactivate_virtualenv {
 function create_run_script {
     echo "#!/usr/bin/env bash
 
-venv/bin/python plugins/caleydo_server --multithreaded
+./venv/bin/python plugins/caleydo_server --multithreaded
 " > run.sh
 }
 
