@@ -30,7 +30,7 @@ class CSVEntry(object):
 
     data = []
     with open(self._path, 'r') as csvfile:
-      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ','), quotechar='|')
+      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ',').encode('ascii','ignore'), quotechar='|')
       data.extend(reader)
     # print data
     def to_num(s):
