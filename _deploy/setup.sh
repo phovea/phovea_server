@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function sedeasy {
-  sed "s/$(echo $1 | sed -e 's/\([[\/.*]\|\]\)/\\&/g')/$(echo $2 | sed -e 's/[\/&]/\\&/g')/g" $3 $4
+  sed "s/$(echo $1 | sed -e 's/\([[\/.*]\|\]\)/\\&/g')/$(echo $2 | sed -e 's/[\/&]/\\&/g')/g" $3 > $4
 }
 
 function install_apt_dependencies {
@@ -10,7 +10,7 @@ function install_apt_dependencies {
     wd="`pwd`"
     cd /tmp #switch to tmp directory
     set -vx #to turn echoing on and
-    sudo apt-get install -y python-pip python-dev zlib1g-dev cython `cat ${wd}/debian.txt`
+    sudo apt-get install -y supervisor python-pip python-dev zlib1g-dev `cat ${wd}/debian.txt`
     set +vx #to turn them both off
     cd ${wd}
     rm debian.txt
@@ -21,15 +21,20 @@ function install_pip_dependencies {
     echo "--- installing pip dependencies ---"
     wd="`pwd`"
     cd /tmp #switch to tmp directory
-    sudo pip install -r ${wd}/requirements.txt
+    pip install -r ${wd}/requirements.txt
     set -vx #to turn echoing on and
     cd ${wd}
     rm requirements.txt
   fi
 }
 
-function create_uwsgi_conf {
+function create_server_config {
   local name=$1
+  wd="`pwd`"
+  cd /tmp #switch to tmp directory
+  pip install gunicorn setproctitle
+  set -vx #to turn echoing on and
+  cd ${wd}
   sedeasy caleydo_web $1 caleydo_web_nginx.in.conf caleydo_web_nginx.conf
   sedeasy caleydo_web $1 caleydo_web_uwsgi.in.ini caleydo_web_uwsgi.ini
 }
@@ -60,8 +65,9 @@ venv/bin/python plugins/caleydo_server --multithreaded
 install_apt_dependencies
 create_virtualenv
 install_pip_dependencies
-deactivate_virtualenv
 create_run_script
 
 name=${PWD##*/}
-create_uwsgi_conf ${name}
+create_server_config ${name}
+
+deactivate_virtualenv
