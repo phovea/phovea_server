@@ -27,5 +27,5 @@ exec ./venv/bin/gunicorn ${CALEYDO_WSGI_MODULE}:application \
   --workers ${NUM_WORKERS} \
   --user=${USER} \
   --bind=unix:${SOCKFILE} \
-  --log-level=debug \
+  --log-level=info \
   --log-file=-
