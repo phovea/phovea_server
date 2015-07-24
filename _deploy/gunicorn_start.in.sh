@@ -3,7 +3,7 @@
 NAME="caleydo_app"                                  # Name of the application
 WEB_DIR=/var/www/caleydo_app             # Django project directory
 SOCKFILE=/var/www/caleydo_app/run/gunicorn.sock  # we will communicte using this unix socket
-USER=ubuntu                                        # the user to run as
+USER=`whoami`                                        # the user to run as
 GROUP=data-www                                     # the group to run as
 NUM_WORKERS=3                                     # how many worker processes should Gunicorn spawn
 CALEYDO_WSGI_MODULE=plugins.caleydo_server.__main__                     # WSGI module name

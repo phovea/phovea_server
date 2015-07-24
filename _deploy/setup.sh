@@ -36,16 +36,21 @@ function create_server_config {
   set -vx #to turn echoing on and
   cd ${wd}
 
-  sedeasy caleydo_web $1 gunicorn_start.in.sh gunicorn_start.sh
+  sedeasy /var/www/caleydo_app ${wd} gunicorn_start.in.sh gunicorn_start.sh
+  sedeasy caleydo_app ${name} gunicorn_start.sh gunicorn_start.sh
   chmod +x gunicorn_start.sh
 
-  sedeasy caleydo_web $1 supervisor.in.conf supervisor.conf
+
+  sedeasy /var/www/caleydo_app ${wd} supervisor.in.conf supervisor.conf
+  sedeasy caleydo_app ${name} supervisor.conf supervisor.conf
+
   #create the supervisor config
   sudo ln -s ${wd}/supervisor.conf /etc/supervisor/conf.d/${name}.conf
 
   #create the nginx config and enable the site
   if [ -d /etc/nginx ] ; then
-    sedeasy caleydo_web $1 nginx.in.conf nginx.conf
+    sedeasy /var/www/caleydo_app ${wd} nginx.in.conf nginx.conf
+    sedeasy caleydo_app ${name} nginx.conf nginx.conf
     sudo ln -s ${wd}/nginx.conf /etc/nginx/sites-available/${name}
     sudo ln -s ${wd}/nginx.conf /etc/nginx/sites-enabled/${name}
   fi
