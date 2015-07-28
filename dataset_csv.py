@@ -70,8 +70,8 @@ class CSVStratification(CSVEntry):
     d = [dict(row=row[0], i=i, cluster=row[1]) for i, row in enumerate(data[1:])]
 
     def cmp(a, b):
-      r = a['cluster'] - b['cluster']
-      return a['row'] - b['row'] if r == 0 else r
+      r = int(a['cluster'] - b['cluster'])
+      return int(a['row'] - b['row']) if r == 0 else r
 
     d.sort(cmp)  # sort by cluster;
     clusters = dict()
