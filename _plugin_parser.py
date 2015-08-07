@@ -163,7 +163,7 @@ class PluginMetaData(object):
     self._bower_configs = scripts, cssfiles
 
   def to_requirejs_config_file(self, main_file=None, base_url=None):
-    ccw = caleydo_server.config.view('caleydo_web')
+    ccw = caleydo_server.config.view('caleydo_core')
 
     if main_file is None:
       main_file = ccw.mainFile
@@ -181,11 +181,11 @@ class PluginMetaData(object):
     _extend(c, self.requirejs_config)
 
     #inject caleydo registry information
-    c['config'][ccw.configPrefix + 'caleydo_web/main'] = {
+    c['config'][ccw.configPrefix + 'caleydo_core/main'] = {
       'apiUrl': ccw.apiPrefix,
       'apiJSONSuffix': ccw.apiSuffix
     }
-    c['config'][ccw.configPrefix + 'caleydo_web/plugin'] = {
+    c['config'][ccw.configPrefix + 'caleydo_core/plugin'] = {
       'baseUrl': base_url,
       'plugins': self.caleydo_client_plugins
     }

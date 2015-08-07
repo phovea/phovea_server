@@ -1,5 +1,5 @@
 {
-  "caleydo_web": {
+  "caleydo_core": {
     "baseUrl": "" //the context path to use a trailing slash will be appended, e.g. /test
   }
 }

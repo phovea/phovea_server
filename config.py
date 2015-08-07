@@ -90,9 +90,9 @@ _own_config = os.path.dirname(os.path.abspath(__file__)) + '/config.json'
 if os.path.exists(_own_config):
   _merge_config(_own_config, 'caleydo_server')
 
-_web_config = os.path.dirname(os.path.abspath(__file__)) + '/../caleydo_web/config.json'
+_web_config = os.path.dirname(os.path.abspath(__file__)) + '/../caleydo_core/config.json'
 if os.path.exists(_web_config):
-  _merge_config(_web_config, 'caleydo_web')
+  _merge_config(_web_config, 'caleydo_core')
 
 if os.path.exists('config.json'):
   extend(_c, jsoncfg.load('config.json'))
