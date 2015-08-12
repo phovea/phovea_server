@@ -22,7 +22,7 @@ def replace_variables_f(s, lookup):
       print 'cant resolve ' + m.group(1)
       return '$unresolved$'
     return v
-  return re.sub(r'\$\{(.*)\}', match, s)
+  return re.sub(r'\$\{([^}]+)\}', match, s)
 
 def replace_variables(s, variables):
   return replace_variables_f(s, lambda x: variables.get(x, None))
