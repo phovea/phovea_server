@@ -32,6 +32,8 @@ def replace_nested_variables(obj, lookup):
     return [replace_nested_variables(o, lookup) for o in obj]
   elif isinstance(obj, basestring):
     return replace_variables_f(obj, lookup)
+  elif isinstance(obj, dict):
+    return { k: replace_nested_variables(v, lookup) for k,v in obj.iteritems() }
   return obj
 
 def unpack_eval(s):
