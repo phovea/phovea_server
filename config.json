@@ -11,7 +11,7 @@
   "debug": true,
   "nocache": true,
 
-  "bower_components": "_bower_components",
+  "bower_components": "libs/bower_components",
   "metadata_file": "/package.json",
 
   "port": 9000,
