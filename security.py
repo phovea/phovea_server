@@ -16,6 +16,9 @@ class User(object):
     def is_anonymous(self):
       return self.name == 'anonymous'
 
+    def has_role(self, role):
+      return role in self.roles
+
 class SecurityManager(object):
   def __init__(self):
     pass
@@ -37,7 +40,7 @@ class SecurityManager(object):
     return self.current_user.is_authenticated()
 
   def has_role(self, role):
-    return role in self.current_user.roles
+    return self.current_user.has_role(role)
 
   def init_app(self, app):
     pass
