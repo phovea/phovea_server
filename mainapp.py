@@ -3,8 +3,10 @@ import os
 import os.path
 import caleydo_server.plugin
 import caleydo_server.config
+import caleydo_server.security
 
 app = Flask(__name__)
+caleydo_server.security.init_app(app)
 
 @app.route('/')
 def index():
@@ -93,5 +95,4 @@ def dump_generated_files(target_dir, application, context):
 
 
 def default_app():
-  app.debug = True
   return app

@@ -4,6 +4,8 @@
     "${dir}plugins/",
     "${dir}static/"
   ],
+  "disabledPlugins": [],
+
   "dataDir": "${dir}/_data",
   "use_reloader": false,
   "multithreaded": true,

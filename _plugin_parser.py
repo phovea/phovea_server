@@ -122,6 +122,10 @@ class PluginMetaData(object):
     with open(metadata_file_abs, 'r') as f:
       metadata = json.load(f)
       p = Plugin(plugindir, d, metadata)
+
+      if p.id in cc.disabledPlugins:
+        return
+
       self.plugins.append(p)
       if 'caleydo' in metadata:
         c = metadata['caleydo']
