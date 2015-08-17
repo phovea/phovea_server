@@ -6,7 +6,15 @@ class User(object):
   def __init__(self):
     self.name = 'anonymous'
     self.roles = ['anonymous']
-    self.is_authenticated = False
+
+    def is_authenticated(self):
+      return False
+
+    def is_active(self):
+      return False
+
+    def is_anonymous(self):
+      return self.name == 'anonymous'
 
 class SecurityManager(object):
   def __init__(self):
@@ -21,14 +29,29 @@ class SecurityManager(object):
   def logout(self):
     pass
 
+  @property
   def current_user(self):
     return User()
+
+  def is_authenticated(self):
+    return self.current_user.is_authenticated()
+
+  def has_role(self, role):
+    return role in self.current_user.roles
 
   def init_app(self, app):
     pass
 
+  def add_login_routes(self, app):
+    pass
+
 class DummyManager(SecurityManager):
-  pass
+
+  def is_authenticated(self):
+    return True
+
+  def has_role(self, role):
+    return True
 
 _manager = None
 def manager():
@@ -47,3 +70,6 @@ def login_required(f):
 
 def init_app(app):
   manager().init_app(app)
+
+def add_login_routes(app):
+  manager().add_login_routes(app)
