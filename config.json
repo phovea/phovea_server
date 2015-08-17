@@ -17,5 +17,6 @@
   "metadata_file": "/package.json",
 
   "port": 9000,
-  "address": "0.0.0.0"
+  "address": "0.0.0.0",
+  "secret_key": "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w"
 }

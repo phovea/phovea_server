@@ -17,6 +17,8 @@ def init_app(app):
     app.debug = True
   if cc.nocache and hasattr(app, 'after_request'):
     app.after_request(add_no_cache_header)
+  if cc.secret_key:
+    app.config['SECRET_KEY'] = cc.secret_key
 
 class ApplicationProxy(object):
   """
