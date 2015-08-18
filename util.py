@@ -55,9 +55,10 @@ def fix_id(id):
   """
   import re
   #convert strange characters to space
-  r = re.sub(r"""[!#$%&'\(\)\*\+,\.\/:;<=>\?@\[\\\]\^`\{\|}~]+""", ' ', id)
+  r = re.sub(r"""[!#$%&'\(\)\*\+,\./:;<=>\?@\[\\\]\^`\{\|}~_]+""", ' ', id)
   #title case all words
   r = r.title()
+  r = r[0].lo + r[1:]
   #remove white spaces
-  r = r.sub(r'\s+', '', id, flags=re.UNICODE)
+  r = re.sub(r'\s+', '', r, flags=re.UNICODE)
   return r

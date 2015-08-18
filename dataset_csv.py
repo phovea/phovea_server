@@ -17,7 +17,7 @@ def fix_id(fqname):
 
 class CSVEntry(ADataSetEntry):
   def __init__(self, desc, project):
-    super(CSVEntry, self).__init__(desc['name'], project.id, desc['type'])
+    super(CSVEntry, self).__init__(desc['name'], project.id, desc['type'], desc.get('id',None))
     self._desc = desc
     desc['fqname'] = self.fqname
     desc['id'] = self.id
@@ -102,6 +102,34 @@ class CSVStratification(CSVEntry):
   def asjson(self, range=None):
     return self.load()
 
+  @staticmethod
+  def parse(data, path, project, id = None):
+    desc = dict(type='stratification',
+                name=data.get('name','Uploaded File'),
+                path = os.path.basename(path),
+                idtype=data.get('idtype',data.get('rowtype','unknown')))
+    for k,v in data.iteritems():
+      if k not in desc:
+        desc[k] = v
+    if id is not None:
+      desc['id'] = id
+    if 'size0' in data and 'ngroups' in data:
+      desc['size'] = [int(data['size0'])]
+      del desc['size0']
+      desc['ngroups'] = int(data['ngroups'])
+    else: #derive from the data
+      clusters = set()
+      count = 0
+      with open(path, 'r') as csvfile:
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii','ignore'), quotechar='|')
+        for row in reader:
+          count+=1
+          clusters.add(row[1])
+      desc['size'] = [ count ]
+      desc['ngroups'] = len(clusters)
+
+    return CSVStratification(desc, project)
+
 
 class CSVMatrix(CSVEntry):
   def __init__(self, desc, project):
@@ -163,6 +191,48 @@ class CSVMatrix(CSVEntry):
     r = dict(data=arr, rows=rows, cols=cols, rowIds=rowids, colIds=colids)
     return r
 
+  @staticmethod
+  def parse(data, path, project, id = None):
+    desc = dict(type='matrix',
+                name=data.get('name','Uploaded File'),
+                path = os.path.basename(path),
+                rowtype=data.get('rowtype','unknown'),
+                coltype=data.get('coltype','unknown'),
+                value=dict(type=data.get('value_type','real')))
+    for k,v in data.iteritems():
+      if k not in desc:
+        desc[k] = v
+    if id is not None:
+      desc['id'] = id
+
+    if all((k in data) for k in ['size0','size1','value_min','value_max']):
+      desc['size'] = [int(data['size0']),int(data['size1'])]
+      del desc['size0']
+      del desc['size1']
+      desc['value']['range'] = [float(data['value_min']),float(data['value_max'])]
+      del desc['value_min']
+      del desc['value_max']
+    else: #derive from the data
+      rows = 0
+      cols = None
+      min_v = None
+      max_v = None
+      with open(path, 'r') as csvfile:
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii','ignore'), quotechar='|')
+        for row in reader:
+          if cols is None:
+            cols = len(row)-1
+          else:
+            rows+=1
+            min_act = min(map(float, row[1:]))
+            min_v = min_act if min_v is None else min(min_act, min_v)
+            max_act = max(map(float, row[1:]))
+            max_v = max_act if max_v is None else min(max_act, max_v)
+      desc['size'] = [rows, cols]
+      desc['value']['range'] = [float(data['value_min']) if 'value_min' in data else min_v, float(data['value_max']) if 'value_max' in data else max_v]
+
+    return CSVMatrix(desc, project)
+
 
 class CSVTable(CSVEntry):
   def __init__(self, desc, project):
@@ -205,6 +275,10 @@ class CSVTable(CSVEntry):
     r = dict(data=arr, rows=rows, rowids=rowids)
 
     return r
+
+  @staticmethod
+  def parse(data, path, id = None):
+    pass
 
 
 class CSVVector(CSVEntry):
@@ -250,10 +324,14 @@ class CSVVector(CSVEntry):
 
     return r
 
+  @staticmethod
+  def parse(data, path, project, id = None):
+    pass
+
 
 def to_files(plugins):
   for plugin in plugins:
-    index = os.path.join(plugin.folder+'/','data/index.json')
+    index = os.path.join(plugin.folder,'data/index.json')
     if not os.path.isfile(index):
       continue
     with open(index, 'r') as f:
@@ -269,9 +347,44 @@ def to_files(plugins):
           yield CSVStratification(di, plugin)
 
 
+class DataPlugin(object):
+  def __init__(self):
+    #add a magic plugin for the static data dir
+    from caleydo_server.config import view
+    cc = view('caleydo_server')
+    self.folder = cc.dataDir
+    self.id = 'data'
+
+  def save(self, f):
+    import werkzeug.utils
+    filename = werkzeug.utils.secure_filename(f.filename+'.csv')
+    dir_ = os.path.join(self.folder,'data')
+    if not os.path.exists(dir_):
+      os.makedirs(dir_)
+    path = os.path.join(dir_, filename)
+    f.save(path)
+    return path
+
+  def append(self, desc, path):
+    desc['path'] = os.path.basename(path)
+    index = os.path.join(self.folder,'data/index.json')
+    old = []
+    if os.path.isfile(index):
+      with open(index,'r') as f:
+        old = json.load(f)
+    old.append(desc)
+    with open(index,'w') as f:
+        json.dump(old, f, indent=1)
+
+
+dataPlugin = DataPlugin()
+
 class StaticFileProvider(ADataSetProvider):
   def __init__(self, plugins):
+
     self.files = list(to_files(plugins))
+
+    self.files.extend(to_files([dataPlugin]))
 
   def __len__(self):
     return len(self.files)
@@ -279,6 +392,22 @@ class StaticFileProvider(ADataSetProvider):
   def __iter__(self):
     return iter(self.files)
 
+  def upload(self, data, files, id=None):
+    if 'csv' != data.get('_provider', 'csv'):
+      return None #not the right provider
+    type = data.get('type','unknown')
+    parsers = dict(matrix=CSVMatrix.parse,table=CSVTable.parse,vector=CSVVector.parse,stratification=CSVStratification.parse)
+    if type not in parsers:
+      return None #unknown type
+    f = files[files.keys()[0]]
+    path = dataPlugin.save(f)
+    r = parsers[type](data, path, dataPlugin, id)
+    if r:
+      dataPlugin.append(r._desc, path)
+      self.files.append(r)
+    else:
+      os.remove(path) #delete file again
+    return r
 
 def create():
   """

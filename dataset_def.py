@@ -1,12 +1,12 @@
 __author__ = 'Samuel Gratzl'
 
 class ADataSetEntry(object):
-  def __init__(self, name, project, type):
+  def __init__(self, name, project, type, id = None):
     self.name = name
     self.fqname = project + '/'+ name
     self.type = type
     import caleydo_server.util
-    self.id = caleydo_server.util.fix_id(self.fqname)
+    self.id = id if id is not None else caleydo_server.util.fix_id(self.fqname)
 
   def idtypes(self):
     return []

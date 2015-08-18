@@ -56,7 +56,7 @@ def _list_datasets():
       flask.abort(flask.make_response('invalid format: "{0}" possible ones: {1}'.format(format,','.join(formats.keys())), 400))
     return formats[format](data)
   else:
-    _upload_dataset(flask.request)
+    return _upload_dataset(flask.request)
 
 def get(dataset_id):
   for p in _providers():
@@ -74,7 +74,7 @@ def _get_dataset(dataset_id):
       r = range.parse(r)
     return caleydo_server.util.jsonify(d.asjson(r))
   else:
-    _update_dataset(dataset_id, flask.request)
+    return _update_dataset(dataset_id, flask.request)
 
 def _dataset_getter(dataset_id, dataset_type):
   if isinstance(dataset_id, int) and dataset_id < 0:
