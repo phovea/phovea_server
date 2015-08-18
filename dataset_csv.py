@@ -227,7 +227,7 @@ class CSVMatrix(CSVEntry):
             min_act = min(map(float, row[1:]))
             min_v = min_act if min_v is None else min(min_act, min_v)
             max_act = max(map(float, row[1:]))
-            max_v = max_act if max_v is None else min(max_act, max_v)
+            max_v = max_act if max_v is None else max(max_act, max_v)
       desc['size'] = [rows, cols]
       desc['value']['range'] = [float(data['value_min']) if 'value_min' in data else min_v, float(data['value_max']) if 'value_max' in data else max_v]
 
@@ -357,10 +357,12 @@ class DataPlugin(object):
 
   def save(self, f):
     import werkzeug.utils
-    filename = werkzeug.utils.secure_filename(f.filename+'.csv')
+    import caleydo_server.util
     dir_ = os.path.join(self.folder,'data')
     if not os.path.exists(dir_):
       os.makedirs(dir_)
+    filename = os.path.basename(f.filename)
+    filename = werkzeug.utils.secure_filename(filename+caleydo_server.util.random_id(3)+'.csv')
     path = os.path.join(dir_, filename)
     f.save(path)
     return path

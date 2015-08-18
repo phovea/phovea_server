@@ -58,7 +58,15 @@ def fix_id(id):
   r = re.sub(r"""[!#$%&'\(\)\*\+,\./:;<=>\?@\[\\\]\^`\{\|}~_]+""", ' ', id)
   #title case all words
   r = r.title()
-  r = r[0].lo + r[1:]
+  r = r[0].lower() + r[1:]
   #remove white spaces
   r = re.sub(r'\s+', '', r, flags=re.UNICODE)
   return r
+
+def random_id(length):
+  import string, random
+  s=string.lowercase+string.digits
+  id = ''
+  for i in range(0,length):
+    id += random.choice(s)
+  return id
