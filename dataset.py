@@ -112,10 +112,16 @@ for handler in caleydo_server.plugin.list('dataset-specific-handler'):
   p = handler.load()
   p(app, _dataset_getter)
 
+def _to_upload_desc(data_dict):
+  if 'desc' in data_dict:
+    import json
+    return json.loads(data_dict['desc'])
+  return data_dict
+
 def _upload_dataset(request, id=None):
   #first choose the provider to handle the upload
   for p in _providers():
-    r = p.upload(request.values, request.files, id)
+    r = p.upload(_to_upload_desc(request.values), request.files, id)
     if r:
       return caleydo_server.util.jsonify(r.to_description(),indent=1)
   #invalid upload
@@ -127,7 +133,7 @@ def _update_dataset(dataset_id, request):
   if old is None:
     _upload_dataset(request, dataset_id)
     return
-  r = old.update(request.values, request.files)
+  r = old.update(_to_upload_desc(request.values), request.files)
   if r:
     return caleydo_server.util.jsonify(old.to_description(),indent=1)
   flask.abort(400)
