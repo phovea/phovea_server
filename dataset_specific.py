@@ -81,21 +81,21 @@ def _add_handler(app, dataset_getter, type):
     d = dataset_getter(dataset_id, type)
     return jsonify(d.to_description())
 
-  app.add_url_rule('/'+type+'/<int:dataset_id>','desc_'+type, desc_gen)
+  app.add_url_rule('/'+type+'/<dataset_id>','desc_'+type, desc_gen)
 
   def rows_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
     r = asrange(flask.request.args.get('range',None))
     return jsonify(d.rows(r[0] if r is not None else None))
 
-  app.add_url_rule('/'+type+'/<int:dataset_id>/rows','rows_'+type, rows_gen)
+  app.add_url_rule('/'+type+'/<dataset_id>/rows','rows_'+type, rows_gen)
 
   def rowids_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
     r = asrange(flask.request.args.get('range',None))
     return jsonify(d.rowids(r[0] if r is not None else None))
 
-  app.add_url_rule('/'+type+'/<int:dataset_id>/rowIds','rowids_'+type, rowids_gen)
+  app.add_url_rule('/'+type+'/<dataset_id>/rowIds','rowids_'+type, rowids_gen)
 
   def data_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
@@ -103,7 +103,7 @@ def _add_handler(app, dataset_getter, type):
     formatter = resolve_formatter(type, flask.request.args.get('format','json'))
     return formatter(d, r, args=flask.request.args)
 
-  app.add_url_rule('/'+type+'/<int:dataset_id>/data','data_'+type, data_gen)
+  app.add_url_rule('/'+type+'/<dataset_id>/data','data_'+type, data_gen)
 
 def add_table_handler(app, dataset_getter):
   _add_handler(app, dataset_getter, 'table')
@@ -125,14 +125,14 @@ def add_matrix_handler(app, dataset_getter):
     r = asrange(flask.request.args.get('range',None))
     return jsonify(d.cols(r[0] if r is not None else None))
 
-  app.add_url_rule('/matrix/<int:dataset_id>/cols','cols_matrix', cols_matrix)
+  app.add_url_rule('/matrix/<dataset_id>/cols','cols_matrix', cols_matrix)
 
   def colids_matrix(dataset_id):
     d = dataset_getter(dataset_id, 'matrix')
     r = asrange(flask.request.args.get('range',None))
     return jsonify(d.colids(r[0] if r is not None else None))
 
-  app.add_url_rule('/matrix/<int:dataset_id>/colIds','colids_matrix', colids_matrix)
+  app.add_url_rule('/matrix/<dataset_id>/colIds','colids_matrix', colids_matrix)
 
 
 
