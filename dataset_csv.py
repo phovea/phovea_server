@@ -2,6 +2,7 @@ import json
 import csv
 import os
 import numpy as np
+from caleydo_server.dataset_def import ADataSetEntry, ADataSetProvider
 
 
 def assign_ids(ids, idtype):
@@ -10,14 +11,16 @@ def assign_ids(ids, idtype):
   manager = caleydo_server.plugin.lookup('idmanager')
   return np.array(manager(ids, idtype))
 
+def fix_id(fqname):
+  import caleydo_server.util
+  return caleydo_server.util.fix_id(fqname)
 
-class CSVEntry(object):
+class CSVEntry(ADataSetEntry):
   def __init__(self, desc, project):
+    super(CSVEntry, self).__init__(desc['name'], project.id, desc['type'])
     self._desc = desc
-    self.name = desc['name']
-    self.type = desc['type']
-    self.fqname= project.id + '/' + self.name
     desc['fqname'] = self.fqname
+    desc['id'] = self.id
     self._path = os.path.join(project.folder+'/data/',self._desc['path'])
     del self._desc['path']
     self._project = project
@@ -50,12 +53,6 @@ class CSVEntry(object):
 
   def to_description(self):
     return self._desc
-
-  def to_idtype_descriptions(self):
-    def to_desc(t):
-      return dict(id=t, name=t, names=t + 's')
-
-    return map(to_desc, self.idtypes())
 
   def idtypes(self):
     return [v for k, v in self._desc.iteritems() if k in ['rowtype', 'coltype', 'idtype']]
@@ -272,7 +269,7 @@ def to_files(plugins):
           yield CSVStratification(di, plugin)
 
 
-class StaticFileProvider(object):
+class StaticFileProvider(ADataSetProvider):
   def __init__(self, plugins):
     self.files = list(to_files(plugins))
 

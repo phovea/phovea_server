@@ -46,3 +46,18 @@ def glob_recursivly(path, match):
   for dirpath, dirnames, files in os.walk(path):
     for f in fnmatch.filter(files, match):
       yield os.path.join(dirpath, f)
+
+def fix_id(id):
+  """
+  fixes the id such that is it a resource identifier
+  :param id:
+  :return:
+  """
+  import re
+  #convert strange characters to space
+  r = re.sub(r"""[!#$%&'\(\)\*\+,\.\/:;<=>\?@\[\\\]\^`\{\|}~]+""", ' ', id)
+  #title case all words
+  r = r.title()
+  #remove white spaces
+  r = r.sub(r'\s+', '', id, flags=re.UNICODE)
+  return r

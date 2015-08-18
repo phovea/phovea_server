@@ -2,6 +2,7 @@ import flask
 import caleydo_server.plugin
 import caleydo_server.range
 import caleydo_server.util
+import itertools
 
 app = flask.Flask(__name__)
 app_idtype = flask.Flask(__name__)
@@ -15,22 +16,11 @@ def _providers():
     _providers_r = [p.load().factory() for p in caleydo_server.plugin.list('dataset-provider')]
   return _providers_r
 
-_dataset_r = None
-def _datasets():
-  global _dataset_r
-  if _dataset_r is None: #lazy load the datasets
-    r = []
-    #check all dataset provider plugins
-    for p in _providers():
-      r.extend(p)
-    _dataset_r = r
-  return _dataset_r
-
-def __iter__():
-  return iter(_datasets())
+def iter():
+  return itertools.chain(*_providers())
 
 def list_datasets():
-  return _datasets()
+  return list(iter())
 
 def _list_format_json(data):
   return caleydo_server.util.jsonify(data)
@@ -56,33 +46,39 @@ def _list_format_csv(data):
       yield delimiter.join([str(d['id']), d['name'], d['fqname'], d['type'], ','.join(str(d) for d in d['size']), caleydo_server.util.to_json(d)])
   return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=dataset.csv'})
 
-@app.route('/')
+@app.route('/', methods=['GET','POST'])
 def _list_datasets():
-  ds = list_datasets()
-  def with_id(d, i):
-    d['id'] = i
-    return d
-  data = [with_id(d.to_description(),i) for i,d in enumerate(ds)]
-  format = flask.request.args.get('format','json')
-  formats = dict(json=_list_format_json,treejson=_list_format_treejson,csv=_list_format_csv)
-  if format not in formats:
-    flask.abort(flask.make_response('invalid format: "{0}" possible ones: {1}'.format(format,','.join(formats.keys())), 400))
-  return formats[format](data)
+  if flask.request.method == 'GET':
+    data = [d.to_description() for d in iter()]
+    format = flask.request.args.get('format','json')
+    formats = dict(json=_list_format_json,treejson=_list_format_treejson,csv=_list_format_csv)
+    if format not in formats:
+      flask.abort(flask.make_response('invalid format: "{0}" possible ones: {1}'.format(format,','.join(formats.keys())), 400))
+    return formats[format](data)
+  else:
+    _upload_dataset(flask.request)
 
 def get(dataset_id):
-  return  _datasets()[dataset_id]
+  for p in _providers():
+    r = p[dataset_id]
+    if r is not None:
+      return r
+  return None
 
-@app.route('/<int:dataset_id>')
+@app.route('/<dataset_id>', methods=['PUT','GET'])
 def _get_dataset(dataset_id):
-  d = get(dataset_id)
-  r = flask.request.args.get('range', None)
-  if r is not None:
-    r = range.parse(r)
-  return caleydo_server.util.jsonify(d.asjson(r))
+  if flask.request.method == 'GET':
+    d = get(dataset_id)
+    r = flask.request.args.get('range', None)
+    if r is not None:
+      r = range.parse(r)
+    return caleydo_server.util.jsonify(d.asjson(r))
+  else:
+    _update_dataset(dataset_id, flask.request)
 
 def _dataset_getter(dataset_id, dataset_type):
-  if dataset_id < 0:
-    return [d for d in _datasets() if d.type == dataset_type]
+  if isinstance(dataset_id, int) and dataset_id < 0:
+    return [d for d in list_datasets() if d.type == dataset_type]
   t = get(dataset_id)
   if t is None:
     flask.abort(404) #,extra='invalid dataset id "'+str(dataset_id)+'"')
@@ -95,13 +91,32 @@ for handler in caleydo_server.plugin.list('dataset-specific-handler'):
   p = handler.load()
   p(app, _dataset_getter)
 
+def _upload_dataset(request, id=None):
+  #first choose the provider to handle the upload
+  for p in _providers():
+    r = p.upload(request.values, request.files, id)
+    if r:
+      return caleydo_server.util.jsonify(r.to_description(),indent=1)
+  #invalid upload
+  flask.abort(400)
+
+
+def _update_dataset(dataset_id, request):
+  old = get(dataset_id)
+  if old is None:
+    _upload_dataset(request, dataset_id)
+    return
+  r = old.update(request.values, request.files)
+  if r:
+    return caleydo_server.util.jsonify(old.to_description(),indent=1)
+  flask.abort(400)
 
 def create_dataset():
   return app
 
 def list_idtypes():
   tmp = dict()
-  for d in _datasets():
+  for d in list_datasets():
     for idtype in d.to_idtype_descriptions():
       tmp[idtype['id']] = idtype
   return tmp.values()
