@@ -4,7 +4,6 @@
     "${dir}plugins/",
     "${dir}static/"
   ],
-  "disabledPlugins": [],
 
   "dataDir": "${dir}/_data",
   "use_reloader": false,
@@ -18,5 +17,10 @@
 
   "port": 9000,
   "address": "0.0.0.0",
-  "secret_key": "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w"
+  "secret_key": "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w",
+
+  "disable": {
+    "plugins": [],
+    "extensions": []
+  }
 }

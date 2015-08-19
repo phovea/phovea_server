@@ -9,6 +9,22 @@ import caleydo_server.config
 
 cc = caleydo_server.config.view('caleydo_server')
 
+def is_disabled_plugin(p):
+  def check(disable):
+    return isinstance(disable,basestring) and re.match(disable, p.id)
+  return any(map(check, cc.disable['plugins']))
+
+def is_disabled_extension(extension, extension_type, p):
+  if is_disabled_plugin(p):
+    return True
+  def check_elem(k,v):
+    vk = extension_type if k == 'type' else extension['k']
+    return re.match(v, vk)
+  def check(disable):
+    if isinstance(disable, basestring):
+      return re.match(disable, extension['id'])
+    return all(check_elem(k,v) for k,v in disable.iteritems())
+  return any(map(check, cc.disable['extensions']))
 
 def _resolve_client_config(config, vars):
   config = replace_variables(config, vars)
@@ -79,33 +95,39 @@ class PluginMetaData(object):
     }
     self._bower_configs = None
 
-  def _add_client_extension(self, plugins, plugin_desc):
-    if not isinstance(plugins, list):
-      plugins = [ plugins ]
+  def _add_client_extension(self, extensions, plugin):
+    if not isinstance(extensions, list):
+      extensions = [ extensions ]
     def fill(p):
-      p['folder'] = plugin_desc.folder_name
+      p['folder'] = plugin.folder_name
       if 'id' not in p:
-        p['id'] = plugin_desc.id
+        p['id'] = plugin.id
       if 'version' not in p:
-        p['version'] = plugin_desc.version
+        p['version'] = plugin.version
       if 'name' not in p:
-        p['name'] = plugin_desc.name
+        p['name'] = plugin.name
       return p
-    self.caleydo_client_plugins.extend(map(fill, plugins))
+    for p in extensions:
+      extension = fill(p)
+      if not is_disabled_extension(extension, 'web', plugin):
+        self.caleydo_client_plugins.append(extension)
 
-  def _add_server_extension(self, plugins, plugin_desc):
-    if not isinstance(plugins, list):
-      plugins = [ plugins ]
+  def _add_server_extension(self, extensions, plugin):
+    if not isinstance(extensions, list):
+      extensions = [ extensions ]
     def fill(p):
-      p['folder'] = plugin_desc.folder_name
+      p['folder'] = plugin.folder_name
       if 'id' not in p:
-        p['id'] = plugin_desc.id
+        p['id'] = plugin.id
       if 'version' not in p:
-        p['version'] = plugin_desc.version
+        p['version'] = plugin.version
       if 'name' not in p:
-        p['name'] = plugin_desc.name
+        p['name'] = plugin.name
       return p
-    self.caleydo_server_plugins.extend(map(fill, plugins))
+    for p in extensions:
+      extension = fill(p)
+      if not is_disabled_extension(extension, 'python', plugin):
+        self.caleydo_server_plugins.append(extension)
 
   def _add_requirejs_config(self, rconfig, d):
     _extend(self.requirejs_config, rconfig)
@@ -123,7 +145,7 @@ class PluginMetaData(object):
       metadata = json.load(f)
       p = Plugin(plugindir, d, metadata)
 
-      if p.id in cc.disabledPlugins:
+      if is_disabled_plugin(p):
         return
 
       self.plugins.append(p)
