@@ -17,9 +17,17 @@ def _providers():
   return _providers_r
 
 def iter():
+  """
+  an iterator of all known datasets
+  :return:
+  """
   return itertools.chain(*_providers())
 
 def list_datasets():
+  """
+  list all known datasets
+  :return:
+  """
   return list(iter())
 
 def _list_format_json(data):
@@ -75,22 +83,27 @@ def _list_datasets():
     return _upload_dataset(flask.request)
 
 def get(dataset_id):
+  """
+  :param dataset_id:
+  :return: returns the selected dataset identified by id
+  """
   for p in _providers():
     r = p[dataset_id]
     if r is not None:
       return r
   return None
 
-@app.route('/<dataset_id>', methods=['PUT','GET'])
+@app.route('/<dataset_id>', methods=['PUT','GET', 'DELETE'])
 def _get_dataset(dataset_id):
-  if flask.request.method == 'GET':
-    d = get(dataset_id)
-    r = flask.request.args.get('range', None)
-    if r is not None:
-      r = range.parse(r)
-    return caleydo_server.util.jsonify(d.asjson(r))
-  else:
+  if flask.request.method == 'PUT':
     return _update_dataset(dataset_id, flask.request)
+  elif flask.request.method == 'DELETE':
+    return _remove_dataset(dataset_id)
+  d = get(dataset_id)
+  r = flask.request.args.get('range', None)
+  if r is not None:
+    r = range.parse(r)
+  return caleydo_server.util.jsonify(d.asjson(r))
 
 @app.route('/<dataset_id>/desc')
 def _get_dataset_desc(dataset_id):
@@ -107,11 +120,6 @@ def _dataset_getter(dataset_id, dataset_type):
     flask.abort(400) #,extra='the given dataset "'+str(dataset_id)+'" is not a '+dataset_type)
   return t
 
-#add all specific handler
-for handler in caleydo_server.plugin.list('dataset-specific-handler'):
-  p = handler.load()
-  p(app, _dataset_getter)
-
 def _to_upload_desc(data_dict):
   if 'desc' in data_dict:
     import json
@@ -127,16 +135,65 @@ def _upload_dataset(request, id=None):
   #invalid upload
   flask.abort(400)
 
+def add(desc, files = [], id = None):
+  """
+  adds a new dataset to this storage
+  :param desc: the dict description information
+  :param files: a list of FileStorage
+  :param id: optional the unique id to use
+  :return: the newly created dataset or None if an error occurred
+  """
+  for p in _providers():
+    r = p.upload(desc, files, id)
+    if r:
+      return r
+  return None
+
+def update(dataset, desc, files = []):
+  """
+  updates the given dataset
+  :param dataset: a dataset or a dataset id
+  :param desc: the dict description information
+  :param files: a list of FileStorage
+  :return:
+  """
+  old = get(dataset) if isinstance(dataset,basestring) else dataset
+  if old is None:
+    return add(desc, files)
+  r = old.update(desc, files)
+  return r
 
 def _update_dataset(dataset_id, request):
   old = get(dataset_id)
   if old is None:
-    _upload_dataset(request, dataset_id)
-    return
+    return _upload_dataset(request, dataset_id)
   r = old.update(_to_upload_desc(request.values), request.files)
   if r:
     return caleydo_server.util.jsonify(old.to_description(),indent=1)
   flask.abort(400)
+
+def _remove_dataset(dataset_id):
+  old = get(dataset_id)
+  if old is None:
+    flask.abort(404) #not found
+  for p in _providers():
+    if p.remove(old):
+      return 'Successfully deleted '+dataset_id
+  flask.abort(400)
+
+def remove(dataset):
+  """
+  removes the given dataset
+  :param dataset: a dataset or a dataset id
+  :return: boolean whether the operation was successful
+  """
+  old = get(dataset) if isinstance(dataset,basestring) else dataset
+  if old is None:
+    return False
+  for p in _providers():
+    if p.remove(old):
+      return True
+  return False
 
 def create_dataset():
   return app
@@ -152,6 +209,10 @@ def list_idtypes():
 def _list_idtypes():
   return caleydo_server.util.jsonify(list_idtypes())
 
+#add all specific handler
+for handler in caleydo_server.plugin.list('dataset-specific-handler'):
+  p = handler.load()
+  p(app, _dataset_getter)
 
 def create_idtype():
   return app_idtype
