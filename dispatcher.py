@@ -1,26 +1,3 @@
-from threading import Lock
-from werkzeug.wsgi import pop_path_info, get_path_info
-
-import caleydo_server.config
-cc = caleydo_server.config.view('caleydo_server')
-import caleydo_server.security
-
-def add_no_cache_header(response):
-  #  response.headers['Last-Modified'] = datetime.now()
-  response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
-  response.headers['Pragma'] = 'no-cache'
-  response.headers['Expires'] = '-1'
-  return response
-
-
-def init_app(app):
-  if cc.debug and hasattr(app, 'debug'):
-    app.debug = True
-  if cc.nocache and hasattr(app, 'after_request'):
-    app.after_request(add_no_cache_header)
-  if cc.secret_key:
-    app.config['SECRET_KEY'] = cc.secret_key
-  caleydo_server.security.init_app(app)
 
 class ApplicationProxy(object):
   """
@@ -39,7 +16,6 @@ class ApplicationProxy(object):
     if self._impl is not None:
       return self._impl
     self._impl = self.loader()
-    init_app(self._impl)
     return self._impl
 
   def match(self, path):
@@ -51,11 +27,10 @@ class PathDispatcher(object):
   """
   def __init__(self, default_app, applications):
     self.default_app = default_app
-    init_app(default_app)
-    caleydo_server.security.add_login_routes(default_app)
 
     self.applications = [ ApplicationProxy(key,value) for key,value in applications.iteritems()]
     #print self.applications
+    from threading import Lock
     self.lock = Lock()
 
   def get_application(self, path):
@@ -65,6 +40,8 @@ class PathDispatcher(object):
           return app
 
   def __call__(self, environ, start_response):
+    from werkzeug.wsgi import pop_path_info, get_path_info
+
     app = self.get_application(get_path_info(environ))
     if app is not None:
       for i in range(app.peeks):
