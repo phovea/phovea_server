@@ -14,14 +14,14 @@
         {
           "type": "namespace",
           "id": "caleydo-dataset",
-          "file": "dataset",
+          "file": "dataset_api",
           "namespace": "/api/dataset",
           "factory": "create_dataset"
         },
         {
           "type": "namespace",
           "id": "caleydo-idtype",
-          "file": "dataset",
+          "file": "dataset_api",
           "namespace": "/api/idtype",
           "factory": "create_idtype"
         },

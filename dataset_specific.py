@@ -5,8 +5,6 @@ import range as ranges
 from caleydo_server.util import jsonify
 import caleydo_server.plugin
 
-
-
 def asrange(r):
   if r is None:
     return None

@@ -1,7 +1,6 @@
 __author__ = 'Samuel Gratzl'
 
 import json
-import flask
 import caleydo_server.plugin
 
 class JSONExtensibleEncoder(json.JSONEncoder):
@@ -37,6 +36,7 @@ def jsonify(obj, *args, **kwargs):
   :param kwargs:
   :return:
   """
+  import flask
   return flask.Response(to_json(obj, *args, **kwargs), mimetype='application/json')
 
 def glob_recursivly(path, match):
