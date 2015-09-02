@@ -86,6 +86,9 @@ class ADataSetProvider(object):
         return elem
     return None
 
+  def remove(self, entry):
+    return False
+
   def upload(self, data, files, id=None):
     """
     adds a new dataset to this provider
