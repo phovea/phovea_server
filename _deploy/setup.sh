@@ -63,6 +63,10 @@ function create_server_config {
   fi
 }
 
+function activate_virtualenv {
+  source venv/bin/activate
+}
+
 function create_virtualenv {
   echo "--- creating virtual environment ---"
   wd="`pwd`"
@@ -71,8 +75,8 @@ function create_virtualenv {
   else
     sudo pip install virtualenv
   fi
-  virtualenv venv
-  source venv/bin/activate
+  virtualenv --system-site-packages venv
+  activate_virtualenv
 }
 
 function deactivate_virtualenv {
@@ -86,12 +90,28 @@ function create_run_script {
 " > run.sh
 }
 
-install_apt_dependencies
-create_virtualenv
-install_pip_dependencies
-create_run_script
 
-name=${PWD##*/}
-create_server_config ${name}
+#command switch
+case "$1" in
+update)
+  install_apt_dependencies
+  activate_virtualenv
+  install_pip_dependencies
+  deactivate_virtualenv
+  ;;
+create_config)
+  name=${PWD##*/}
+  create_server_config ${name}
+  ;;
+*)
+  install_apt_dependencies
+  create_virtualenv
+  install_pip_dependencies
+  create_run_script
 
-deactivate_virtualenv
+  name=${PWD##*/}
+  create_server_config ${name}
+
+  deactivate_virtualenv
+  ;;
+esac
