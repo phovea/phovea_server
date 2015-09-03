@@ -120,6 +120,14 @@ function manage_server {
   sudo supervisorctl caleydo_web ${stop}
 }
 
+function run_custom_setup_scripts {
+  local cmd=${1:-setup}
+  for script in setup_*.sh ; do
+    echo "--- run setup script: ${script}"
+    ( exec ${script} ${cmd})
+  done
+}
+
 function setup {
   echo "setup"
   install_apt_dependencies
@@ -131,6 +139,8 @@ function setup {
   create_server_config ${name}
 
   deactivate_virtualenv
+
+  run_custom_setup_scripts setup
 }
 
 function update {
@@ -143,12 +153,16 @@ function update {
   install_pip_dependencies
   deactivate_virtualenv
 
+  run_custom_setup_scripts update
+
   manage_server start
 }
 
 function uninstall {
   echo "uninstall"
   manage_server stop
+
+  run_custom_setup_scripts uninstall
 
   name=${PWD##*/}
   remove_server_config ${name}
@@ -171,6 +185,9 @@ create_config)
   ;;
 uninstall)
   uninstall
+  ;;
+start|restart|stop)
+  manage_server $1
   ;;
 *)
   setup
