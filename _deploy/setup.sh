@@ -109,7 +109,7 @@ function remove_virtualenv {
 }
 
 function create_run_script {
-    echo "#!/usr/bin/env bash
+  echo "#!/usr/bin/env bash
 
 ./venv/bin/python plugins/caleydo_server --multithreaded
 " > run.sh
@@ -117,14 +117,15 @@ function create_run_script {
 
 function manage_server {
   local cmd=${1:-stop}
-  sudo supervisorctl caleydo_web ${stop}
+  sudo supervisorctl ${cmd} caleydo_web
 }
 
 function run_custom_setup_scripts {
   local cmd=${1:-setup}
   for script in setup_*.sh ; do
     echo "--- run setup script: ${script}"
-    ( exec ${script} ${cmd})
+    chmod +x ./${script}
+    ( exec ./${script} update)
   done
 }
 
