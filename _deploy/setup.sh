@@ -143,6 +143,11 @@ function setup {
   run_custom_setup_scripts setup
 }
 
+function pre_update {
+  echo "pre update"
+  rm -rf libs plugins scripts static setup_*.sh
+}
+
 function update {
   echo "update"
 
@@ -177,6 +182,9 @@ function create_config {
 
 #command switch
 case "$1" in
+pre_update)
+  pre_update
+  ;;
 update)
   update
   ;;
