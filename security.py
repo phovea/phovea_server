@@ -1,11 +1,19 @@
 __author__ = 'Samuel Gratzl'
 
 import caleydo_server.plugin as p
+import sys
 
 class User(object):
-  def __init__(self):
+  def __init__(self, id):
+    self.id = id
     self.name = 'anonymous'
     self.roles = ['anonymous']
+
+  def get_id(self):
+    try:
+        return unicode(self.id)  # python 2
+    except NameError:
+        return str(self.id)  # python 3
 
   def is_authenticated(self):
     return False
@@ -18,6 +26,28 @@ class User(object):
 
   def has_role(self, role):
     return role in self.roles
+
+  def __eq__(self, other):
+    '''
+    Checks the equality of two `UserMixin` objects using `get_id`.
+    '''
+    if isinstance(other, User):
+      return self.get_id() == other.get_id()
+    return NotImplemented
+
+  def __ne__(self, other):
+    '''
+    Checks the inequality of two `UserMixin` objects using `get_id`.
+    '''
+    equal = self.__eq__(other)
+    if equal is NotImplemented:
+      return NotImplemented
+    return not equal
+
+  if sys.version_info[0] != 2:  # pragma: no cover
+    # Python 3 implicitly set __hash__ to None if we override __eq__
+    # We set it back to its default implementation
+    __hash__ = object.__hash__
 
 class SecurityManager(object):
   """
