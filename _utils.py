@@ -16,6 +16,13 @@ def extend(target, w):
 
 
 def replace_variables_f(s, lookup):
+  if re.match(r'^\$\{([^}]+)\}$', s): #full string is a pattern
+    s = s[2:len(s)-1]
+    v = lookup(s)
+    if v is None:
+      print 'cant resolve ' + s
+      return '$unresolved$'
+    return v
   def match(m):
     v = lookup(m.group(1))
     if v is None:
