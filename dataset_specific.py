@@ -21,10 +21,9 @@ def format_csv(dataset, range, args):
   include_cols = bool(args.get('f_cols', False))
   delimiter = args.get('f_delimiter',';')
 
-  import StringIO, itertools
+  import itertools
 
   def gen():
-    f = StringIO.StringIO()
     if include_cols and dataset.type == 'matrix':
       cols = dataset.cols(range[1] if range is not None else None)
       header = delimiter.join(cols)
@@ -32,24 +31,28 @@ def format_csv(dataset, range, args):
       header = delimiter.join([d.name for d in dataset.columns])
     else:
       header = ''
-    d = dataset.asnumpy(range)
-    import numpy
-    numpy.savetxt(f, d, header=header, delimiter=delimiter)
-    if not include_rows:
-      yield f.getvalue()
-      return
 
-    #extend with the row ids
-    rows = dataset.rows(range[0] if range is not None else None)
-    yield dataset.idtype if dataset.type == 'table' else dataset.rowtype
-    yield delimiter
-    yield f.readline()
-    yield '\n'
-    for row, line in itertools.izip(rows, f):
-      yield row
+    d = dataset.asnumpy(range)
+
+    if include_rows:
+      rows = dataset.rows(range[0] if range is not None else None)
+      yield dataset.idtype if dataset.type == 'table' else dataset.rowtype
       yield delimiter
-      yield line
-      yield '\n'
+
+    yield header
+    yield '\n'
+
+    if include_rows:
+      #extend with the row ids
+      for row, line in itertools.izip(rows, d):
+        yield row
+        yield delimiter
+        yield delimiter.join(map(str, line))
+        yield '\n'
+    else:
+      for line in d:
+        yield delimiter.join(map(str, line))
+        yield '\n'
 
   return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename='+dataset.name+'.csv'})
 
