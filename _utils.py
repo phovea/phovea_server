@@ -44,7 +44,7 @@ def replace_nested_variables(obj, lookup):
   return obj
 
 def unpack_eval(s):
-  return re.sub(r'eval!(.*)', '\1', s)
+  return re.sub(r'"eval!(.*)"', r'\1', s)
 
 def unpack_python_eval(s):
   m = re.search(r'eval!(.*)', s)
