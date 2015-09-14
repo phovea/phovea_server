@@ -52,6 +52,15 @@ class ADataSetEntry(object):
     """
     return False
 
+  def modify(self, args, files):
+    """
+    modifies this dataset with the given arguments
+    :param args: data dict
+    :param files: list of FileStorage files
+    :return: boolean whether the operation was successful
+    """
+    return False
+
   def remove(self):
     """
     removes itself

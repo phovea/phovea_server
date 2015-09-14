@@ -66,10 +66,12 @@ def _list_datasets():
   else:
     return _upload_dataset(flask.request)
 
-@app.route('/<dataset_id>', methods=['PUT','GET', 'DELETE'])
+@app.route('/<dataset_id>', methods=['PUT','GET', 'DELETE', 'POST'])
 def _get_dataset(dataset_id):
   if flask.request.method == 'PUT':
     return _update_dataset(dataset_id, flask.request)
+  elif flask.request.method == 'POST':
+    return _modify_dataset(dataset_id, flask.request)
   elif flask.request.method == 'DELETE':
     return _remove_dataset(dataset_id)
   d = get(dataset_id)
@@ -112,6 +114,15 @@ def _update_dataset(dataset_id, request):
   if old is None:
     return _upload_dataset(request, dataset_id)
   r = old.update(_to_upload_desc(request.values), request.files)
+  if r:
+    return caleydo_server.util.jsonify(old.to_description(),indent=1)
+  flask.abort(400)
+
+def _mofidy_dataset(dataset_id, request):
+  old = get(dataset_id)
+  if old is None:
+    flask.abort(400)
+  r = old.modify(_to_upload_desc(request.values), request.files)
   if r:
     return caleydo_server.util.jsonify(old.to_description(),indent=1)
   flask.abort(400)
