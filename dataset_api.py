@@ -118,7 +118,7 @@ def _update_dataset(dataset_id, request):
     return caleydo_server.util.jsonify(old.to_description(),indent=1)
   flask.abort(400)
 
-def _mofidy_dataset(dataset_id, request):
+def _modify_dataset(dataset_id, request):
   old = get(dataset_id)
   if old is None:
     flask.abort(400)
