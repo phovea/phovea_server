@@ -133,7 +133,7 @@ def _remove_dataset(dataset_id):
     flask.abort(404) #not found
   r = remove(dataset_id)
   if r:
-    return 'Successfully deleted '+dataset_id
+    return caleydo_server.util.jsonify(dict(state='success',msg='Successfully deleted dataset '+dataset_id,id=dataset_id),indent=1)
   flask.abort(400)
 
 def create_dataset():
