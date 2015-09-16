@@ -15,12 +15,15 @@ class User(object):
     except NameError:
         return str(self.id)  # python 3
 
+  @property
   def is_authenticated(self):
     return False
 
+  @property
   def is_active(self):
     return False
 
+  @property
   def is_anonymous(self):
     return self.name == 'anonymous'
 
@@ -81,8 +84,7 @@ class SecurityManager(object):
   def is_authenticated(self):
     """whether the current user is authenticated
     """
-    v = self.current_user.is_authenticated
-    return v if isinstance(v, bool) else v()
+    return self.current_user.is_authenticated
 
   def has_role(self, role):
     """whether the current use has the role
