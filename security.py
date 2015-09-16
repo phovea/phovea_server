@@ -63,7 +63,7 @@ class SecurityManager(object):
     """logs the given user in
     :returns the logged in user object or None if login failed
     """
-    return User()
+    return User('')
 
   def logout(self):
     """
@@ -76,12 +76,13 @@ class SecurityManager(object):
     """
     :returns the current logged in user
     """
-    return User()
+    return User('')
 
   def is_authenticated(self):
     """whether the current user is authenticated
     """
-    return self.current_user.is_authenticated()
+    v = self.current_user.is_authenticated
+    return v if isinstance(v, bool) else v()
 
   def has_role(self, role):
     """whether the current use has the role
