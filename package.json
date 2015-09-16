@@ -123,13 +123,13 @@
     },
     "dependencies": {
       "python": {
-        "Flask": ">=0.10.1",
-        "flask-restplus": ">=0.4.0",
-        "Flask-Sockets": ">=0.1",
-        "gevent": ">=1.0.2",
-        "gevent-websocket": ">=0.9.5",
+        "Flask": "==0.10.1",
+        "flask-restplus": "==0.7.2",
+        "Flask-Sockets": "==0.1",
+        "gevent": "==1.0.2",
+        "gevent-websocket": "==0.9.5",
         "numpy": ">=1.8.2",
-        "json-cfg": ">=0.3.4"
+        "json-cfg": "==0.3.4"
       },
       "debian": {
         "python-numpy": "",
