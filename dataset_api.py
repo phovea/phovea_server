@@ -75,6 +75,8 @@ def _get_dataset(dataset_id):
   elif flask.request.method == 'DELETE':
     return _remove_dataset(dataset_id)
   d = get(dataset_id)
+  if d is None:
+    flask.abort(404)
   r = flask.request.args.get('range', None)
   if r is not None:
     r = range.parse(r)
