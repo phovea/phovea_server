@@ -125,7 +125,7 @@ function run_custom_setup_scripts {
   for script in setup_*.sh ; do
     echo "--- run setup script: ${script}"
     chmod +x ./${script}
-    ( exec ./${script} update)
+    ( exec ./${script} ${cmd})
   done
 }
 
