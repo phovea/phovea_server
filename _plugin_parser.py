@@ -209,11 +209,8 @@ class PluginMetaData(object):
     #inject caleydo registry information
     c['config'][ccw.configPrefix + 'caleydo_core/main'] = {
       'apiUrl': ccw.apiPrefix,
-      'apiJSONSuffix': ccw.apiSuffix
-    }
-    c['config'][ccw.configPrefix + 'caleydo_core/plugin'] = {
-      'baseUrl': base_url,
-      'plugins': self.caleydo_client_plugins
+      'apiJSONSuffix': ccw.apiSuffix,
+      'registry': dict(baseUrl=base_url, extensions=self.caleydo_client_plugins)
     }
 
     #inject bower dependencies
