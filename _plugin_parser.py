@@ -62,8 +62,8 @@ class PluginMetaData(object):
       data = json.load(f)
 
     self.plugins = filter(lambda x: not is_disabled_plugin(x), map(Plugin, data['plugins']))
-    by_folder= { p.folder : p for p in self.plugins }
-    self.caleydo_server_plugins = filter(lambda x : not is_disabled_extension(x, 'python', by_folder[x.folder]), data['extensions']['python'])
+    by_folder= { p.folder_name : p for p in self.plugins }
+    self.caleydo_server_plugins = filter(lambda x : x['folder'] in by_folder and not is_disabled_extension(x, 'python', by_folder[x['folder']]), data['extensions']['python'])
 
   @property
   def server_extensions(self):

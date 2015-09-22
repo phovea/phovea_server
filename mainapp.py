@@ -23,6 +23,10 @@ def is_on_black_list(path):
   #print 'check',path,black_list.match(path) is not None
   return black_list.match(path) is not None
 
+@app.route('/')
+def index():
+  return deliver('index.html')
+
 @app.route('/<path:path>')
 def deliver(path):
   print path
