@@ -2,6 +2,7 @@
   "dir": "./",
   "pluginDirs": [
     "${dir}plugins/",
+    "${dir}_tmp/",
     "${dir}static/"
   ],
 
@@ -11,9 +12,6 @@
 
   "debug": true,
   "nocache": true,
-
-  "bower_components": "libs/bower_components",
-  "metadata_file": "/package.json",
 
   "port": 9000,
   "address": "0.0.0.0",
