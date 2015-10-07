@@ -6,7 +6,7 @@ from caleydo_server.util import jsonify
 import caleydo_server.plugin
 
 def asrange(r):
-  if r is None:
+  if r is None or r == '':
     return None
   return ranges.parse(r)
 
@@ -22,6 +22,15 @@ def format_csv(dataset, range, args):
   delimiter = args.get('f_delimiter',';')
 
   import itertools
+  import numpy as np
+  import numpy.ma as ma
+
+  def to_str(v):
+    if isinstance(v, basestring):
+      return v
+    if np.isnan(v) or ma.is_masked(v):
+      return ''
+    return str(v)
 
   def gen():
     if include_cols and dataset.type == 'matrix':
@@ -47,11 +56,11 @@ def format_csv(dataset, range, args):
       for row, line in itertools.izip(rows, d):
         yield row
         yield delimiter
-        yield delimiter.join(map(str, line))
+        yield delimiter.join(map(to_str, line))
         yield '\n'
     else:
       for line in d:
-        yield delimiter.join(map(str, line))
+        yield delimiter.join(map(to_str, line))
         yield '\n'
 
   return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename='+dataset.name+'.csv'})
@@ -65,7 +74,27 @@ def format_image(dataset, range, args):
   #TODO set a palette to specify colors instead of gray scales
   #how to interpolate / sample colors - which space?
   minmax = dataset.range
-  img = scipy.misc.toimage(dataset.asnumpy(range), cmin=minmax[0], cmax=minmax[1])
+  cmin = float(args.get('format_min',minmax[0]))
+  cmax = float(args.get('format_max',minmax[1]))
+  img = scipy.misc.toimage(dataset.asnumpy(range), cmin=cmin, cmax=cmax)
+
+  if 'format_w' in args:
+    width = int(args.get('format_w'))
+    wpercent = (width/float(img.size[0]))
+    height = int(args.get('format_h', (float(img.size[1])*float(wpercent))))
+    import PIL
+    img = img.resize((width, height), PIL.Image.NEAREST)
+  elif 'format_h' in args:
+    height = int(args.get('format_h'))
+    hpercent = (height/float(img.size[1]))
+    width = int(float(img.size[0])*float(hpercent))
+    import PIL
+    img = img.resize((width, height), PIL.Image.NEAREST)
+
+  if args.get('format_transpose', False):
+    import PIL
+    img = img.transpose(PIL.Image.ROTATE_90)
+
   b = io.BytesIO()
   img.save(b, format=format)
   b.seek(0)
@@ -94,9 +123,17 @@ def _add_handler(app, dataset_getter, type):
   def rowids_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
     r = asrange(flask.request.args.get('range',None))
-    return jsonify(d.rowids(r[0] if r is not None else None))
+    ids = d.rowids(r[0] if r is not None else None)
+    return jsonify(str(ranges.from_list(list(ids))))
 
   app.add_url_rule('/'+type+'/<dataset_id>/rowIds','rowids_'+type, rowids_gen)
+
+  def raw_gen(dataset_id):
+    d = dataset_getter(dataset_id, type)
+    r = asrange(flask.request.args.get('range',None))
+    return jsonify(d.asnumpy(r))
+
+  app.add_url_rule('/'+type+'/<dataset_id>/raw','raw_'+type, raw_gen)
 
   def data_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
@@ -111,6 +148,17 @@ def add_table_handler(app, dataset_getter):
 
 def add_vector_handler(app, dataset_getter):
   _add_handler(app, dataset_getter, 'vector')
+
+  def hist_vector(dataset_id):
+    d = dataset_getter(dataset_id, 'vector')
+    r = asrange(flask.request.args.get('range',None))
+    data = d.asnumpy(r)
+    import numpy as np
+    hist, bin_edges = np.histogram(data, bins=int(flask.request.args.get('bins',np.sqrt(len(data)))), range=d.range)
+    return jsonify(hist)
+
+  app.add_url_rule('/vector/<dataset_id>/hist','hist_vector', hist_vector)
+
 
 def add_matrix_handler(app, dataset_getter):
   """
@@ -131,9 +179,20 @@ def add_matrix_handler(app, dataset_getter):
   def colids_matrix(dataset_id):
     d = dataset_getter(dataset_id, 'matrix')
     r = asrange(flask.request.args.get('range',None))
-    return jsonify(d.colids(r[0] if r is not None else None))
+    ids = d.colids(r[0] if r is not None else None)
+    return jsonify(str(ranges.from_list(list(ids))))
 
   app.add_url_rule('/matrix/<dataset_id>/colIds','colids_matrix', colids_matrix)
+
+  def hist_matrix(dataset_id):
+    d = dataset_getter(dataset_id, 'matrix')
+    r = asrange(flask.request.args.get('range',None))
+    data = d.asnumpy(r)
+    import numpy as np
+    hist, bin_edges = np.histogram(data, bins=int(flask.request.args.get('bins',np.sqrt(len(data)))), range=d.range)
+    return jsonify(hist)
+
+  app.add_url_rule('/matrix/<dataset_id>/hist','hist_matrix', hist_matrix)
 
 
 

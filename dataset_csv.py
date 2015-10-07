@@ -57,11 +57,22 @@ class CSVEntry(ADataSetEntry):
   def idtypes(self):
     return [v for k, v in self._desc.iteritems() if k in ['rowtype', 'coltype', 'idtype']]
 
+def guess_color(name, i):
+  name = name.lower()
+  colors = dict(name='blue',female='red',deceased='#e41a1b',living='#377eb8')
+  if name in colors:
+    return colors[name]
+  l = ['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd',
+          '#ccebc5', '#ffed6f']
+  return l[i%len(l)]
 
 class CSVStratification(CSVEntry):
   def __init__(self, desc, project):
     super(CSVStratification, self).__init__(desc, project)
     self.idtype = desc['idtype']
+    for i,g in enumerate(desc['groups']):
+      if 'color' not in g:
+        g['color'] = guess_color(g['name'], i)
 
   def _process(self, data):
     d = [dict(row=row[0], i=i, cluster=row[1]) for i, row in enumerate(data[1:])]
@@ -78,7 +89,9 @@ class CSVStratification(CSVEntry):
         clusters[c].append(di['i'])
       else:
         clusters[c] = [di['i']]
-    clusters = [dict(name=k, range=v) for k, v in clusters.iteritems()]
+
+    colors= { g['name']: g['color'] for g in self._desc['groups'] }
+    clusters = [dict(name=k, range=v, color=colors.get(k,'gray')) for k, v in clusters.iteritems()]
 
     rows = np.array([d[0] for d in data[1:]])
     return {
