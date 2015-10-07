@@ -13,7 +13,7 @@ function sedeasy {
 }
 
 function install_apt_dependencies {
-  if [ -f debian.txt ] ; then
+  if [ -f debian.txt ] && [ which apt-get >/dev/null ]; then
     echo "--- installing apt dependencies ---"
     cd /tmp #switch to tmp directory
     set -vx #to turn echoing on and
@@ -21,6 +21,17 @@ function install_apt_dependencies {
     set +vx #to turn them both off
     cd ${basedir}
     rm debian.txt
+  fi
+}
+function install_yum_dependencies {
+  if [ -f redhat.txt ] && [ which yum >/dev/null ]; then
+    echo "--- installing yum dependencies ---"
+    cd /tmp #switch to tmp directory
+    set -vx #to turn echoing on and
+    sudo yum install -y supervisor python-pip python-devel zlib-devel `cat ${basedir}/redhat.txt`
+    set +vx #to turn them both off
+    cd ${basedir}
+    rm redhat.txt
   fi
 }
 function install_pip_dependencies {
@@ -155,6 +166,7 @@ function update {
   manage_server stop
 
   install_apt_dependencies
+  install_yum_dependencies<
   activate_virtualenv
   install_pip_dependencies
   deactivate_virtualenv

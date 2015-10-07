@@ -8,6 +8,13 @@ from .dataset import *
 app = flask.Flask(__name__)
 app_idtype = flask.Flask(__name__)
 
+@app.errorhandler(ValueError)
+def on_value_error(error):
+  print 'ValueError: ('+str(error.message)+') at '+str(flask.request.environ)
+  import traceback
+  print traceback.format_exc()
+  return '<strong>{2} - {0}</strong><pre>{1}</pre>'.format('ValueError', error.message, 500), 500
+
 def _list_format_json(data):
   return caleydo_server.util.jsonify(data)
 
@@ -76,7 +83,7 @@ def _get_dataset(dataset_id):
     return _remove_dataset(dataset_id)
   d = get(dataset_id)
   if d is None:
-    flask.abort(404)
+    return 'invalid dataset id "'+str(dataset_id)+'"', 404
   r = flask.request.args.get('range', None)
   if r is not None:
     r = range.parse(r)
@@ -92,9 +99,9 @@ def _dataset_getter(dataset_id, dataset_type):
     return [d for d in list_datasets() if d.type == dataset_type]
   t = get(dataset_id)
   if t is None:
-    flask.abort(404) #,extra='invalid dataset id "'+str(dataset_id)+'"')
+    return 'invalid dataset id "'+str(dataset_id)+'"', 404
   if t.type != dataset_type:
-    flask.abort(400) #,extra='the given dataset "'+str(dataset_id)+'" is not a '+dataset_type)
+    return 'the given dataset "'+str(dataset_id)+'" is not a '+dataset_type, 400
   return t
 
 def _to_upload_desc(data_dict):
@@ -104,39 +111,50 @@ def _to_upload_desc(data_dict):
   return data_dict
 
 def _upload_dataset(request, id=None):
-  #first choose the provider to handle the upload
-  r = add(_to_upload_desc(request.values), request.files, id)
-  if r:
-    return caleydo_server.util.jsonify(r.to_description(),indent=1)
-  #invalid upload
-  flask.abort(400)
+  try:
+    #first choose the provider to handle the upload
+    r = add(_to_upload_desc(request.values), request.files, id)
+    if r:
+      return caleydo_server.util.jsonify(r.to_description(),indent=1)
+    #invalid upload
+    return 'invalid upload', 400
+  except ValueError, e:
+    return on_value_error(e)
 
 def _update_dataset(dataset_id, request):
-  old = get(dataset_id)
-  if old is None:
-    return _upload_dataset(request, dataset_id)
-  r = old.update(_to_upload_desc(request.values), request.files)
-  if r:
-    return caleydo_server.util.jsonify(old.to_description(),indent=1)
-  flask.abort(400)
+  try:
+    old = get(dataset_id)
+    if old is None:
+      return _upload_dataset(request, dataset_id)
+    r = old.update(_to_upload_desc(request.values), request.files)
+    if r:
+      return caleydo_server.util.jsonify(old.to_description(),indent=1)
+    #invalid upload
+    return 'invalid upload', 400
+  except ValueError, e:
+    return on_value_error(e)
 
 def _modify_dataset(dataset_id, request):
-  old = get(dataset_id)
-  if old is None:
-    flask.abort(400)
-  r = old.modify(_to_upload_desc(request.values), request.files)
-  if r:
-    return caleydo_server.util.jsonify(old.to_description(),indent=1)
-  flask.abort(400)
+  try:
+    old = get(dataset_id)
+    if old is None:
+      return 'invalid dataset id "'+str(dataset_id)+'"', 404
+    r = old.modify(_to_upload_desc(request.values), request.files)
+    if r:
+      return caleydo_server.util.jsonify(old.to_description(),indent=1)
+      #invalid upload
+    return 'invalid upload', 400
+  except ValueError, e:
+    return on_value_error(e)
 
 def _remove_dataset(dataset_id):
   dataset = get(dataset_id)
   if dataset is None:
-    flask.abort(404) #not found
+    return 'invalid dataset id "'+str(dataset_id)+'"', 404
   r = remove(dataset_id)
   if r:
     return caleydo_server.util.jsonify(dict(state='success',msg='Successfully deleted dataset '+dataset_id,id=dataset_id),indent=1)
-  flask.abort(400)
+  return 'invalid request', 400
 
 def create_dataset():
   return app
