@@ -123,7 +123,7 @@ class RangeElem(object):
     return self.iter()
 
   def iter(self, size=0):
-    return itertools.islice(fix(self.start, size), fix(self.end, size), self.step)
+    return iter(xrange(fix(self.start, size), fix(self.end, size), self.step))
 
   def contains(self, value, size=0):
     f = fix(self.start, size)
@@ -199,14 +199,14 @@ class Range1D(object):
     act = 1
 
     while act < l:
-      while deltas[start] == deltas[act - 1] and act < l:  # while the same delta
+      while act < l and deltas[start] == deltas[act - 1]:  # while the same delta
         act += 1
       if act == start + 1:  # just a single item used
         r.append(RangeElem.single(indices[start]))
       else:
         # +1 since end is excluded
         #fix while just +1 -1 allowed
-        if abs(deltas[1]) == 1:
+        if abs(deltas[start]) == 1:
           r.append(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]))
         else:
           for i in xrange(start, act):
@@ -404,7 +404,7 @@ class Range1D(object):
     if self._islist:
       return (d.start for d in self._elems)
     else:
-      return itertools.chain((iter(d, size) for d in self._elems))
+      return itertools.chain(*[d.iter(size) for d in self._elems])
 
   def __iter__(self):
     return self.iter()
@@ -658,7 +658,7 @@ def none():
 def __call__(*args):
   return range(*args)
 
-def slice(start, end = -1, step = 1):
+def from_slice(start, end = -1, step = 1):
   r = Range()
   r[0].set_slice(start, end, step)
   return r
@@ -724,13 +724,13 @@ def parse_range(code):
       act, dim = parse_named_range1d(code, act)
       act += 1 # skip ,
       dims.append(dim)
-    elif ',':
+    elif c == ',':
       act+=1
       dims.append(Range1D.all())
     else:
-      t = parse_range1d(code, act)
-      act = t.act + 1 #skip ,
-      dims.append(t.dim)
+      ract, dim = parse_range1d(code, act)
+      act = ract + 1 #skip ,
+      dims.append(dim)
   return Range(dims)
 
 def parse_named_range1d(code, act):
@@ -742,7 +742,7 @@ def parse_named_range1d(code, act):
   if c == '"':
     end = code.index('"', act +1)
     ract, dim = parse_range1d(code, end +1)
-    return ract, Range1DGroup(name, code.slice(act+1, end), dim)
+    return ract, Range1DGroup(name, code[act+1:end], dim)
   elif c == '{':
     groups = []
     while code[act] != '}':
@@ -754,6 +754,8 @@ def parse_named_range1d(code, act):
     return act, Range1D.all()
 
 def parse_range1d(code, act):
+  if act >= len(code):
+    return act, Range1D.all()
   c = code[act]
   if c == ',' or c == '{':
     n = act
@@ -761,14 +763,15 @@ def parse_range1d(code, act):
   elif c == '(':
     n = code.index(')', act)
     r = Range1D([RangeElem.parse(ni) for ni in code[act+1: n].split(',')])
+    n+=1
   else:
-    n = code.index(',', act)
+    n = code.find(',', act)
     if n < 0:
-      n = code.index('{', act)
+      n = code.find('{', act)
     if n < 0:
       n = len(code)
     r = Range1D([ RangeElem.parse(code[act:n+1])])
-  return act, r
+  return n, r
 
 def parse(*args):
   if len(args) == 0:
