@@ -1,0 +1,28 @@
+__author__ = 'Samuel Gratzl'
+
+class MemoryIDAssigner(object):
+  def __init__(self):
+    self._idsmapping = {}
+
+  def __call__(self, ids, idtype):
+    """
+     return the integer index ids for the given ids in the given idtype
+    """
+    if idtype not in self._idsmapping:
+      self._idsmapping[idtype] = { id: i for i,id in enumerate(ids) }
+      #1 to 1 mapping
+      return range(len(ids))
+
+    cache = self._idsmapping[idtype]
+    def add(id) :
+      i = cache.get(id, -1)
+      if i < 0: #not yet part of
+        i = len(cache)
+        cache[id] = i
+      return i
+    return [ add(id) for id in ids]
+
+_assigner = MemoryIDAssigner()
+
+def create():
+  return _assigner
