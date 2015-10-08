@@ -26,6 +26,11 @@ def to_json(obj, *args, **kwargs):
   :param kwargs:
   :return:
   """
+  #try:
+  #  doesnt work since we can't convert numpy arrays
+  #  import ujson
+  #  return ujson.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
+  #except ImportError:
   return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
 
 def jsonify(obj, *args, **kwargs):
