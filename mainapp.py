@@ -29,7 +29,7 @@ def index():
 
 @app.route('/<path:path>')
 def deliver(path):
-  print path
+  #print path
   if path.endswith('/'):
     path += 'index.html'
   if is_on_black_list(path):
@@ -40,7 +40,7 @@ def deliver(path):
     dpath = flask.safe_join(d, path)
     if os.path.exists(dpath):
       # send_static_file will guess the correct MIME type
-      print 'sending',dpath
+      #print 'sending',dpath
       return flask.send_from_directory(d, path)
   return 'This page does not exist', 404
 
