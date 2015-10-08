@@ -770,7 +770,7 @@ def parse_range1d(code, act):
       n = code.find('{', act)
     if n < 0:
       n = len(code)
-    r = Range1D([ RangeElem.parse(code[act:n+1])])
+    r = Range1D([ RangeElem.parse(code[act:n])])
   return n, r
 
 def parse(*args):
