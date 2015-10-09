@@ -65,6 +65,17 @@ def format_csv(dataset, range, args):
 
   return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename='+dataset.name+'.csv'})
 
+def _color_palette(arg):
+  if arg is None:
+    return None
+  if arg == 'blue_white_red':
+    from .colors import blue_white_red
+    return blue_white_red.as_palette()
+  elif arg == 'white_red':
+    from .colors import white_red
+    return white_red.as_palette()
+  return None
+
 def format_image(dataset, range, args):
   format = args.get('format','png')
 
@@ -76,7 +87,7 @@ def format_image(dataset, range, args):
   minmax = dataset.range
   cmin = float(args.get('format_min',minmax[0]))
   cmax = float(args.get('format_max',minmax[1]))
-  img = scipy.misc.toimage(dataset.asnumpy(range), cmin=cmin, cmax=cmax)
+  img = scipy.misc.toimage(dataset.asnumpy(range), cmin=cmin, cmax=cmax, pal = _color_palette(args.get('format_palette', None)))
 
   if 'format_w' in args:
     width = int(args.get('format_w'))
