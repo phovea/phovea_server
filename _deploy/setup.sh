@@ -166,7 +166,7 @@ function update {
   manage_server stop
 
   install_apt_dependencies
-  install_yum_dependencies<
+  install_yum_dependencies
   activate_virtualenv
   install_pip_dependencies
   deactivate_virtualenv
