@@ -19,7 +19,7 @@ class ApplicationProxy(object):
     return self._impl
 
   def match(self, path):
-    return path.startswith(self.namespace)
+    return path.startswith(self.namespace+'/')
 
 class PathDispatcher(object):
   """
