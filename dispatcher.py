@@ -19,7 +19,8 @@ class ApplicationProxy(object):
     return self._impl
 
   def match(self, path):
-    return path.startswith(self.namespace+'/')
+    #start of a suburl or the whole one
+    return path.startswith(self.namespace+'/') or path == self.namespace
 
 class PathDispatcher(object):
   """
