@@ -156,12 +156,21 @@ class CSVMatrix(CSVEntry):
   def _process(self, data):
     cols = np.array(data[0][1:])
     rows = np.array(map(lambda x: x[0], data[1:]))
+    is_number = self.value == 'real' or self.value == 'int'
+
+    if is_number:
+      vs = map(lambda x: [np.NaN if v == 'NA' or v == '' else v for v in x[1:]], data[1:])
+      #import numpy.ma as ma
+      #dd = ma.masked_equal(np.array(vs), np.NaN)
+      dd = np.array(vs)
+    else:
+      dd = np.array(map(lambda x: x[1:], data[1:]))
     return {
       'cols': cols,
       'colIds': assign_ids(cols, self.coltype),
       'rows': rows,
       'rowIds': assign_ids(rows, self.rowtype),
-      'data': np.array(map(lambda x: x[1:], data[1:]))
+      'data': dd
     }
 
   def rows(self, range=None):

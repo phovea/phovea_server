@@ -13,8 +13,8 @@ def asrange(r):
 def format_json(dataset, range, args):
   d = dataset.asjson(range)
   if bool(args.get('f_pretty_print', False)):
-    return jsonify(d, indent=' ')
-  return jsonify(d)
+    return jsonify(d, indent=' ', allow_nan=False)
+  return jsonify(d, allow_nan=False)
 
 def format_csv(dataset, range, args):
   include_rows = bool(args.get('f_rows', False))
@@ -142,7 +142,7 @@ def _add_handler(app, dataset_getter, type):
   def raw_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
     r = asrange(flask.request.args.get('range',None))
-    return jsonify(d.asnumpy(r))
+    return jsonify(d.asnumpy(r), allow_nan=False)
 
   app.add_url_rule('/'+type+'/<dataset_id>/raw','raw_'+type, raw_gen)
 
