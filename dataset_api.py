@@ -163,6 +163,23 @@ def create_dataset():
 def _list_idtypes():
   return caleydo_server.util.jsonify(list_idtypes())
 
+@app_idtype.route('/<idtype>/map')
+def _map_ids(idtype):
+  name = flask.request.args.get('id',None)
+  if name is not None:
+    return get_idmanager([name])[0]
+  names = flask.request.args.getlist('ids[]',[])
+  return caleydo_server.util.jsonify(get_idmanager(names))
+
+@app_idtype.route('/<idtype>/unmap')
+def _unmap_ids(idtype):
+  name = flask.request.args.get('id',None)
+  if name is not None:
+    return get_idmanager.unmap([name])[0]
+  names = flask.request.args.getlist('ids[]',[])
+  return caleydo_server.util.jsonify(get_idmanager.unmap(names))
+
+
 #add all specific handler
 for handler in caleydo_server.plugin.list('dataset-specific-handler'):
   p = handler.load()

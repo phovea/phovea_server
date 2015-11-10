@@ -4,6 +4,17 @@ class MemoryIDAssigner(object):
   def __init__(self):
     self._idsmapping = {}
 
+  def unmap(self, uids, idtype):
+    if idtype not in self._idsmapping:
+      return [None] * len(uids)
+    cache = self._idsmapping[idtype]
+    def lookup(id):
+      for k,v in cache.iteritems():
+        if v == id:
+          return v
+      return None
+    return map(lookup, uids)
+
   def __call__(self, ids, idtype):
     """
      return the integer index ids for the given ids in the given idtype

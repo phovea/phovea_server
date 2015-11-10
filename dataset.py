@@ -85,3 +85,6 @@ def list_idtypes():
     for idtype in d.to_idtype_descriptions():
       tmp[idtype['id']] = idtype
   return tmp.values()
+
+def get_idmanager():
+  return caleydo_server.plugin.lookup('idmanager')
