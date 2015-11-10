@@ -42,7 +42,9 @@ class CSVEntry(ADataSetEntry):
       except ValueError:
         return s
 
-    data = [[to_num(i) for i in row] for row in data]
+    header = data[0]
+    data = [[to_num(v) if i > 0 else v for i,v in enumerate(row)] for row in data[1:]]
+    data.insert(0, header)
 
     # convert to col, row and data
     self._loaded = self._process(data)
