@@ -167,17 +167,17 @@ def _list_idtypes():
 def _map_ids(idtype):
   name = flask.request.args.get('id',None)
   if name is not None:
-    return get_idmanager([name])[0]
-  names = flask.request.args.getlist('ids[]',[])
-  return caleydo_server.util.jsonify(get_idmanager(names))
+    return get_idmanager([name], idtype)[0]
+  names = flask.request.args.getlist('ids[]')
+  return caleydo_server.util.jsonify(get_idmanager(names, idtype))
 
 @app_idtype.route('/<idtype>/unmap')
 def _unmap_ids(idtype):
   name = flask.request.args.get('id',None)
   if name is not None:
-    return get_idmanager.unmap([name])[0]
-  names = flask.request.args.getlist('ids[]',[])
-  return caleydo_server.util.jsonify(get_idmanager.unmap(names))
+    return get_idmanager().unmap([int(name)], idtype)[0]
+  names = map(int, flask.request.args.getlist('ids[]'))
+  return caleydo_server.util.jsonify(get_idmanager().unmap(names, idtype))
 
 
 #add all specific handler

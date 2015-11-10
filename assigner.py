@@ -11,7 +11,7 @@ class MemoryIDAssigner(object):
     def lookup(id):
       for k,v in cache.iteritems():
         if v == id:
-          return v
+          return k
       return None
     return map(lookup, uids)
 
