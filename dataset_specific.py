@@ -93,18 +93,18 @@ def format_image(dataset, range, args):
     width = int(args.get('format_w'))
     wpercent = (width/float(img.size[0]))
     height = int(args.get('format_h', (float(img.size[1])*float(wpercent))))
-    import PIL
-    img = img.resize((width, height), PIL.Image.NEAREST)
+    from PIL.Image import NEAREST
+    img = img.resize((width, height), NEAREST)
   elif 'format_h' in args:
     height = int(args.get('format_h'))
     hpercent = (height/float(img.size[1]))
     width = int(float(img.size[0])*float(hpercent))
-    import PIL
-    img = img.resize((width, height), PIL.Image.NEAREST)
+    from PIL.Image import NEAREST
+    img = img.resize((width, height), NEAREST)
 
   if args.get('format_transpose', False):
-    import PIL
-    img = img.transpose(PIL.Image.ROTATE_90)
+    from PIL.Image import ROTATE_90
+    img = img.transpose(ROTATE_90)
 
   b = io.BytesIO()
   img.save(b, format=format)

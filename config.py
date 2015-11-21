@@ -58,6 +58,9 @@ class CaleydoConfigSection(object):
   def __getattr__(self, item):
     return self.get(item)
 
+  def __getitem__(self, item):
+    return self.get(item)
+
   def _expand(self, section=None):
     if self._section is None:
       return section
