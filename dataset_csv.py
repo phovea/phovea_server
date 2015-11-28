@@ -203,7 +203,17 @@ class CSVMatrix(CSVEntry):
     n = self.load()['data']
     if range is None:
       return n
-    return n[range[0].asslice(), range[1].asslice()]
+
+    rows = range[0].asslice()
+    cols = range[1].asslice()
+    d = None
+    if isinstance(rows, list) and isinstance(cols, list):
+      #fancy indexing in two dimension doesn't work
+      d_help = n[rows,:]
+      d = d_help[:,cols]
+    else:
+      d = n[rows, cols]
+    return d
 
   def asjson(self, range=None):
     arr = self.asnumpy(range)
