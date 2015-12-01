@@ -219,6 +219,9 @@ class CSVMatrix(CSVEntry):
       d = d_help[:,cols]
     else:
       d = n[rows, cols]
+
+    if d.ndim == 1:
+      d = d.reshape((1,d.shape[0]))
     return d
 
   def asjson(self, range=None):

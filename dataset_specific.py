@@ -87,7 +87,10 @@ def format_image(dataset, range, args):
   minmax = dataset.range
   cmin = float(args.get('format_min',minmax[0]))
   cmax = float(args.get('format_max',minmax[1]))
-  img = scipy.misc.toimage(dataset.asnumpy(range), cmin=cmin, cmax=cmax, pal = _color_palette(args.get('format_palette', None)))
+  d = dataset.asnumpy(range)
+  if d.ndim == 1:
+    d = d.reshape((1,d.shape[0]))
+  img = scipy.misc.toimage(d, cmin=cmin, cmax=cmax, pal = _color_palette(args.get('format_palette', None)))
 
   if 'format_w' in args:
     width = int(args.get('format_w'))
