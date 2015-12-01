@@ -383,7 +383,7 @@ class Range1D(object):
     else:
       arr = args
     return [base.index(index) for index in arr]
-  
+
   def index_range_of(self, r, size = 0):
     if r.isnone or self.isnone:
       return Range1D.none()
@@ -446,7 +446,7 @@ class Range1DGroup(Range1D):
     super(Range1DGroup, self).__init__(base)
     self.name = name
     self.color = color
-    
+
   def pre_multiply(self, sub, size = 0):
     r = super(Range1DGroup, self).pre_multiply(sub, size)
     return Range1DGroup(self.name, self.color, r)
@@ -766,8 +766,12 @@ def parse_range1d(code, act):
     n+=1
   else:
     n = code.find(',', act)
-    if n < 0:
-      n = code.find('{', act)
+    n2 = code.find('}', act)
+    if n >= 0 and n2 >= 0:
+      n = min(n, n2)
+    elif n < 0:
+      n = n2
+
     if n < 0:
       n = len(code)
     r = Range1D([ RangeElem.parse(code[act:n])])
