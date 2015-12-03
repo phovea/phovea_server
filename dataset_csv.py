@@ -68,6 +68,11 @@ def guess_color(name, i):
           '#ccebc5', '#ffed6f']
   return l[i%len(l)]
 
+def cmpString(a, b):
+  if a == b:
+    return 0
+  return -1 if a < b else +1
+
 class CSVStratification(CSVEntry):
   def __init__(self, desc, project):
     super(CSVStratification, self).__init__(desc, project)
@@ -80,14 +85,10 @@ class CSVStratification(CSVEntry):
     d = [dict(row=row[0], i=i, cluster=row[1]) for i, row in enumerate(data[1:])]
 
     def cmp(a, b):
-      r = int(a['cluster'] - b['cluster'])
+      r = cmpString(a['cluster'],b['cluster'])
       if r != 0:
         return r
-      ra = a['row']
-      rb = b['row']
-      if ra == rb:
-        return 0
-      return -1 if ra < rb else +1
+      return cmpString(a['row'],b['row']) if r == 0 else r
 
     d.sort(cmp)  # sort by cluster;
     clusters = dict()
