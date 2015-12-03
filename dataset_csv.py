@@ -222,7 +222,11 @@ class CSVMatrix(CSVEntry):
       d = n[rows, cols]
 
     if d.ndim == 1:
-      d = d.reshape((1,d.shape[0]))
+      #two options one row and n columns or the other way around
+      if rows is Ellipsis or (isinstance(rows, list) and len(rows) > 1):
+        d = d.reshape((d.shape[0],1))
+      else:
+        d = d.reshape((1,d.shape[0]))
     return d
 
   def asjson(self, range=None):
