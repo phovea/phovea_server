@@ -1,5 +1,10 @@
 __author__ = 'Samuel Gratzl'
 
+def to_plural(s):
+  if s[len(s)-1] == 'y':
+    return s[0:len(s)-1] + 'ies'
+  return s+'s'
+
 class ADataSetEntry(object):
   """
   A basic dataset entry
@@ -39,7 +44,7 @@ class ADataSetEntry(object):
     :return:
     """
     def to_desc(t):
-      return dict(id=t, name=t, names=t + 's')
+      return dict(id=t, name=t, names=to_plural(t))
 
     return map(to_desc, self.idtypes())
 
