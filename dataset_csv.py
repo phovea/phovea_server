@@ -84,7 +84,14 @@ class CSVStratification(CSVEntry):
   def _process(self, data):
     d = [dict(row=row[0], i=i, cluster=row[1]) for i, row in enumerate(data[1:])]
 
+    groups = [g['name'] for g in self._desc['groups']]
+
     def cmp(a, b):
+      ga = groups.index(a['cluster'])
+      gb = groups.index(b['cluster'])
+      if ga != gb:
+        return ga - gb
+
       r = cmpString(a['cluster'],b['cluster'])
       if r != 0:
         return r
@@ -100,7 +107,7 @@ class CSVStratification(CSVEntry):
         clusters[c] = [di['i']]
 
     colors= { g['name']: g['color'] for g in self._desc['groups'] }
-    clusters = [dict(name=k, range=v, color=colors.get(k,'gray')) for k, v in clusters.iteritems()]
+    clusters = [dict(name=k, range=clusters.get(k,[]), color=colors.get(k,'gray')) for k in groups]
 
     rows = np.array([d[0] for d in data[1:]])
     return {
