@@ -33,6 +33,8 @@ class MemoryIDAssigner(object):
       return i
     return [ add(id) for id in ids]
 
+def ascii(s):
+  return s.encode('ascii','ignore')
 
 class DBIDAssigner(object):
   def __init__(self):
@@ -42,19 +44,21 @@ class DBIDAssigner(object):
 
   @staticmethod
   def to_forward_key(idtype, identifier):
-    return idtype + '2id.' + str(identifier)
+    return ascii(idtype + '2id.' + str(identifier))
 
   @staticmethod
   def to_backward_key(idtype, id):
-    return 'id2' + idtype + '.' + str(id)
+    return ascii('id2' + idtype + '.' + str(id))
 
   def unmap(self, uids, idtype):
+    idtype = ascii(idtype)
     def lookup(id):
       key = self.to_backward_key(idtype, id)
       return self._db.get(key, None)
     return map(lookup, uids)
 
   def __call__(self, ids, idtype):
+    idtype = ascii(idtype)
     """
      return the integer index ids for the given ids in the given idtype
     """
@@ -65,7 +69,7 @@ class DBIDAssigner(object):
       if i < 0: #not yet part of
         i = int(self._db.get(idtype,'-1'))+1
         self._db[key] = str(i)
-        self._db[self.to_backward_key(idtype, i)] = str(id)
+        self._db[self.to_backward_key(idtype, i)] = str(id).encode('ascii','ignore')
         self._db[idtype] = str(i)
       return i
     return map(add, ids)
