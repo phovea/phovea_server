@@ -1,6 +1,9 @@
 __author__ = 'Samuel Gratzl'
 
 class MemoryIDAssigner(object):
+  """
+  assigns ids to object in memory only, i.e. not persisted
+  """
   def __init__(self):
     self._idsmapping = {}
 
@@ -37,6 +40,9 @@ def ascii(s):
   return s.encode('ascii','ignore')
 
 class DBIDAssigner(object):
+  """
+  assigns ids to object using a dbm database
+  """
   def __init__(self):
     import anydbm
     import caleydo_server.config
@@ -58,23 +64,92 @@ class DBIDAssigner(object):
     return map(lookup, uids)
 
   def __call__(self, ids, idtype):
-    idtype = ascii(idtype)
     """
      return the integer index ids for the given ids in the given idtype
     """
-
-    def add(id) :
+    idtype = ascii(idtype)
+    max_old = -1 if idtype not in self._db else int(self._db[idtype])
+    r = []
+    for id in ids:
       key = self.to_forward_key(idtype, id)
-      i = int(self._db.get(key, '-1'))
-      if i < 0: #not yet part of
-        i = int(self._db.get(idtype,'-1'))+1
+      if key in self._db:
+        r.append(int(self._db[key]))
+      else:
+        i = max_old + 1
+        print 'create ',key,i
+        max_old += 1
         self._db[key] = str(i)
         self._db[self.to_backward_key(idtype, i)] = str(id).encode('ascii','ignore')
-        self._db[idtype] = str(i)
-      return i
-    return map(add, ids)
+        r.append(i)
 
-_assigner = DBIDAssigner()
+    self._db[idtype] = str(max_old)
+    return r
+
+
+class SqliteIDAssigner(object):
+  """
+  assigns ids to object using a sqlite database
+  """
+  def __init__(self):
+    import sqlite3
+    import caleydo_server.config
+    self._db = sqlite3.connect(caleydo_server.config.get('caleydo_server.dataDir')+'/mapping.sqlite3')
+    self._db.execute('create table if not exists mapping(idtype text, name text, id int, primary key(idtype,name), unique (idtype,id))')
+    self._cache = {}
+
+  def unmap(self, uids, idtype):
+    existing = self.get_cache(idtype)
+    def lookup(id):
+      for k,v in existing.iteritems():
+        if v == id:
+          return k
+      return None
+    return map(lookup, uids)
+
+  def get_cache(self, idtype):
+    existing = self._cache.get(idtype, None)
+
+    #lazy load
+    if existing is None:
+      existing = dict()
+      self._cache[idtype] = existing
+      for row in self._db.execute('select name, id from mapping where idtype=?', (idtype,)):
+        existing[row[0]] = row[1]
+
+    return existing
+
+  def __call__(self, ids, idtype):
+    """
+     return the integer index ids for the given ids in the given idtype
+    """
+    existing = self.get_cache(idtype)
+
+    missing = []
+    r = []
+    max_v = len(existing) -1
+
+    for id in ids:
+      id = str(id)
+      if id in existing:
+        i = existing[id]
+      else:
+        max_v += 1
+        i = max_v
+        missing.append((id, i))
+        existing[id] = i
+      r.append(i)
+
+    if len(missing) > 0:
+      print idtype,len(missing)
+      self._db.executemany('insert or ignore into mapping values ("'+idtype+'",?,?)', missing)
+      self._db.commit()
+
+    return r
+
+#TODO implement a Redis based id assigner
+#TODO implement a real id mappper
+
+_assigner = SqliteIDAssigner()
 
 def create():
   return _assigner
