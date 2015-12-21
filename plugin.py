@@ -103,9 +103,31 @@ class Registry(object):
     self._extensions = [ExtensionDesc(p) for p in extensions]
     self._extensions.append(PreLoadedExtensionDesc(dict(type='manager',id='registry'), self))
 
+    self._singletons = None
+
+  @property
+  def singletons(self):
+    if self._singletons is not None:
+      return self._singletons
+
     def loader(e):
       return lambda: e.load().factory()
-    self._singletons = { e.id : loader(e) for e in self._extensions if e.type == 'manager'}
+
+    import collections
+
+    #select singleton impl with lowest priority default 100
+    mm = collections.defaultdict(lambda: [])
+    for e in self._extensions:
+      if e.type == 'manager':
+        mm[e.id].append(e)
+    def select(v):
+      v = sorted(v,cmp = lambda a,b: getattr(a,'priority',100)-getattr(b,'priority',100))
+      print v[0].id, getattr(v[0],'module','server')
+      return loader(v[0])
+    self._singletons = { k: select(v) for k,v in mm.iteritems() }
+
+    return self._singletons
+
 
   def __len__(self):
     return len(self._extensions)
@@ -126,8 +148,8 @@ class Registry(object):
     return filter(plugin_type, self)
 
   def lookup(self, singleton_id):
-    if singleton_id in self._singletons:
-      return self._singletons[singleton_id]()
+    if singleton_id in self.singletons:
+      return self.singletons[singleton_id]()
     return None
 
 def list(plugin_type = None):
