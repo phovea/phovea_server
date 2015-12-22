@@ -327,7 +327,7 @@ class CSVTable(CSVEntry):
     arr = self.asnumpy(range)
     rows = self.rows(None if range is None else range[0])
     rowids = self.rowids(None if range is None else range[0])
-    r = dict(data=arr, rows=rows, rowids=rowids)
+    r = dict(data=arr, rows=rows, rowIds=rowids)
 
     return r
 
