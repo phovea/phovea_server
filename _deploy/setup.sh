@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#allow empty matching glob
+shopt -s nullglob
 
 #search for the right parent directory such that we have a common start directory
 while [[ ! -f "run.sh" ]] && [[ ! -f "Vagrantfile" ]]
