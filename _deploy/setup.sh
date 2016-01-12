@@ -17,23 +17,25 @@ function install_apt_dependencies {
     echo "--- installing apt dependencies ---"
     cd /tmp #switch to tmp directory
     set -vx #to turn echoing on and
-    sudo apt-get install -y supervisor python-pip python-dev zlib1g-dev `cat ${basedir}/debian.txt`
+    sudo apt-get install -y python-pip python-dev zlib1g-dev `cat ${basedir}/debian.txt`
     set +vx #to turn them both off
     cd ${basedir}
     rm debian.txt
   fi
 }
+
 function install_yum_dependencies {
   if [ -f redhat.txt ] && [ -x "$(command -v yum)" ]; then
     echo "--- installing yum dependencies ---"
     cd /tmp #switch to tmp directory
     set -vx #to turn echoing on and
-    sudo yum install -y supervisor python-pip python-devel zlib-devel `cat ${basedir}/redhat.txt`
+    sudo yum install -y python-pip python-devel zlib-devel `cat ${basedir}/redhat.txt`
     set +vx #to turn them both off
     cd ${basedir}
     rm redhat.txt
   fi
 }
+
 function install_pip_dependencies {
   if [ -f requirements.txt ] ; then
     echo "--- installing pip dependencies ---"
@@ -57,6 +59,30 @@ function create_server_config {
   sedeasy caleydo_app ${name} gunicorn_start.sh
   chmod +x gunicorn_start.sh
 
+  #create the nginx config and enable the site
+  if [ -d /etc/nginx ] ; then
+    #gunicorn in socket file mode
+    sedeasy "#BIND=unix" "BIND=unix" gunicorn_start.sh
+
+    cp nginx.in.conf nginx.conf
+    sedeasy /var/www/caleydo_app ${basedir} nginx.conf
+    sedeasy caleydo_app ${name} nginx.conf
+    sudo ln -s ${basedir}/nginx.conf /etc/nginx/sites-available/${name}
+    sudo ln -s ${basedir}/nginx.conf /etc/nginx/sites-enabled/${name}
+    sudo service nginx restart
+  fi
+}
+
+function register_as_service {
+  local name=$1
+  #install supervisor
+  if [ -x "$(command -v apt-get)" ]; then
+    sudo apt-get install -y supervisor
+  fi
+
+  if [ -x "$(command -v yum)" ]; then
+    sudo yum install -y supervisor
+  fi
 
   cp supervisor.in.conf supervisor.conf
   sedeasy /var/www/caleydo_app ${basedir} supervisor.conf
@@ -67,25 +93,10 @@ function create_server_config {
   #reread the list of elements
   sudo supervisorctl reread
   sudo supervisorctl update
-
-  #create the nginx config and enable the site
-  if [ -d /etc/nginx ] ; then
-    cp nginx.in.conf nginx.conf
-    sedeasy /var/www/caleydo_app ${basedir} nginx.conf
-    sedeasy caleydo_app ${name} nginx.conf
-    sudo ln -s ${basedir}/nginx.conf /etc/nginx/sites-available/${name}
-    sudo ln -s ${basedir}/nginx.conf /etc/nginx/sites-enabled/${name}
-    sudo service nginx restart
-  fi
 }
 
 function remove_server_config {
   local name=$1
-  sudo rm /etc/supervisor/conf.d/${name}.conf
-  #reread the list of elements
-  sudo supervisorctl reread
-  sudo supervisorctl update
-
   #remove the nginx config and disable the site
   if [ -d /etc/nginx ] ; then
     sudo service nginx stop
@@ -93,6 +104,14 @@ function remove_server_config {
     sudo rm /etc/nginx/sites-enabled/${name}
     sudo service nginx start
   fi
+}
+
+function unregister_from_service {
+  local name=$1
+  sudo rm /etc/supervisor/conf.d/${name}.conf
+  #reread the list of elements
+  sudo supervisorctl reread
+  sudo supervisorctl update
 }
 
 function activate_virtualenv {
@@ -149,6 +168,23 @@ function setup {
 
   name=${PWD##*/}
   create_server_config ${name}
+  register_as_service ${name}
+
+  deactivate_virtualenv
+
+  run_custom_setup_scripts setup
+}
+
+function setup_docker {
+  echo "setup_docker"
+  install_apt_dependencies
+  create_virtualenv
+  install_pip_dependencies
+  create_run_script
+
+  name=${PWD##*/}
+  create_server_config ${name}
+  #register_as_service ${name}
 
   deactivate_virtualenv
 
@@ -184,6 +220,7 @@ function uninstall {
 
   name=${PWD##*/}
   remove_server_config ${name}
+  unregister_from_service ${name}
 
   remove_virtualenv
 }
@@ -195,6 +232,9 @@ function create_config {
 
 #command switch
 case "$1" in
+docker)
+  setup_docker
+  ;;
 pre_update)
   pre_update
   ;;
