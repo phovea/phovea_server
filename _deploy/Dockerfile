@@ -1,5 +1,5 @@
 FROM ubuntu:trusty
-MAINTAINER Samuel Gratzl (samuel-gratzl@gmx.at)
+MAINTAINER Samuel Gratzl <samuel-gratzl@gmx.at>
 
 RUN apt-get update
 
