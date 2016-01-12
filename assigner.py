@@ -46,7 +46,11 @@ class DBIDAssigner(object):
   def __init__(self):
     import anydbm
     import caleydo_server.config
-    self._db = anydbm.open(caleydo_server.config.get('caleydo_server.dataDir')+'/mapping.dbm','c')
+    import os
+    base_dir = caleydo_server.config.get('caleydo_server.dataDir')
+    if not os.path.exists(base_dir):
+      os.makedirs(base_dir)
+    self._db = anydbm.open(base_dir+'/mapping.dbm','c')
 
   @staticmethod
   def to_forward_key(idtype, identifier):
@@ -93,7 +97,11 @@ class SqliteIDAssigner(object):
   def __init__(self):
     import sqlite3
     import caleydo_server.config
-    self._db = sqlite3.connect(caleydo_server.config.get('caleydo_server.dataDir')+'/mapping.sqlite3')
+    import os
+    base_dir = caleydo_server.config.get('caleydo_server.dataDir')
+    if not os.path.exists(base_dir):
+      os.makedirs(base_dir)
+    self._db = sqlite3.connect(base_dir+'/mapping.sqlite3')
     self._db.execute('create table if not exists mapping(idtype text, name text, id int, primary key(idtype,name), unique (idtype,id))')
     self._cache = {}
 
