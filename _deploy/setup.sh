@@ -156,7 +156,7 @@ function run_custom_setup_scripts {
   local cmd=${1:-setup}
   for script in setup_*.sh ; do
     echo "--- run setup script: ${script}"
-    chmod +x ./${script}
+    #chmod +x ./${script}
     ( exec ./${script} ${cmd})
   done
 }
