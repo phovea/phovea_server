@@ -19,7 +19,7 @@ function install_apt_dependencies {
     echo "--- installing apt dependencies ---"
     cd /tmp #switch to tmp directory
     set -vx #to turn echoing on and
-    sudo apt-get install -y python-pip python-dev zlib1g-dev `cat ${basedir}/debian.txt`
+    sudo apt-get install -y python-pip python-dev zlib1g-dev wget `cat ${basedir}/debian.txt`
     set +vx #to turn them both off
     cd ${basedir}
     rm debian.txt
@@ -31,7 +31,7 @@ function install_yum_dependencies {
     echo "--- installing yum dependencies ---"
     cd /tmp #switch to tmp directory
     set -vx #to turn echoing on and
-    sudo yum install -y python-pip python-devel zlib-devel `cat ${basedir}/redhat.txt`
+    sudo yum install -y python-pip python-devel zlib-devel wget `cat ${basedir}/redhat.txt`
     set +vx #to turn them both off
     cd ${basedir}
     rm redhat.txt
