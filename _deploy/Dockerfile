@@ -9,4 +9,4 @@ RUN chmod +x setup.sh
 RUN ./setup.sh docker
 
 EXPOSE 9000
-CMD ["./gunicorn_start.sh"]
+CMD ["./start_caleydo.sh"]
