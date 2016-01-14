@@ -9,6 +9,7 @@ COPY ./run.sh /var/www/caleydo_web/
 WORKDIR /var/www/caleydo_web/
 RUN chmod +x setup.sh
 RUN ./setup.sh docker common
+COPY ./gunicorn_start.in.sh /var/www/caleydo_web/
 RUN ./setup.sh docker config
 
 COPY . /var/www/caleydo_web/
