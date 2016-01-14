@@ -14,15 +14,37 @@ function sedeasy {
   sed -i "s/$(echo $1 | sed -e 's/\([[\/.*]\|\]\)/\\&/g')/$(echo $2 | sed -e 's/[\/&]/\\&/g')/g" $3
 }
 
+function install_common_apt_dependencies {
+  if [ -x "$(command -v apt-get)" ]; then
+    echo "--- installing common apt dependencies ---"
+    cd /tmp #switch to tmp directory
+    set -vx #to turn echoing on and
+    sudo apt-get install -y python-pip python-dev zlib1g-dev wget
+    set +vx #to turn them both off
+    cd ${basedir}
+  fi
+}
+
 function install_apt_dependencies {
   if [ -f debian.txt ] && [ -x "$(command -v apt-get)" ]; then
     echo "--- installing apt dependencies ---"
     cd /tmp #switch to tmp directory
     set -vx #to turn echoing on and
-    sudo apt-get install -y python-pip python-dev zlib1g-dev wget `cat ${basedir}/debian.txt`
+    sudo apt-get install -y `cat ${basedir}/debian.txt`
     set +vx #to turn them both off
     cd ${basedir}
     rm debian.txt
+  fi
+}
+
+function install_common_yum_dependencies {
+  if [ -x "$(command -v yum)" ]; then
+    echo "--- installing common yum dependencies ---"
+    cd /tmp #switch to tmp directory
+    set -vx #to turn echoing on and
+    sudo yum install -y python-pip python-devel zlib-devel wget
+    set +vx #to turn them both off
+    cd ${basedir}
   fi
 }
 
@@ -163,7 +185,11 @@ function run_custom_setup_scripts {
 
 function setup {
   echo "setup"
+  install_common_apt_dependencies
   install_apt_dependencies
+  install_common_yum_dependencies
+  install_yum_dependencies
+
   create_virtualenv
   install_pip_dependencies
   create_run_script
@@ -178,19 +204,52 @@ function setup {
 }
 
 function setup_docker {
-  echo "setup_docker"
-  install_apt_dependencies
-  create_virtualenv
-  install_pip_dependencies
-  create_run_script
+  #more fine granular for docker layers
+  local cmd=${1:-all}
+  case "$1" in
+  common)
+    install_common_apt_dependencies
+    create_run_script
+    create_virtualenv
+    ;;
+  config)
+    name=${PWD##*/}
+    activate_virtualenv
+    create_server_config ${name}
+    #register_as_service ${name}
+    ;;
+  apt)
+    install_apt_dependencies
+    ;;
+  pip)
+    activate_virtualenv
+    install_pip_dependencies
+    deactivate_virtualenv
+    ;;
+  custom)
+    run_custom_setup_scripts setup
+    ;;
+  *)
+    echo "setup_docker"
+    install_common_apt_dependencies
+    install_apt_dependencies
 
-  name=${PWD##*/}
-  create_server_config ${name}
-  #register_as_service ${name}
+    create_run_script
 
-  deactivate_virtualenv
+    create_virtualenv
 
-  run_custom_setup_scripts setup
+    name=${PWD##*/}
+    create_server_config ${name}
+    #register_as_service ${name}
+
+    install_pip_dependencies
+
+    deactivate_virtualenv
+
+    run_custom_setup_scripts setup
+    ;;
+  esac
+
 }
 
 function pre_update {
@@ -203,8 +262,11 @@ function update {
 
   manage_server stop
 
+  install_common_apt_dependencies
   install_apt_dependencies
+  install_common_yum_dependencies
   install_yum_dependencies
+
   activate_virtualenv
   install_pip_dependencies
   deactivate_virtualenv
@@ -235,19 +297,24 @@ function create_config {
 #command switch
 case "$1" in
 docker)
-  setup_docker
+  shift
+  setup_docker $@
   ;;
 pre_update)
-  pre_update
+  shift
+  pre_update $@
   ;;
 update)
-  update
+  shift
+  update $@
   ;;
 create_config)
-  create_config
+  cshift
+  reate_config $@
   ;;
 uninstall)
-  uninstall
+  shift
+  uninstall $@
   ;;
 start|restart|stop)
   manage_server $1
