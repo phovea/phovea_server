@@ -19,7 +19,7 @@ function install_common_apt_dependencies {
     echo "--- installing common apt dependencies ---"
     cd /tmp #switch to tmp directory
     set -vx #to turn echoing on and
-    sudo apt-get install -y python-pip python-dev zlib1g-dev wget
+    sudo apt-get install -y python-pip python-dev zlib1g-dev python-numpy python-scipy python-matplotlib wget
     set +vx #to turn them both off
     cd ${basedir}
   fi
@@ -42,7 +42,7 @@ function install_common_yum_dependencies {
     echo "--- installing common yum dependencies ---"
     cd /tmp #switch to tmp directory
     set -vx #to turn echoing on and
-    sudo yum install -y python-pip python-devel zlib-devel wget
+    sudo yum install -y python-pip python-devel zlib-devel numpy scipy python-matplotlib wget
     set +vx #to turn them both off
     cd ${basedir}
   fi
