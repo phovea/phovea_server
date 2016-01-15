@@ -47,6 +47,9 @@ def _init_app(app, is_default_app = False):
   if cc.secret_key:
     app.config['SECRET_KEY'] = cc.secret_key
 
+  if cc.max_file_size:
+    app.config['MAX_CONTENT_LENGTH'] = cc.max_file_size
+
   import caleydo_server.security
   caleydo_server.security.init_app(app)
   if is_default_app:
