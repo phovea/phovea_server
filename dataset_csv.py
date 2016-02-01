@@ -82,9 +82,13 @@ class CSVStratification(CSVEntry):
         g['color'] = guess_color(g['name'], i)
 
   def _process(self, data):
-    d = [dict(row=row[0], i=i, cluster=row[1]) for i, row in enumerate(data[1:])]
+    def to_string(v):
+      if type(v) is float:
+        return str(int(v))
+      return str(v)
+    d = [dict(row=row[0], i=i, cluster=to_string(row[1])) for i, row in enumerate(data[1:])]
 
-    groups = [g['name'] for g in self._desc['groups']]
+    groups = [str(g['name']) for g in self._desc['groups']]
 
     def cmp(a, b):
       ga = groups.index(a['cluster'])
