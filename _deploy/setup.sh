@@ -22,11 +22,11 @@ function isRedHat {
   [ -f /etc/redhat-release ]
 }
 
-function isRedHat {
+function useAnaconda {
   [ -f /etc/redhat-release ]
 }
 
-function install_redhat_anaconda {
+function install_anaconda {
   local ANACONDA="Anaconda2-2.4.1-Linux-x86_64.sh"
   wget "https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/${ANACONDA}"
   chmod +x ${ANACONDA}
@@ -41,8 +41,8 @@ function install_common_dependencies {
   isDebian && sudo apt-get install -y python-pip python-dev zlib1g-dev python-numpy python-scipy python-matplotlib wget
   isRedHat && sudo yum install -y zlib-devel wget
 
-  if isRedHat ; then
-    install_redhat_anaconda
+  if useAnaconda ; then
+    install_anaconda
   fi
 
   set +vx #to turn them both off
@@ -83,7 +83,7 @@ function create_server_config {
   sedeasy /var/www/caleydo_app ${basedir} gunicorn_start.sh
   sedeasy caleydo_app ${name} gunicorn_start.sh
 
-  if isRedHat; then #use anaconda
+  if useAnaconda; then #use anaconda
     sedeasy "#ENV_DIR=~/anaco" "ENV_DIR=~/anaco" gunicorn_start.sh
     sedeasy "#ENV_ACTIVATE=acti" "ENV_ACTIVATE=acti" gunicorn_start.sh
   fi
@@ -107,13 +107,11 @@ function create_server_config {
 function register_as_service {
   local name=$1
   #install supervisor
-  if [ -x "$(command -v apt-get)" ]; then
-    sudo apt-get install -y supervisor
-  fi
+  isDebian && sudo apt-get install -y supervisor
 
-  if [ -x "$(command -v yum)" ]; then
-    sudo yum install -y supervisor
-  fi
+  #TODO install supervisor via pip and do the configuration
+  isRedHat && sudo yum install -y supervisor
+
 
   cp supervisor.in.conf supervisor.conf
   sedeasy /var/www/caleydo_app ${basedir} supervisor.conf
@@ -146,34 +144,57 @@ function unregister_from_service {
 }
 
 function activate_virtualenv {
-  source venv/bin/activate
+  if useAnaconda ; then
+    source activate venv
+  else
+    source venv/bin/activate
+  fi
 }
 
 function create_virtualenv {
   echo "--- creating virtual environment ---"
-  if hash virtualenv 2>/dev/null; then
-     echo "virtualenv already installed"
-  else
-    sudo pip install virtualenv
+  if useAnaconda ; then
+    conda create -n venv numpy scipy matplotlib pip gevent greenlet gunicorn
+  else:
+    if hash virtualenv 2>/dev/null; then
+       echo "virtualenv already installed"
+    else
+      sudo pip install virtualenv
+    fi
+    virtualenv --system-site-packages venv
   fi
-  virtualenv --system-site-packages venv
   activate_virtualenv
 }
 
 function deactivate_virtualenv {
-  deactivate
+  if useAnaconda ; then
+    source deactivate
+  else
+    deactivate
+  fi
 }
 
 function remove_virtualenv {
   echo "--- removing virtual environment ---"
-  rm -rf venv
+  if useAnaconda ; then
+    conda env remove --name venv
+  else:
+    rm -rf venv
+  fi
 }
 
 function create_run_script {
-  echo "#!/usr/bin/env bash
+  if useAnaconda; then
+    echo "#!/usr/bin/env bash
 
-./venv/bin/python plugins/caleydo_server --multithreaded
-" > run.sh
+  ~/anaconda2/envs//venv/bin/python plugins/caleydo_server
+  " > run.sh
+  else:
+    echo "#!/usr/bin/env bash
+
+  ./venv/bin/python plugins/caleydo_server
+  " > run.sh
+  fi
 }
 
 function manage_server {
@@ -192,20 +213,20 @@ function run_custom_setup_scripts {
 
 function setup {
   echo "setup"
-  install_common_apt_dependencies
-  install_apt_dependencies
-  install_common_yum_dependencies
-  install_yum_dependencies
+  install_common_dependencies
+  install_dependencies
 
   create_virtualenv
+
   install_pip_dependencies
   create_run_script
 
   name=${PWD##*/}
   create_server_config ${name}
-  register_as_service ${name}
 
   deactivate_virtualenv
+
+  register_as_service ${name}
 
   run_custom_setup_scripts setup
 }
@@ -215,7 +236,7 @@ function setup_docker {
   local cmd=${1:-all}
   case "$1" in
   common)
-    install_common_apt_dependencies
+    install_common_dependencies
     create_run_script
     create_virtualenv
     ;;
@@ -226,7 +247,7 @@ function setup_docker {
     #register_as_service ${name}
     ;;
   apt)
-    install_apt_dependencies
+    install_dependencies
     ;;
   pip)
     activate_virtualenv
@@ -238,8 +259,8 @@ function setup_docker {
     ;;
   *)
     echo "setup_docker"
-    install_common_apt_dependencies
-    install_apt_dependencies
+    install_common_dependencies
+    install_dependencies
 
     create_run_script
 
@@ -269,10 +290,8 @@ function update {
 
   manage_server stop
 
-  install_common_apt_dependencies
-  install_apt_dependencies
-  install_common_yum_dependencies
-  install_yum_dependencies
+  install_common_dependencies
+  install_dependencies
 
   activate_virtualenv
   install_pip_dependencies
@@ -316,8 +335,8 @@ update)
   update $@
   ;;
 create_config)
-  cshift
-  reate_config $@
+  shift
+  create_config $@
   ;;
 uninstall)
   shift
