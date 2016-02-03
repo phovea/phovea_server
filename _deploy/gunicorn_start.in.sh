@@ -18,7 +18,18 @@ echo "Starting $NAME as `whoami`"
 
 # Activate the virtual environment
 cd ${WEB_DIR}
-source ./venv/bin/activate
+
+VENV_NAME=venv
+
+#virtualenv variant
+ENV_DIR=./${VENV_NAME}
+ENV_ACTIVATE=./${VENV_NAME}/bin/activate
+
+#conda variant
+#ENV_DIR=~/anaconda2/envs/${VENV_NAME}
+#ENV_ACTIVATE=activate ${VENV_NAME}
+
+source ${ENV_ACTIVATE}
 
 # Create the run directory if it doesn't exist
 RUNDIR=$(dirname ${SOCKFILE})
@@ -26,8 +37,9 @@ test -d ${RUNDIR} || mkdir -p ${RUNDIR}
 
 # Start your Django Unicorn
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
-#--group=${GROUP} \
-exec ./venv/bin/gunicorn ${CALEYDO_WSGI_MODULE}:application \
+#--group=${GROUP}
+
+exec ${ENV_DIR}/bin/gunicorn ${CALEYDO_WSGI_MODULE}:application \
   -k flask_sockets.worker \
   --name ${NAME} \
   --workers ${NUM_WORKERS} \
