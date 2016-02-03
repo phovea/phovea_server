@@ -33,7 +33,7 @@ function install_apt_dependencies {
     sudo apt-get install -y `cat ${basedir}/debian.txt`
     set +vx #to turn them both off
     cd ${basedir}
-    rm debian.txt
+    #rm debian.txt
   fi
 }
 
@@ -56,7 +56,7 @@ function install_yum_dependencies {
     sudo yum install -y python-pip python-devel zlib-devel wget `cat ${basedir}/redhat.txt`
     set +vx #to turn them both off
     cd ${basedir}
-    rm redhat.txt
+    #rm redhat.txt
   fi
 }
 
@@ -67,7 +67,7 @@ function install_pip_dependencies {
     pip install -r ${basedir}/requirements.txt
     set -vx #to turn echoing on and
     cd ${basedir}
-    rm requirements.txt
+    #rm requirements.txt
   fi
 }
 
