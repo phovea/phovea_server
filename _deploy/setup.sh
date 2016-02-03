@@ -14,51 +14,53 @@ function sedeasy {
   sed -i "s/$(echo $1 | sed -e 's/\([[\/.*]\|\]\)/\\&/g')/$(echo $2 | sed -e 's/[\/&]/\\&/g')/g" $3
 }
 
-function install_common_apt_dependencies {
-  if [ -x "$(command -v apt-get)" ]; then
-    echo "--- installing common apt dependencies ---"
-    cd /tmp #switch to tmp directory
-    set -vx #to turn echoing on and
-    sudo apt-get install -y python-pip python-dev zlib1g-dev python-numpy python-scipy python-matplotlib wget
-    set +vx #to turn them both off
-    cd ${basedir}
-  fi
+function isDebian {
+    [ -f /etc/lsb-release ]
 }
 
-function install_apt_dependencies {
-  if [ -f debian.txt ] && [ -x "$(command -v apt-get)" ]; then
-    echo "--- installing apt dependencies ---"
-    cd /tmp #switch to tmp directory
-    set -vx #to turn echoing on and
-    sudo apt-get install -y `cat ${basedir}/debian.txt`
-    set +vx #to turn them both off
-    cd ${basedir}
-    #rm debian.txt
-  fi
+function isRedHat {
+  [ -f /etc/redhat-release ]
 }
 
-function install_common_yum_dependencies {
-  if [ -x "$(command -v yum)" ]; then
-    echo "--- installing common yum dependencies ---"
-    cd /tmp #switch to tmp directory
-    set -vx #to turn echoing on and
-    sudo yum install -y python-pip python-devel zlib-devel numpy scipy python-matplotlib wget
-    set +vx #to turn them both off
-    cd ${basedir}
-  fi
+function isRedHat {
+  [ -f /etc/redhat-release ]
 }
 
-function install_yum_dependencies {
-  if [ -f redhat.txt ] && [ -x "$(command -v yum)" ]; then
-    echo "--- installing yum dependencies ---"
-    cd /tmp #switch to tmp directory
-    set -vx #to turn echoing on and
-    sudo yum install -y python-pip python-devel zlib-devel wget `cat ${basedir}/redhat.txt`
-    set +vx #to turn them both off
-    cd ${basedir}
-    #rm redhat.txt
-  fi
+function install_redhat_anaconda {
+  local ANACONDA="Anaconda2-2.4.1-Linux-x86_64.sh"
+  wget "https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/${ANACONDA}"
+  chmod +x ${ANACONDA}
+  exec ./${ANACONDA}
 }
+
+function install_common_dependencies {
+  echo "--- installing common  dependencies ---"
+  cd /tmp #switch to tmp directory
+  set -vx #to turn echoing on and
+
+  isDebian && sudo apt-get install -y python-pip python-dev zlib1g-dev python-numpy python-scipy python-matplotlib wget
+  isRedHat && sudo yum install -y zlib-devel wget
+
+  if isRedHat ; then
+    install_redhat_anaconda
+  fi
+
+  set +vx #to turn them both off
+  cd ${basedir}
+}
+
+function install_dependencies {
+  echo "--- installing dependencies ---"
+  cd /tmp #switch to tmp directory
+  set -vx #to turn echoing on and
+
+  isDebian && [ -f debian.txt ] && sudo apt-get install -y `cat ${basedir}/debian.txt`
+  isRedHat && [ -f redhat.txt ] && sudo yum install -y `cat ${basedir}/redhat.txt`
+
+  set +vx #to turn them both off
+  cd ${basedir}
+}
+
 
 function install_pip_dependencies {
   if [ -f requirements.txt ] ; then
@@ -67,20 +69,25 @@ function install_pip_dependencies {
     pip install -r ${basedir}/requirements.txt
     set -vx #to turn echoing on and
     cd ${basedir}
-    #rm requirements.txt
   fi
 }
 
 function create_server_config {
   local name=$1
   cd /tmp #switch to tmp directory
-  pip install gunicorn setproctitle
+  pip install gunicorn
   set -vx #to turn echoing on and
   cd ${basedir}
 
   cp gunicorn_start.in.sh gunicorn_start.sh
   sedeasy /var/www/caleydo_app ${basedir} gunicorn_start.sh
   sedeasy caleydo_app ${name} gunicorn_start.sh
+
+  if isRedHat; then #use anaconda
+    sedeasy "#ENV_DIR=~/anaco" "ENV_DIR=~/anaco" gunicorn_start.sh
+    sedeasy "#ENV_ACTIVATE=acti" "ENV_ACTIVATE=acti" gunicorn_start.sh
+  fi
+
   chmod +x gunicorn_start.sh
 
   #create the nginx config and enable the site
