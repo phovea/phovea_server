@@ -39,7 +39,7 @@ function install_common_dependencies {
   set -vx #to turn echoing on and
 
   isDebian && sudo apt-get install -y python-pip python-dev zlib1g-dev python-numpy python-scipy python-matplotlib wget
-  isRedHat && sudo yum install -y zlib-devel wget
+  isRedHat && sudo yum install -y zlib-devel wget epel-package
 
   if useAnaconda ; then
     install_anaconda
@@ -106,11 +106,12 @@ function create_server_config {
 
 function register_as_service {
   local name=$1
+
   #install supervisor
   isDebian && sudo apt-get install -y supervisor
 
   #TODO install supervisor via pip and do the configuration
-  isRedHat && sudo yum install -y supervisor
+  #isRedHat && sudo yum install -y supervisor
 
 
   cp supervisor.in.conf supervisor.conf

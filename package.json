@@ -145,9 +145,6 @@
         "python-matplotlib": ""
       },
       "redhat": {
-        "numpy":"",
-        "scipy":"",
-        "python-matplotlib":""
       }
     }
   },
