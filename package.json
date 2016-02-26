@@ -124,6 +124,27 @@
           "file": "assigner",
           "factory": "create",
           "singleton": true
+        },
+        {
+          "type": "dataset-specific-handler",
+          "id": "handler-graph",
+          "file": "graph_api",
+          "datatype": "graph",
+          "factory": "add_graph_handler"
+        },
+        {
+          "type": "graph-formatter",
+          "id": "formatter-json",
+          "file": "graph_api",
+          "format": "json",
+          "factory": "format_json"
+        },
+        {
+          "type": "graph-parser",
+          "id": "parser-json",
+          "file": "graph_parser",
+          "format": "json",
+          "factory": "parse_json"
         }
       ]
     },
