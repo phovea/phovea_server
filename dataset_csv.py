@@ -310,10 +310,14 @@ class CSVTable(CSVEntry):
   def _process(self, data):
     rows = np.array(map(lambda x: x[0], data[1:]))
     d = map(lambda x: x[1:], data[1:])
+    import pandas as pd
+    df = pd.DataFrame({ c['name'] : map(lambda x: x[i], d) for i,c in enumerate(self.columns) })
+    df.index = rows
     return {
       'rows': rows,
       'rowIds': assign_ids(rows, self.idtype),
-      'data': d
+      'data': d,
+      'df': df
     }
 
   def rows(self, range=None):
@@ -335,10 +339,10 @@ class CSVTable(CSVEntry):
     return n[range.asslice()]
 
   def aspandas(self, range=None):
-    n = self.load()['rowIds']
+    n = self.load()['df']
     if range is None:
       return n
-    return n[range.asslice()]
+    return n.iloc[range.asslice()]
 
   def asjson(self, range=None):
     arr = self.aslist(range)
