@@ -41,7 +41,7 @@ def format_csv(dataset, range, args):
     else:
       header = ''
 
-    d = dataset.asnumpy(range)
+    d = dataset.aslist(range)
 
     if include_rows:
       rows = dataset.rows(range[0] if range is not None else None)
@@ -81,13 +81,14 @@ def format_image(dataset, range, args):
 
   import scipy.misc
   import io
+  import numpy as np
 
   #TODO set a palette to specify colors instead of gray scales
   #how to interpolate / sample colors - which space?
   minmax = dataset.range
   cmin = float(args.get('format_min',minmax[0]))
   cmax = float(args.get('format_max',minmax[1]))
-  d = dataset.asnumpy(range)
+  d = np.array(dataset.aslist(range))
   if d.ndim == 1:
     d = d.reshape((1,d.shape[0]))
   img = scipy.misc.toimage(d, cmin=cmin, cmax=cmax, pal = _color_palette(args.get('format_palette', None)))
@@ -145,7 +146,7 @@ def _add_handler(app, dataset_getter, type):
   def raw_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
     r = asrange(flask.request.args.get('range',None))
-    return jsonify(d.asnumpy(r), allow_nan=False)
+    return jsonify(d.aslist(r), allow_nan=False)
 
   app.add_url_rule('/'+type+'/<dataset_id>/raw','raw_'+type, raw_gen)
 
@@ -166,8 +167,8 @@ def add_vector_handler(app, dataset_getter):
   def hist_vector(dataset_id):
     d = dataset_getter(dataset_id, 'vector')
     r = asrange(flask.request.args.get('range',None))
-    data = d.asnumpy(r)
     import numpy as np
+    data = d.asnumpy(r)
     hist, bin_edges = np.histogram(data, bins=int(flask.request.args.get('bins',np.sqrt(len(data)))), range=d.range)
     return jsonify(hist)
 

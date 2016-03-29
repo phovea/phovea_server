@@ -132,6 +132,9 @@ class CSVStratification(CSVEntry):
       return n
     return n[range.asslice()]
 
+  def groups(self):
+    return self.load()['groups']
+
   def asjson(self, range=None):
     return self.load()
 
@@ -216,6 +219,9 @@ class CSVMatrix(CSVEntry):
     if range is None:
       return n
     return n[range.asslice()]
+
+  def aslist(self, range=None):
+    return self.asnumpy(range)
 
   def asnumpy(self, range=None):
     n = self.load()['data']
@@ -303,10 +309,11 @@ class CSVTable(CSVEntry):
 
   def _process(self, data):
     rows = np.array(map(lambda x: x[0], data[1:]))
+    d = map(lambda x: x[1:], data[1:])
     return {
       'rows': rows,
       'rowIds': assign_ids(rows, self.idtype),
-      'data': map(lambda x: x[1:], data[1:])
+      'data': d
     }
 
   def rows(self, range=None):
@@ -321,14 +328,20 @@ class CSVTable(CSVEntry):
       return n
     return n[range.asslice()]
 
-  def asnumpy(self, range=None):
+  def aslist(self, range=None):
     n = self.load()['data']
     if range is None:
       return n
-    return n[range[0].asslice()]
+    return n[range.asslice()]
+
+  def aspandas(self, range=None):
+    n = self.load()['rowIds']
+    if range is None:
+      return n
+    return n[range.asslice()]
 
   def asjson(self, range=None):
-    arr = self.asnumpy(range)
+    arr = self.aslist(range)
     rows = self.rows(None if range is None else range[0])
     rowids = self.rowids(None if range is None else range[0])
     r = dict(data=arr, rows=rows, rowIds=rowids)
@@ -368,6 +381,9 @@ class CSVVector(CSVEntry):
     if range is None:
       return n
     return n[range.asslice()]
+
+  def aslist(self, range=None):
+    return self.asnumpy(range)
 
   def asnumpy(self, range=None):
     n = self.load()['data']
