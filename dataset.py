@@ -88,3 +88,5 @@ def list_idtypes():
 
 def get_idmanager():
   return caleydo_server.plugin.lookup('idmanager')
+def get_mappingmanager():
+  return caleydo_server.plugin.lookup('mappingmanager')
