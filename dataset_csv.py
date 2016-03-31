@@ -298,25 +298,39 @@ class CSVMatrix(CSVEntry):
 
     return CSVMatrix(desc, project)
 
+class CSVColumn(object):
+  def __init__(self, desc, table):
+    self._desc = desc
+    self._table = table
+    self.name = desc['name']
+    self.type = desc['value']['type']
+
+  def aslist(self, range = None):
+    return self.asnumpy(range).tolist()
+
+  def asnumpy(self, range=None):
+    return self._table.aspandas(range)[self.name].values
+
+  def dump(self):
+    return self._desc
+
 
 class CSVTable(CSVEntry):
   def __init__(self, desc, project):
     super(CSVTable, self).__init__(desc, project)
-    print desc
     self.idtype = desc['idtype']
-    self.columns = desc['columns']
+    self.columns = [CSVColumn(d, self) for d in desc['columns']]
     self.shape = desc['size']
 
   def _process(self, data):
     rows = np.array(map(lambda x: x[0], data[1:]))
-    d = map(lambda x: x[1:], data[1:])
     import pandas as pd
-    df = pd.DataFrame({ c['name'] : map(lambda x: x[i], d) for i,c in enumerate(self.columns) })
+    objs = { c.name : map(lambda x: x[i+1], data[1:]) for i,c in enumerate(self.columns) }
+    df = pd.DataFrame(objs)
     df.index = rows
     return {
       'rows': rows,
       'rowIds': assign_ids(rows, self.idtype),
-      'data': d,
       'df': df
     }
 
@@ -333,10 +347,7 @@ class CSVTable(CSVEntry):
     return n[range.asslice()]
 
   def aslist(self, range=None):
-    n = self.load()['data']
-    if range is None:
-      return n
-    return n[range.asslice()]
+    return self.aspandas(range).to_records(index=False)
 
   def aspandas(self, range=None):
     n = self.load()['df']

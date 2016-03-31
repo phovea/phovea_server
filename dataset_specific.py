@@ -56,11 +56,11 @@ def format_csv(dataset, range, args):
       for row, line in itertools.izip(rows, d):
         yield row
         yield delimiter
-        yield delimiter.join(map(to_str, line))
+        yield delimiter.join(map(to_str, line) if dataset.type == 'matrix' else (to_str(line[d.name] for d in dataset.columns)))
         yield '\n'
     else:
       for line in d:
-        yield delimiter.join(map(to_str, line))
+        yield delimiter.join(map(to_str, line) if dataset.type == 'matrix' else (to_str(line[d.name] for d in dataset.columns)))
         yield '\n'
 
   return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename='+dataset.name+'.csv'})
@@ -168,20 +168,34 @@ def add_table_handler(app, dataset_getter):
       return view, args
     flask.abort(404)
 
+  def col_table(dataset_id, column):
+    d = dataset_getter(dataset_id, 'table')
+    r = asrange(flask.request.args.get('range',None))
+    for col in d.columns:
+      if col.name == column:
+        return jsonify(col.aslist(range), allow_nan=False)
+    flask.abort(404)
+
   def view_table(dataset_id, view_name):
     view, args = find_view(dataset_id, view_name)
     formatter = resolve_formatter('table', flask.request.args.get('format','json'))
     return formatter(view, args, args=flask.request.args)
+
   def view_raw_table(dataset_id, view_name):
     view, args = find_view(dataset_id, view_name)
     return jsonify(view.aslist(args), allow_nan=False)
+
   def view_rows_table(dataset_id, view_name):
     view, args = find_view(dataset_id, view_name)
     return jsonify(view.rows(args))
+
   def view_rowids_table(dataset_id, view_name):
     view, args = find_view(dataset_id, view_name)
     ids = view.rowids(args)
     return jsonify(str(ranges.from_list(list(ids))))
+
+
+  app.add_url_rule('/table/<dataset_id>/col/<column>','col_table', col_table)
 
   app.add_url_rule('/table/<dataset_id>/view/<view_name>','view_table', view_table)
   app.add_url_rule('/table/<dataset_id>/view/<view_name>/raw','view_raw_table', view_raw_table)
