@@ -160,6 +160,33 @@ def _add_handler(app, dataset_getter, type):
 
 def add_table_handler(app, dataset_getter):
   _add_handler(app, dataset_getter, 'table')
+  def find_view(dataset_id, view_name):
+    d = dataset_getter(dataset_id, 'table')
+    if hasattr(d, 'views') and view_name in d.views:
+      view = d.views[view_name]
+      args = flask.request.args.to_dict()
+      return view, args
+    flask.abort(404)
+
+  def view_table(dataset_id, view_name):
+    view, args = find_view(dataset_id, view_name)
+    formatter = resolve_formatter('table', flask.request.args.get('format','json'))
+    return formatter(view, args, args=flask.request.args)
+  def view_raw_table(dataset_id, view_name):
+    view, args = find_view(dataset_id, view_name)
+    return jsonify(view.aslist(args), allow_nan=False)
+  def view_rows_table(dataset_id, view_name):
+    view, args = find_view(dataset_id, view_name)
+    return jsonify(view.rows(args))
+  def view_rowids_table(dataset_id, view_name):
+    view, args = find_view(dataset_id, view_name)
+    ids = view.rowids(args)
+    return jsonify(str(ranges.from_list(list(ids))))
+
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>','view_table', view_table)
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>/raw','view_raw_table', view_raw_table)
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>/rows','view_rows_table', view_rows_table)
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>/rowIds','view_rowids_table', view_rowids_table)
 
 def add_vector_handler(app, dataset_getter):
   _add_handler(app, dataset_getter, 'vector')
