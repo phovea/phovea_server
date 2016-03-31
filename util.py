@@ -2,6 +2,7 @@ __author__ = 'Samuel Gratzl'
 
 import json
 import caleydo_server.plugin
+import pandas.json as ujson
 
 class JSONExtensibleEncoder(json.JSONEncoder):
   """
@@ -31,7 +32,9 @@ def to_json(obj, *args, **kwargs):
   #  import ujson
   #  return ujson.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
   #except ImportError:
-  return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
+  if 'allow_nan' in kwargs:
+    del kwargs['allow_nan']
+  return ujson.dumps(obj, *args, **kwargs)
 
 def jsonify(obj, *args, **kwargs):
   """
