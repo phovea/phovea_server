@@ -347,7 +347,7 @@ class CSVTable(CSVEntry):
     return n[range.asslice()]
 
   def aslist(self, range=None):
-    return self.aspandas(range).to_records(index=False)
+    return self.aspandas(range).to_dict('records')
 
   def aspandas(self, range=None):
     n = self.load()['df']
