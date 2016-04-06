@@ -118,7 +118,7 @@ def _upload_dataset(request, id=None):
       return caleydo_server.util.jsonify(r.to_description(),indent=1)
     #invalid upload
     return 'invalid upload', 400
-  except ValueError, e:
+  except ValueError as e:
     return on_value_error(e)
 
 def _update_dataset(dataset_id, request):
@@ -131,7 +131,7 @@ def _update_dataset(dataset_id, request):
       return caleydo_server.util.jsonify(old.to_description(),indent=1)
     #invalid upload
     return 'invalid upload', 400
-  except ValueError, e:
+  except ValueError as e:
     return on_value_error(e)
 
 def _modify_dataset(dataset_id, request):
@@ -144,7 +144,7 @@ def _modify_dataset(dataset_id, request):
       return caleydo_server.util.jsonify(old.to_description(),indent=1)
       #invalid upload
     return 'invalid upload', 400
-  except ValueError, e:
+  except ValueError as e:
     return on_value_error(e)
 
 def _remove_dataset(dataset_id):
