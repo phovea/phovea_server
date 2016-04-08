@@ -9,7 +9,7 @@ app = flask.Flask(__name__)
 app_idtype = flask.Flask(__name__)
 
 import logging
-_log = logging.getLogger('caleydo_server.' + __name__)
+_log = logging.getLogger(__name__)
 
 @app.errorhandler(ValueError)
 def on_value_error(error):

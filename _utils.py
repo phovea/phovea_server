@@ -3,7 +3,7 @@ __author__ = 'Samuel Gratzl'
 import re
 
 import logging
-_log = logging.getLogger('caleydo_server.'+__name__)
+_log = logging.getLogger(__name__)
 
 # extend a dictionary recursivly
 def extend(target, w):

@@ -4,7 +4,7 @@ from flask_sockets import Sockets as Socket
 from geventwebsocket import WebSocketError
 
 import logging
-_log = logging.getLogger('caleydo_server.' + __name__)
+_log = logging.getLogger(__name__)
 
 class WebsocketSend(object):
   def __init__(self, ws):
