@@ -34,6 +34,7 @@ def to_json(obj, *args, **kwargs):
   #except ImportError:
   if 'allow_nan' in kwargs:
     del kwargs['allow_nan']
+  kwargs['ensure_ascii'] = False
   return ujson.dumps(obj, *args, **kwargs)
 
 def jsonify(obj, *args, **kwargs):
