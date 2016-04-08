@@ -3,16 +3,24 @@ __author__ = 'Samuel Gratzl'
 import gevent.monkey
 gevent.monkey.patch_all() #ensure the standard libraries are patched
 
-import os
 import os.path
 import sys
 
+
 sys.path.append('plugins/')
-print os.getcwd()
 import caleydo_server.config
 
 #append the plugin directories as primary lookup path
 cc = caleydo_server.config.view('caleydo_server')
+
+#configure logging
+import logging.config
+
+logging.config.dictConfig(cc.logging)
+
+_log = logging.getLogger('caleydo_server.'+__name__)
+_log.debug('extent with plugin directory %s',str(cc.getlist('pluginDirs')))
+
 sys.path.extend(cc.getlist('pluginDirs'))
 
 #set configured registry
@@ -57,7 +65,7 @@ def _init_app(app, is_default_app = False):
 
 #helper to plugin in function scope
 def _loader(p):
-  print 'add application: ' + p.id + ' at namespace: ' + p.namespace
+  _log.info('add application: ' + p.id + ' at namespace: ' + p.namespace)
   def load_app():
     app = p.load().factory()
     _init_app(app)
