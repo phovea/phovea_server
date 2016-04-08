@@ -18,7 +18,7 @@ import logging.config
 
 logging.config.dictConfig(cc.logging)
 
-_log = logging.getLogger('caleydo_server.'+__name__)
+_log = logging.getLogger(__name__)
 _log.debug('extent with plugin directory %s',str(cc.getlist('pluginDirs')))
 
 sys.path.extend(cc.getlist('pluginDirs'))

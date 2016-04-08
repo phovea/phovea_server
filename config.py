@@ -102,13 +102,13 @@ if os.path.exists('config.json'):
 
 def merge_plugin_configs(plugins):
   import logging
-  _log = logging.getLogger('caleydo_server.' + __name__)
+  _log = logging.getLogger(__name__)
   global _c
   _c = {}
   for plugin in plugins:
     config_file = os.path.join(plugin.folder, 'config.json')
     if os.path.exists(config_file):
-      _log.infO('merging: %s %s',config_file, plugin.id)
+      _log.info('merging: %s %s',config_file, plugin.id)
       _merge_config(config_file, plugin.id)
   #override with more important settings
   if os.path.exists('config.json'):
