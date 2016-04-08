@@ -1,6 +1,9 @@
 #will be injected
 _registry = None
 
+import logging
+_log = logging.getLogger('caleydo_server.' + __name__)
+
 def _get_registry():
   global _registry
   if _registry is None:
@@ -69,7 +72,7 @@ class ExtensionDesc(AExtensionDesc):
   def load(self):
     if self._impl is None:
       import importlib
-      print 'importing', self.module
+      _log.info('importing %s', self.module)
       m = importlib.import_module(self.module)
       if hasattr(m,'_plugin_initialize'): #init method
         #import inspect
@@ -122,7 +125,7 @@ class Registry(object):
         mm[e.id].append(e)
     def select(v):
       v = sorted(v,cmp = lambda a,b: getattr(a,'priority',100)-getattr(b,'priority',100))
-      print v[0].id, getattr(v[0],'module','server')
+      _log.info('creating singleton %s %s',v[0].id, getattr(v[0],'module','server'))
       return loader(v[0])
     self._singletons = { k: select(v) for k,v in mm.iteritems() }
 

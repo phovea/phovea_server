@@ -2,6 +2,9 @@ __author__ = 'Samuel Gratzl'
 
 import re
 
+import logging
+_log = logging.getLogger('caleydo_server.'+__name__)
+
 # extend a dictionary recursivly
 def extend(target, w):
   for k,v in w.iteritems():
@@ -20,13 +23,13 @@ def replace_variables_f(s, lookup):
     s = s[2:len(s)-1]
     v = lookup(s)
     if v is None:
-      print 'cant resolve ' + s
+      _log.error('cant resolve ' + s)
       return '$unresolved$'
     return v
   def match(m):
     v = lookup(m.group(1))
     if v is None:
-      print 'cant resolve ' + m.group(1)
+      _log.error('cant resolve ' + m.group(1))
       return '$unresolved$'
     return v
   return re.sub(r'\$\{([^}]+)\}', match, s)

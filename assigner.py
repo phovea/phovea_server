@@ -1,5 +1,9 @@
 __author__ = 'Samuel Gratzl'
 
+
+import logging
+_log = logging.getLogger('caleydo_server.'+__name__)
+
 class MemoryIDAssigner(object):
   """
   assigns ids to object in memory only, i.e. not persisted
@@ -80,7 +84,7 @@ class DBIDAssigner(object):
         r.append(int(self._db[key]))
       else:
         i = max_old + 1
-        print 'create ',key,i
+        _log.debug('create %s  %d',key,i)
         max_old += 1
         self._db[key] = str(i)
         self._db[self.to_backward_key(idtype, i)] = str(id).encode('ascii','ignore')
@@ -148,7 +152,7 @@ class SqliteIDAssigner(object):
       r.append(i)
 
     if len(missing) > 0:
-      print idtype,len(missing)
+      _log.debug('add missing to %s %d', idtype, len(missing))
       self._db.executemany('insert or ignore into mapping values ("'+idtype+'",?,?)', missing)
       self._db.commit()
 

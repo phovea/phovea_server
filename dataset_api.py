@@ -8,11 +8,13 @@ from .dataset import *
 app = flask.Flask(__name__)
 app_idtype = flask.Flask(__name__)
 
+import logging
+_log = logging.getLogger('caleydo_server.' + __name__)
+
 @app.errorhandler(ValueError)
 def on_value_error(error):
-  print 'ValueError: ('+str(error.message)+') at '+str(flask.request.environ)
-  import traceback
-  print traceback.format_exc()
+  _log.error('ValueError: ('+str(error.message)+') at '+str(flask.request.environ))
+  _log.error(error)
   return '<strong>{2} - {0}</strong><pre>{1}</pre>'.format('ValueError', error.message, 500), 500
 
 def _list_format_json(data):

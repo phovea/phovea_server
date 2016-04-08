@@ -3,6 +3,9 @@ __author__ = 'Samuel Gratzl'
 from flask_sockets import Sockets as Socket
 from geventwebsocket import WebSocketError
 
+import logging
+_log = logging.getLogger('caleydo_server.' + __name__)
+
 class WebsocketSend(object):
   def __init__(self, ws):
     self._ws = ws
@@ -22,12 +25,13 @@ def websocket_loop(ws, handler_map):
     msg = ws.receive()
     if msg is None:
       continue
-    print msg
+    _log.debug('msg received %s', msg)
     data = json.loads(msg)
     t = data['type']
     payload = data['data']
 
 
     if t not in handler_map:
-      print 'no handler defined for message of type: '+t
-    handler_map[t](payload, WebsocketSend(ws))
+      _log.warning('no handler defined for message of type: '+t)
+    else:
+      handler_map[t](payload, WebsocketSend(ws))
