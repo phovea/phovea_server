@@ -41,6 +41,13 @@ def _add_no_cache_header(response):
   response.headers['Expires'] = '-1'
   return response
 
+def _to_stack_trace():
+  import traceback
+  return traceback.format_exc()
+
+def _exception_handler(error):
+    return 'Internal Server Error\n'  + _to_stack_trace(), 500
+
 def _init_app(app, is_default_app = False):
   """
   initializes an application by setting common properties and options
@@ -49,9 +56,14 @@ def _init_app(app, is_default_app = False):
   :return:
   """
   if hasattr(app, 'debug'):
+    _log.info('setting debug flag to {0}'.format(cc.debug))
     app.debug = cc.debug
   if cc.nocache and hasattr(app, 'after_request'):
     app.after_request(_add_no_cache_header)
+  if cc.error_stack_trace and hasattr(app, 'register_error_handler'):
+    _log.info('_exception_handler to %s'.format(cc.debug))
+    app.register_error_handler(500, _exception_handler)
+
   if cc.secret_key:
     app.config['SECRET_KEY'] = cc.secret_key
 
