@@ -48,8 +48,8 @@ def _init_app(app, is_default_app = False):
   :param is_default_app:
   :return:
   """
-  if cc.debug and hasattr(app, 'debug'):
-    app.debug = True
+  if hasattr(app, 'debug'):
+    app.debug = cc.debug
   if cc.nocache and hasattr(app, 'after_request'):
     app.after_request(_add_no_cache_header)
   if cc.secret_key:
