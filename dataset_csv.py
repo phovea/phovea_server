@@ -132,6 +132,9 @@ class CSVStratification(CSVEntry):
       return n
     return n[range.asslice()]
 
+  def groups(self):
+    return self.load()['groups']
+
   def asjson(self, range=None):
     return self.load()
 
@@ -217,6 +220,9 @@ class CSVMatrix(CSVEntry):
       return n
     return n[range.asslice()]
 
+  def aslist(self, range=None):
+    return self.asnumpy(range)
+
   def asnumpy(self, range=None):
     n = self.load()['data']
     if range is None:
@@ -292,21 +298,40 @@ class CSVMatrix(CSVEntry):
 
     return CSVMatrix(desc, project)
 
+class CSVColumn(object):
+  def __init__(self, desc, table):
+    self._desc = desc
+    self._table = table
+    self.name = desc['name']
+    self.type = desc['value']['type']
+
+  def aslist(self, range = None):
+    return self.asnumpy(range).tolist()
+
+  def asnumpy(self, range=None):
+    return self._table.aspandas(range)[self.name].values
+
+  def dump(self):
+    return self._desc
+
 
 class CSVTable(CSVEntry):
   def __init__(self, desc, project):
     super(CSVTable, self).__init__(desc, project)
-    print desc
     self.idtype = desc['idtype']
-    self.columns = desc['columns']
+    self.columns = [CSVColumn(d, self) for d in desc['columns']]
     self.shape = desc['size']
 
   def _process(self, data):
     rows = np.array(map(lambda x: x[0], data[1:]))
+    import pandas as pd
+    objs = { c.name : map(lambda x: x[i+1], data[1:]) for i,c in enumerate(self.columns) }
+    df = pd.DataFrame(objs)
+    df.index = rows
     return {
       'rows': rows,
       'rowIds': assign_ids(rows, self.idtype),
-      'data': map(lambda x: x[1:], data[1:])
+      'df': df
     }
 
   def rows(self, range=None):
@@ -321,14 +346,17 @@ class CSVTable(CSVEntry):
       return n
     return n[range.asslice()]
 
-  def asnumpy(self, range=None):
-    n = self.load()['data']
+  def aslist(self, range=None):
+    return self.aspandas(range).to_dict('records')
+
+  def aspandas(self, range=None):
+    n = self.load()['df']
     if range is None:
       return n
-    return n[range[0].asslice()]
+    return n.iloc[range.asslice()]
 
   def asjson(self, range=None):
-    arr = self.asnumpy(range)
+    arr = self.aslist(range)
     rows = self.rows(None if range is None else range[0])
     rowids = self.rowids(None if range is None else range[0])
     r = dict(data=arr, rows=rows, rowIds=rowids)
@@ -368,6 +396,9 @@ class CSVVector(CSVEntry):
     if range is None:
       return n
     return n[range.asslice()]
+
+  def aslist(self, range=None):
+    return self.asnumpy(range)
 
   def asnumpy(self, range=None):
     n = self.load()['data']

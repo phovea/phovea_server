@@ -11,6 +11,7 @@
 
   "debug": true,
   "nocache": true,
+  "error_stack_trace": true,
 
   "bower_components": "libs/bower_components",
 
@@ -51,6 +52,13 @@
       }
     },
     "loggers": {
+      "geventwebsocket.handler": {
+        "level": "WARN",
+        "handlers": [
+          "console",
+          "file"
+        ]
+      }
     },
     "root": {
       "level": "DEBUG",

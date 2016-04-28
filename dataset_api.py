@@ -120,7 +120,7 @@ def _upload_dataset(request, id=None):
       return caleydo_server.util.jsonify(r.to_description(),indent=1)
     #invalid upload
     return 'invalid upload', 400
-  except ValueError, e:
+  except ValueError as e:
     return on_value_error(e)
 
 def _update_dataset(dataset_id, request):
@@ -133,7 +133,7 @@ def _update_dataset(dataset_id, request):
       return caleydo_server.util.jsonify(old.to_description(),indent=1)
     #invalid upload
     return 'invalid upload', 400
-  except ValueError, e:
+  except ValueError as e:
     return on_value_error(e)
 
 def _modify_dataset(dataset_id, request):
@@ -146,7 +146,7 @@ def _modify_dataset(dataset_id, request):
       return caleydo_server.util.jsonify(old.to_description(),indent=1)
       #invalid upload
     return 'invalid upload', 400
-  except ValueError, e:
+  except ValueError as e:
     return on_value_error(e)
 
 def _remove_dataset(dataset_id):
@@ -169,7 +169,7 @@ def _list_idtypes():
 def _map_ids(idtype):
   name = flask.request.args.get('id',None)
   if name is not None:
-    return get_idmanager([name], idtype)[0]
+    return get_idmanager()([name], idtype)[0]
   names = flask.request.args.getlist('ids[]')
   return caleydo_server.util.jsonify(get_idmanager(names, idtype))
 
@@ -180,6 +180,54 @@ def _unmap_ids(idtype):
     return get_idmanager().unmap([int(name)], idtype)[0]
   names = caleydo_server.range.parse(flask.request.args.get('ids',''))[0].tolist()
   return caleydo_server.util.jsonify(get_idmanager().unmap(names, idtype))
+
+@app_idtype.route('/<idtype>/')
+def _maps_to(idtype):
+  mapper = get_mappingmanager()
+  target_id_types = mapper.maps_to(idtype)
+  return caleydo_server.util.jsonify(target_id_types)
+
+@app_idtype.route('/<idtype>/<to_idtype>')
+def _mapping_to(idtype, to_idtype):
+  return _do_mapping(idtype, to_idtype, False)
+
+def _do_mapping(idtype, to_idtype, to_ids):
+  mapper = get_mappingmanager()
+  args = flask.request.args
+  first_only = args.get('mode','all') == 'first'
+  single = False
+
+  if 'id' in args:
+    names = get_idmanager().unmap([int(args['id'])], idtype)
+    single = True
+  elif 'ids' in args:
+    names = get_idmanager().unmap(caleydo_server.range.parse(args['ids'])[0].tolist(), idtype)
+  elif 'q' in args:
+    names = args['q'].split(',')
+    single = len(names) == 1
+  else:
+    flask.abort(400)
+    return
+
+  mapped_list = mapper(idtype, to_idtype, names)
+  if first_only:
+    mapped_list = [ None if a is None or len(a) == 0 else a[0] for a in mapped_list]
+
+  if to_ids:
+    m = get_idmanager()
+    if first_only:
+      mapped_list = m(mapped_list, to_idtype)
+    else:
+      mapped_list = [m(entry, to_idtype) for entry in mapped_list]
+
+  if single:
+    return mapped_list[0] if first_only else caleydo_server.util.jsonify(mapped_list[0])
+
+  return caleydo_server.util.jsonify(mapped_list)
+
+@app_idtype.route('/<idtype>/<to_idtype>/map')
+def _mapping_to_id(idtype, to_idtype):
+  return _do_mapping(idtype, to_idtype, True)
 
 
 #add all specific handler

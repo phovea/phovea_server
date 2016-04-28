@@ -41,7 +41,7 @@ def format_csv(dataset, range, args):
     else:
       header = ''
 
-    d = dataset.asnumpy(range)
+    d = dataset.aslist(range)
 
     if include_rows:
       rows = dataset.rows(range[0] if range is not None else None)
@@ -56,11 +56,11 @@ def format_csv(dataset, range, args):
       for row, line in itertools.izip(rows, d):
         yield row
         yield delimiter
-        yield delimiter.join(map(to_str, line))
+        yield delimiter.join(map(to_str, line) if dataset.type == 'matrix' else (to_str(line[d.name] for d in dataset.columns)))
         yield '\n'
     else:
       for line in d:
-        yield delimiter.join(map(to_str, line))
+        yield delimiter.join(map(to_str, line) if dataset.type == 'matrix' else (to_str(line[d.name] for d in dataset.columns)))
         yield '\n'
 
   return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename='+dataset.name+'.csv'})
@@ -81,13 +81,14 @@ def format_image(dataset, range, args):
 
   import scipy.misc
   import io
+  import numpy as np
 
   #TODO set a palette to specify colors instead of gray scales
   #how to interpolate / sample colors - which space?
   minmax = dataset.range
   cmin = float(args.get('format_min',minmax[0]))
   cmax = float(args.get('format_max',minmax[1]))
-  d = dataset.asnumpy(range)
+  d = np.array(dataset.aslist(range))
   if d.ndim == 1:
     d = d.reshape((1,d.shape[0]))
   img = scipy.misc.toimage(d, cmin=cmin, cmax=cmax, pal = _color_palette(args.get('format_palette', None)))
@@ -145,7 +146,7 @@ def _add_handler(app, dataset_getter, type):
   def raw_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
     r = asrange(flask.request.args.get('range',None))
-    return jsonify(d.asnumpy(r), allow_nan=False)
+    return jsonify(d.aslist(r), allow_nan=False)
 
   app.add_url_rule('/'+type+'/<dataset_id>/raw','raw_'+type, raw_gen)
 
@@ -159,6 +160,48 @@ def _add_handler(app, dataset_getter, type):
 
 def add_table_handler(app, dataset_getter):
   _add_handler(app, dataset_getter, 'table')
+  def find_view(dataset_id, view_name):
+    d = dataset_getter(dataset_id, 'table')
+    if hasattr(d, 'views') and view_name in d.views:
+      view = d.views[view_name]
+      args = flask.request.args.to_dict()
+      return view, args
+    flask.abort(404)
+
+  def col_table(dataset_id, column):
+    d = dataset_getter(dataset_id, 'table')
+    r = asrange(flask.request.args.get('range',None))
+    for col in d.columns:
+      if col.name == column:
+        return jsonify(col.aslist(range), allow_nan=False)
+
+    return formatter(view, args, args=flask.request.args)
+
+  def view_table(dataset_id, view_name):
+    view, args = find_view(dataset_id, view_name)
+    formatter = resolve_formatter('table', flask.request.args.get('format','json'))
+    return formatter(view, args, args=flask.request.args)
+
+  def view_raw_table(dataset_id, view_name):
+    view, args = find_view(dataset_id, view_name)
+    return jsonify(view.aslist(args), allow_nan=False)
+
+  def view_rows_table(dataset_id, view_name):
+    view, args = find_view(dataset_id, view_name)
+    return jsonify(view.rows(args))
+
+  def view_rowids_table(dataset_id, view_name):
+    view, args = find_view(dataset_id, view_name)
+    ids = view.rowids(args)
+    return jsonify(str(ranges.from_list(list(ids))))
+
+
+  app.add_url_rule('/table/<dataset_id>/col/<column>','col_table', col_table)
+
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>','view_table', view_table)
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>/raw','view_raw_table', view_raw_table)
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>/rows','view_rows_table', view_rows_table)
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>/rowIds','view_rowids_table', view_rowids_table)
 
 def add_vector_handler(app, dataset_getter):
   _add_handler(app, dataset_getter, 'vector')
@@ -166,8 +209,8 @@ def add_vector_handler(app, dataset_getter):
   def hist_vector(dataset_id):
     d = dataset_getter(dataset_id, 'vector')
     r = asrange(flask.request.args.get('range',None))
-    data = d.asnumpy(r)
     import numpy as np
+    data = d.asnumpy(r)
     hist, bin_edges = np.histogram(data, bins=int(flask.request.args.get('bins',np.sqrt(len(data)))), range=d.range)
     return jsonify(hist)
 

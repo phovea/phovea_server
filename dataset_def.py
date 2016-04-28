@@ -82,6 +82,44 @@ class ADataSetEntry(object):
     return dict()
 
 
+#specific api for vectors
+ #idtype
+ #shape
+ #value
+ #range
+ #rows(range=None)
+ #rowids(range=None)
+ #aslist(range=None)
+ #asnumpy(range=None)
+#specific api for matrices
+ #rowtype
+ #coltype
+ #shape
+ #value
+ #range
+ #rows(range=None)
+ #rowids(range=None)
+ #cols(range=None)
+ #colids(range=None)
+ #aslist(range=None)
+ #asnumpy(range=None)
+#specific api for tables
+ #idtype
+ #columns
+ #shape
+ #rows(range=None)
+ #rowids(range=None)
+ #aslist(range=None)
+ #aspandas(range=None)
+#specific api for stratifications
+ #idtype
+ #rows(range=None)
+ #rowids(range=None)
+ #groups()
+
+
+
+
 class ADataSetProvider(object):
 
   def __len__(self):

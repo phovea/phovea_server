@@ -54,8 +54,8 @@ function install_dependencies {
   cd /tmp #switch to tmp directory
   set -vx #to turn echoing on and
 
-  isDebian && [ -f debian.txt ] && sudo apt-get install -y `cat ${basedir}/debian.txt`
-  isRedHat && [ -f redhat.txt ] && sudo yum install -y `cat ${basedir}/redhat.txt`
+  isDebian && [ -f ${basedir}/debian.txt ] && sudo apt-get install -y `cat ${basedir}/debian.txt`
+  isRedHat && [ -f ${basedir}/redhat.txt ] && sudo yum install -y `cat ${basedir}/redhat.txt`
 
   set +vx #to turn them both off
   cd ${basedir}
@@ -95,6 +95,9 @@ function create_server_config {
     #gunicorn in socket file mode
     sedeasy "#BIND=unix" "BIND=unix" gunicorn_start.sh
 
+    #ensure logs directory
+    mkdir -p ${basedir}/logs
+
     cp nginx.in.conf nginx.conf
     sedeasy /var/www/caleydo_app ${basedir} nginx.conf
     sedeasy caleydo_app ${name} nginx.conf
@@ -120,6 +123,8 @@ function register_as_service {
 
   #create the supervisor config
   sudo ln -s ${basedir}/supervisor.conf /etc/supervisor/conf.d/${name}.conf
+  #ensure logs directory
+  mkdir -p ${basedir}/logs
   #reread the list of elements
   sudo supervisorctl reread
   sudo supervisorctl update
