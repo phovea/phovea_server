@@ -173,9 +173,8 @@ def add_table_handler(app, dataset_getter):
     r = asrange(flask.request.args.get('range',None))
     for col in d.columns:
       if col.name == column:
-        return jsonify(col.aslist(range), allow_nan=False)
-
-    return formatter(view, args, args=flask.request.args)
+        return jsonify(col.aslist(r), allow_nan=False)
+    flask.abort(404)
 
   def view_table(dataset_id, view_name):
     view, args = find_view(dataset_id, view_name)
