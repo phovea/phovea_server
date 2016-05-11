@@ -120,6 +120,10 @@ def manager():
       _manager = DummyManager()
   return _manager
 
+def current_username():
+  u = manager().current_user
+  return u.user if hasattr(u, 'name') else 'Anonymous'
+
 def login_required(f):
   """
   Decorator for views that require login.
