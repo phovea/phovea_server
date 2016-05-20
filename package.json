@@ -1,5 +1,6 @@
 {
   "name": "caleydo_server",
+  "description": "Python server implementation of Caleydo Web",
   "version": "0.0.1",
   "license" : "SEE LICENSE IN LICENSE",
   "repository": "Caleydo/caleydo_server",
@@ -8,6 +9,8 @@
   "peerDependencies": {
   },
   "caleydo": {
+    "type": "plugin",
+    "category": "server",
     "plugins": {
       "python": [
         {
