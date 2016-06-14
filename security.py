@@ -122,7 +122,7 @@ def manager():
 
 def current_username():
   u = manager().current_user
-  return u.user if hasattr(u, 'name') else 'Anonymous'
+  return u.name if hasattr(u, 'name') else 'Anonymous'
 
 def login_required(f):
   """
