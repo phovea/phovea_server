@@ -3,6 +3,9 @@ __author__ = 'sam'
 import itertools
 import math
 
+all_f = all
+
+
 def fix(v, size=0):
   return v if v > 0 else (size + 1 + v)
 
@@ -520,11 +523,11 @@ class Range(object):
 
   @property
   def isall(self):
-    return all((d.isall for d in self.dims))
+    return all_f((d.isall for d in self.dims))
 
   @property
   def isnone(self):
-    return all((d.isnone for d in self.dims))
+    return all_f((d.isnone for d in self.dims))
 
   @property
   def ndim(self):
