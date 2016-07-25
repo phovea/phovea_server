@@ -15,6 +15,13 @@
       "python": [
         {
           "type": "namespace",
+          "id": "caleydo-last-deployment",
+          "file": "last_deployment",
+          "namespace": "/api/last_deployment",
+          "factory": "create_last_deployment"
+        },
+        {
+          "type": "namespace",
           "id": "caleydo-dataset",
           "file": "dataset_api",
           "namespace": "/api/dataset",
