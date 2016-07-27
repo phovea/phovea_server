@@ -11,10 +11,15 @@ def modification_date(filename):
 
 """
  Reads the modification date of the caleydo_web_container/package.json
+ OR as fallback (for builded bundles) the caleydo_web_container/registry.json.
 """
 @last_deployment.route('/', methods=['GET'])
 def _last_deployment():
   path =  os.path.normpath(os.path.join(os.getcwd(), 'package.json'))
+
+  if(os.path.exists(path) == False):
+    path =  os.path.normpath(os.path.join(os.getcwd(), 'registry.json'))
+
   date = modification_date(path)
   print 'modification date of ' + path + ' = ' + str(date)
   return caleydo_server.util.jsonify(dict(timestamp = date))
