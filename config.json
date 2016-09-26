@@ -46,7 +46,7 @@
         "class": "logging.handlers.TimedRotatingFileHandler",
         "level": "DEBUG",
         "formatter": "line",
-        "filename": "caleydo.log",
+        "filename": "logs/caleydo.log",
         "when": "midnight",
         "backupCount": 7
       }
