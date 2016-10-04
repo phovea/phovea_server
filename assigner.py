@@ -16,11 +16,23 @@ class MemoryIDAssigner(object):
       return [None] * len(uids)
     cache = self._idsmapping[idtype]
     def lookup(id):
-      for k,v in cache.iteritems():
+      for k,v in cache.items():
         if v == id:
           return k
       return None
     return map(lookup, uids)
+
+
+  def load(self, idtype, mapping):
+    """
+    resets and loads the given mapping
+    :param idtype:
+    :param mapping: array of tuples (id, uid)
+    :return:
+    """
+    del self._idsmapping[idtype]
+    #assuming incremental ids
+    self._idsmapping[idtype] = {id: uid for id,uid in mapping}
 
   def __call__(self, ids, idtype):
     """
@@ -70,6 +82,30 @@ class DBIDAssigner(object):
       key = self.to_backward_key(idtype, id)
       return self._db.get(key, None)
     return map(lookup, uids)
+
+  def load(self, idtype, mapping):
+    """
+    resets and loads the given mapping
+    :param idtype:
+    :param mapping: array of tuples (id, uid)
+    :return:
+    """
+    idtype = ascii(idtype)
+    #assuming incremental ids
+    if idtype in self._db:
+      #clear old data
+      for key in self._db.keys():
+        if key.startswith(idtype + '2id.') or key.startswith('id2' + idtype + '.'):
+          del self._db[key]
+
+    max_uid = None
+    for id,uid in mapping:
+      key = self.to_forward_key(idtype, id)
+      max_uid = uid if max_uid is None else max(uid, max_uid)
+      self._db[key] = str(uid)
+      self._db[self.to_backward_key(idtype, uid)] = str(id).encode('ascii','ignore')
+
+
 
   def __call__(self, ids, idtype):
     """
@@ -129,6 +165,24 @@ class SqliteIDAssigner(object):
         existing[row[0]] = row[1]
 
     return existing
+
+  def load(self, idtype, mapping):
+    """
+    resets and loads the given mapping
+    :param idtype:
+    :param mapping: array of tuples (id, uid)
+    :return:
+    """
+    idtype = ascii(idtype)
+    #delete cache
+    del self._cache[idtype]
+    self._db.execute('delete from mapping where idtype=?', (idtype,))
+
+    self._db.executemany('insert or ignore into mapping values ("' + idtype + '",?,?)', mapping)
+    self._db.commit()
+    self._cache[idtype] = { id: uid for id,uid in mapping}
+
+
 
   def __call__(self, ids, idtype):
     """
