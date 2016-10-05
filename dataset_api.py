@@ -101,9 +101,9 @@ def _dataset_getter(dataset_id, dataset_type):
     return [d for d in list_datasets() if d.type == dataset_type]
   t = get(dataset_id)
   if t is None:
-    return 'invalid dataset id "'+str(dataset_id)+'"', 404
+    flask.abort(404,'invalid dataset id "'+str(dataset_id)+'"')
   if t.type != dataset_type:
-    return 'the given dataset "'+str(dataset_id)+'" is not a '+dataset_type, 400
+    flask.abort(400,'the given dataset "'+str(dataset_id)+'" is not a '+dataset_type)
   return t
 
 def _to_upload_desc(data_dict):
