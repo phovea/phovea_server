@@ -2,8 +2,6 @@ __author__ = 'Samuel Gratzl'
 
 import gevent.monkey
 gevent.monkey.patch_all() #ensure the standard libraries are patched
-
-import os.path
 import sys
 
 
