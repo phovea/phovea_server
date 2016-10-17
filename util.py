@@ -48,7 +48,7 @@ def jsonify(obj, *args, **kwargs):
   :return:
   """
   import flask
-  return flask.Response(to_json(obj, *args, **kwargs), mimetype='application/json')
+  return flask.Response(to_json(obj, *args, **kwargs), mimetype='application/json; charset=utf-8')
 
 def glob_recursivly(path, match):
   import os
