@@ -171,7 +171,7 @@ def _map_ids(idtype):
   if name is not None:
     return get_idmanager()([name], idtype)[0]
   names = flask.request.args.getlist('ids[]')
-  return caleydo_server.util.jsonify(get_idmanager(names, idtype))
+  return caleydo_server.util.jsonify(get_idmanager()(names, idtype))
 
 @app_idtype.route('/<idtype>/unmap')
 def _unmap_ids(idtype):
