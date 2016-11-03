@@ -4,7 +4,7 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 from __future__ import print_function
-from .server import run, application
+from phovea_server.server import run, application
 
 
 if __name__ == '__main__':

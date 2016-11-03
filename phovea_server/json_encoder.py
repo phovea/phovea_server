@@ -1,7 +1,13 @@
-__author__ = 'Samuel Gratzl'
+###############################################################################
+# Caleydo - Visualization for Molecular Biology - http://caleydo.org
+# Copyright (c) The Caleydo Team. All rights reserved.
+# Licensed under the new BSD license, available at http://caleydo.org/license
+###############################################################################
+
 
 import numpy as np
 import numpy.ma as ma
+
 
 class NumpyTablesEncoder(object):
   def __contains__(self, obj):
@@ -24,7 +30,9 @@ class NumpyTablesEncoder(object):
       return a
     return None
 
+
 n = NumpyTablesEncoder()
+
 
 def create():
   return n

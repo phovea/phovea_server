@@ -1,7 +1,13 @@
-__author__ = 'Samuel Gratzl'
+###############################################################################
+# Caleydo - Visualization for Molecular Biology - http://caleydo.org
+# Copyright (c) The Caleydo Team. All rights reserved.
+# Licensed under the new BSD license, available at http://caleydo.org/license
+###############################################################################
 
-import phovea_server.plugin as p
+
+from . import plugin as p
 import sys
+
 
 class User(object):
   def __init__(self, id):
@@ -11,9 +17,9 @@ class User(object):
 
   def get_id(self):
     try:
-        return unicode(self.id)  # python 2
+      return unicode(self.id)  # python 2
     except NameError:
-        return str(self.id)  # python 3
+      return str(self.id)  # python 3
 
   @property
   def is_authenticated(self):
@@ -52,17 +58,19 @@ class User(object):
     # We set it back to its default implementation
     __hash__ = object.__hash__
 
+
 class SecurityManager(object):
   """
   a basic security manager
   """
+
   def __init__(self):
     pass
 
   def login_required(self, f):
     return f
 
-  def login(self, username, extra_fields = {}):
+  def login(self, username, extra_fields={}):
     """logs the given user in
     :returns the logged in user object or None if login failed
     """
@@ -97,6 +105,7 @@ class SecurityManager(object):
   def add_login_routes(self, app):
     pass
 
+
 class DummyManager(SecurityManager):
   """
   a dummy implementation of the security manager where everyone is authenticated
@@ -108,7 +117,10 @@ class DummyManager(SecurityManager):
   def has_role(self, role):
     return True
 
+
 _manager = None
+
+
 def manager():
   """
   :return: the security manager
@@ -120,15 +132,18 @@ def manager():
       _manager = DummyManager()
   return _manager
 
+
 def current_username():
   u = manager().current_user
   return u.name if hasattr(u, 'name') else 'Anonymous'
+
 
 def login_required(f):
   """
   Decorator for views that require login.
   """
   return manager().login_required(f)
+
 
 def init_app(app):
   """
@@ -137,6 +152,7 @@ def init_app(app):
   :return:
   """
   manager().init_app(app)
+
 
 def add_login_routes(app):
   """

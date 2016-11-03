@@ -1,15 +1,22 @@
-__author__ = 'Samuel Gratzl'
+###############################################################################
+# Caleydo - Visualization for Molecular Biology - http://caleydo.org
+# Copyright (c) The Caleydo Team. All rights reserved.
+# Licensed under the new BSD license, available at http://caleydo.org/license
+###############################################################################
+
 
 def to_plural(s):
-  if s[len(s)-1] == 'y':
-    return s[0:len(s)-1] + 'ies'
-  return s+'s'
+  if s[len(s) - 1] == 'y':
+    return s[0:len(s) - 1] + 'ies'
+  return s + 's'
+
 
 class ADataSetEntry(object):
   """
   A basic dataset entry
   """
-  def __init__(self, name, project, type, id = None):
+
+  def __init__(self, name, project, type, id=None):
     """
     constructor for a new dataset
     :param name:
@@ -18,10 +25,10 @@ class ADataSetEntry(object):
     :param id: optional the id to use
     """
     self.name = name
-    self.fqname = project + '/'+ name
+    self.fqname = project + '/' + name
     self.type = type
-    import phovea_server.util
-    self.id = id if id is not None else phovea_server.util.fix_id(self.fqname)
+    from .util import fix_id
+    self.id = id if id is not None else fix_id(self.fqname)
 
   def idtypes(self):
     """
@@ -43,6 +50,7 @@ class ADataSetEntry(object):
     list of a all idtypes of this dataset
     :return:
     """
+
     def to_desc(t):
       return dict(id=t, name=t, names=to_plural(t))
 
@@ -81,49 +89,46 @@ class ADataSetEntry(object):
     """
     return dict()
 
-
-#specific api for vectors
- #idtype
- #shape
- #value
- #range
- #rows(range=None)
- #rowids(range=None)
- #aslist(range=None)
- #asnumpy(range=None)
-#specific api for matrices
- #rowtype
- #coltype
- #shape
- #value
- #range
- #rows(range=None)
- #rowids(range=None)
- #cols(range=None)
- #colids(range=None)
- #aslist(range=None)
- #asnumpy(range=None)
-#specific api for tables
- #idtype
- #columns
- #shape
- #rows(range=None)
- #rowids(range=None)
- #aslist(range=None)
- #aspandas(range=None)
-#specific api for stratifications
- #idtype
- #rows(range=None)
- #rowids(range=None)
- #groups()
-
-
+    # specific api for vectors
+    # idtype
+    # shape
+    # value
+    # range
+    # rows(range=None)
+    # rowids(range=None)
+    # aslist(range=None)
+    # asnumpy(range=None)
+    # specific api for matrices
+    # rowtype
+    # coltype
+    # shape
+    # value
+    # range
+    # rows(range=None)
+    # rowids(range=None)
+    # cols(range=None)
+    # colids(range=None)
+    # aslist(range=None)
+    # asnumpy(range=None)
+    # specific api for tables
+    # idtype
+    # columns
+    # shape
+    # rows(range=None)
+    # rowids(range=None)
+    # aslist(range=None)
+    # aspandas(range=None)
+    # specific api for stratifications
+    # idtype
+    # rows(range=None)
+    # rowids(range=None)
+    # groups()
 
 
 class ADataSetProvider(object):
-
   def __len__(self):
     return 0
+
   def __iter__(self):
     return iter([])
 

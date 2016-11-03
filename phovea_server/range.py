@@ -1,4 +1,9 @@
-__author__ = 'sam'
+###############################################################################
+# Caleydo - Visualization for Molecular Biology - http://caleydo.org
+# Copyright (c) The Caleydo Team. All rights reserved.
+# Licensed under the new BSD license, available at http://caleydo.org/license
+###############################################################################
+
 
 import itertools
 import math
@@ -20,10 +25,6 @@ class SingleRangeElem(object):
 
   def asslice(self):
     return self.start
-
-  @property
-  def step(self):
-    return self.start + 1
 
   @property
   def isall(self):
@@ -119,7 +120,8 @@ class RangeElem(object):
     return RangeElem(f, t, - self.step)
 
   def invert(self, index, size=0):
-    if self.isall: return index
+    if self.isall:
+      return index
     return fix(self.start, size) + index * self.step
 
   def __iter__(self):
@@ -140,8 +142,10 @@ class RangeElem(object):
     return self.contains(value)
 
   def __str__(self):
-    if self.isall: return ''
-    if self.issingle: return str(self.start)
+    if self.isall:
+      return ''
+    if self.issingle:
+      return str(self.start)
     r = str(self.start) + ':' + str(self.end)
     if self.step != 1:
       r = r + ':' + str(self.step)
@@ -208,7 +212,7 @@ class Range1D(object):
         r.append(RangeElem.single(indices[start]))
       else:
         # +1 since end is excluded
-        #fix while just +1 -1 allowed
+        # fix while just +1 -1 allowed
         if abs(deltas[start]) == 1:
           r.append(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]))
         else:
@@ -216,7 +220,7 @@ class Range1D(object):
             r.append(RangeElem.single(indices[i]))
       start = act
       act += 1
-    while start < len(indices):  # corner case by adding act+1, it might happend that last one isn't considered
+    while start < len(indices):  # corner case by adding act+1, it might happened that last one isn't considered
       r.append(RangeElem.single(indices[start]))
       start += 1
     return r
@@ -275,7 +279,6 @@ class Range1D(object):
       return self._elems[0].asslice()
     return self.tolist()
 
-
   @property
   def is_identity_range(self):
     return len(self._elems) == 1 and self._elems[0].start == 0 and self._elems[0].step == 1
@@ -302,11 +305,10 @@ class Range1D(object):
     r = []
     while s.hasNext():
       i = s.next()
-      if 0 <= i < len(l):  #check for out of range
+      if 0 <= i < len(l):  # check for out of range
         r.append(l[i])
 
     return Range1D.start(r)
-
 
   def union(self, other, size=0):
     if self.isall or other.isnone:
@@ -337,7 +339,6 @@ class Range1D(object):
     it2 = other.iter(size)
     r = [i for i in it2 if i in it1]
     return Range1D.start(sorted(r))
-
 
   def without(self, without, size=0):
     if self.isnone or without.isnone:
@@ -371,23 +372,22 @@ class Range1D(object):
 
     return self._elems[act - 1].invert(index - total + s, size)
 
-
   def index(self, *args):
     if len(args) == 0:
       return []
 
     if isinstance(args[0], Range1D):
-      return self.index_range_of(args[0],args[1])
+      return self.index_range_of(args[0], args[1])
     base = list(self.iter())
     if len(args) == 1:
       if type(args[0]) is int:
-       return base.index(args[0])
+        return base.index(args[0])
       arr = args[0]
     else:
       arr = args
     return [base.index(index) for index in arr]
 
-  def index_range_of(self, r, size = 0):
+  def index_range_of(self, r, size=0):
     if r.isnone or self.isnone:
       return Range1D.none()
     if self.is_identity_range:
@@ -395,15 +395,15 @@ class Range1D(object):
       result = [d for d in r if 0 <= d < end]
     else:
       arr = list(self.iter())
-      result = [ arr.index(d) for d in arr if d in arr]
+      result = [arr.index(d) for d in arr if d in arr]
     return Range1D.start(result)
 
-  def filter(self, data, size, transform = lambda x : x):
+  def filter(self, data, size, transform=lambda x: x):
     if self.isall:
       return [transform(x) for x in data]
     return [transform(data[i]) for i in self.iter(size)]
 
-  def iter(self,size=0):
+  def iter(self, size=0):
     if self._islist:
       return (d.start for d in self._elems)
     else:
@@ -426,7 +426,7 @@ class Range1D(object):
   def remove_duplicates(self, size=0):
     arr = list(self.iter())
     arr.sort()
-    arr = [di for i, di in enumerate(arr) if di != arr[i - 1] ]  # same value as before, remove
+    arr = [di for i, di in enumerate(arr) if di != arr[i - 1]]  # same value as before, remove
     return Range1D.start(arr)
 
   def reverse(self):
@@ -450,25 +450,26 @@ class Range1DGroup(Range1D):
     self.name = name
     self.color = color
 
-  def pre_multiply(self, sub, size = 0):
+  def pre_multiply(self, sub, size=0):
     r = super(Range1DGroup, self).pre_multiply(sub, size)
     return Range1DGroup(self.name, self.color, r)
 
-  def union(self, other, size = 0):
+  def union(self, other, size=0):
     r = super(Range1DGroup, self).union(other, size)
     return Range1DGroup(self.name, self.color, r)
 
-  def intersect(self, other, size = 0):
+  def intersect(self, other, size=0):
     r = super(Range1DGroup, self).intersect(other, size)
     return Range1DGroup(self.name, self.color, r)
 
-  def without(self, without, size = 0):
+  def without(self, without, size=0):
     r = super(Range1DGroup, self).without(without, size)
     return Range1DGroup(self.name, self.color, r)
 
   def sort(self, cmp):
     r = super(Range1DGroup, self).sort(cmp)
     return Range1DGroup(self.name, self.color, r)
+
   def __str__(self):
     return '"' + self.name + '""' + self.color + '"' + str(super(Range1DGroup, self))
 
@@ -476,8 +477,10 @@ class Range1DGroup(Range1D):
 def as_ungrouped(range):
   return Range1DGroup('unnamed', 'gray', range)
 
+
 def composite(name, groups):
   return CompositeRange1D(name, groups)
+
 
 def to_base(groups):
   if len(groups) == 1:
@@ -489,24 +492,24 @@ def to_base(groups):
 
 
 class CompositeRange1D(Range1D):
-  def __init__(self, name, groups, base = None):
+  def __init__(self, name, groups, base=None):
     super(CompositeRange1D, self).__init__(base if base is not None else to_base(groups))
     self.name = name
     self.groups = groups
 
-  def pre_multiply(self, sub, size = 0):
+  def pre_multiply(self, sub, size=0):
     r = super(CompositeRange1D, self).pre_multiply(sub, size) if len(self.groups) > 1 else None
     return CompositeRange1D(self.name, [g.pre_multiply(sub, size) for g in self.groups], r)
 
-  def union(self, other, size = 0):
+  def union(self, other, size=0):
     r = super(CompositeRange1D, self).union(other, size) if len(self.groups) > 1 else None
     return CompositeRange1D(self.name, [g.union(other, size) for g in self.groups], r)
 
-  def intersect(self, other, size = 0):
+  def intersect(self, other, size=0):
     r = super(CompositeRange1D, self).intersect(other, size) if len(self.groups) > 1 else None
     return CompositeRange1D(self.name, [g.intersect(other, size) for g in self.groups], r)
 
-  def without(self, without, size = 0):
+  def without(self, without, size=0):
     r = super(CompositeRange1D, self).without(without, size) if len(self.groups) > 1 else None
     return CompositeRange1D(self.name, [g.without(without, size) for g in self.groups], r)
 
@@ -517,8 +520,9 @@ class CompositeRange1D(Range1D):
   def __str__(self):
     return '"' + self.name + '":' + ','.join((str(g) for g in self.groups)) + ''
 
+
 class Range(object):
-  def __init__(self, dims = []):
+  def __init__(self, dims=[]):
     self.dims = dims
 
   @property
@@ -536,7 +540,7 @@ class Range(object):
   def __getitem__(self, item):
     if len(self.dims) > item:
       return self.dims[item]
-    for i in xrange(len(self.dims), item+1):
+    for i in xrange(len(self.dims), item + 1):
       self.dims.append(Range1D.all())
     return self.dims[item]
 
@@ -551,21 +555,21 @@ class Range(object):
       return True
     return str(self) == str(other)
 
-  def pre_multiply(self, other, size = []):
+  def pre_multiply(self, other, size=[]):
     if self.isall:
       return other.copy()
     if other.isall:
       return self.copy()
-    return Range([d.pre_multiply(other[i], size[i] if i >= len(size) else 0) for i,d in enumerate(self.dims)])
+    return Range([d.pre_multiply(other[i], size[i] if i >= len(size) else 0) for i, d in enumerate(self.dims)])
 
-  def union(self, other, size = []):
+  def union(self, other, size=[]):
     if self.isall or other.isnone:
       return self.copy()
     if other.isall or self.isnone:
       return other.copy()
-    return Range([d.union(other[i], size[i] if i >= len(size) else 0) for i,d in enumerate(self.dims)])
+    return Range([d.union(other[i], size[i] if i >= len(size) else 0) for i, d in enumerate(self.dims)])
 
-  def intersect(self, other, size = []):
+  def intersect(self, other, size=[]):
     if self.isnone or other.isnone:
       return none()
     if self.isall:
@@ -573,15 +577,15 @@ class Range(object):
     if other.isall:
       return self.copy()
 
-    return Range([d.intersect(other[i], size[i] if i >= len(size) else 0) for i,d in enumerate(self.dims)])
+    return Range([d.intersect(other[i], size[i] if i >= len(size) else 0) for i, d in enumerate(self.dims)])
 
-  def without(self, without, size = []):
+  def without(self, without, size=[]):
     if self.isnone or without.isnone:
       return self.copy()
     if without.isall:
       return none()
 
-    return Range([d.without(without[i], size[i] if i >= len(size) else 0) for i,d in enumerate(self.dims)])
+    return Range([d.without(without[i], size[i] if i >= len(size) else 0) for i, d in enumerate(self.dims)])
 
   def copy(self):
     return Range([d.copy() for d in self.dims])
@@ -601,28 +605,30 @@ class Range(object):
       return data
 
     ndim = self.ndim
-    #recursive variant for just filtering the needed rows
+
+    # recursive variant for just filtering the needed rows
     def filter_dim(i):
       if i >= ndim:
-        return lambda x : x
+        return lambda x: x
       d = self[i]
-      nex = filter_dim(i+1)
+      nex = filter_dim(i + 1)
       s = size[i] if len(size) > i else 0
-      return lambda elem : d.filter(elem, s, nex) if isinstance(elem, list) else elem
+      return lambda elem: d.filter(elem, s, nex) if isinstance(elem, list) else elem
+
     f = filter_dim(0)
     return f(data)
 
-  def invert(self, indices, size = []):
+  def invert(self, indices, size=[]):
     if self.isall:
       return indices
-    return [ self.dim(i).invert(index, size[i] if len(size) > i else 0) for i, index in enumerate(indices)]
+    return [self.dim(i).invert(index, size[i] if len(size) > i else 0) for i, index in enumerate(indices)]
 
-  def index_of_range(self, r, size = []):
+  def index_of_range(self, r, size=[]):
     if r.isnone or self.isnone:
       return none()
     if self.isnone or r.isall:
       return self.copy()
-    return Range([d.index_range_of(r[i], size[i] if len(size) > i else 0) for i,d in enumerate(self.dims)])
+    return Range([d.index_range_of(r[i], size[i] if len(size) > i else 0) for i, d in enumerate(self.dims)])
 
   def index(self, index_or_range, *args):
     if type(index_or_range) is Range:
@@ -636,12 +642,12 @@ class Range(object):
       arr.extend(args)
     if len(arr) == 0:
       return []
-    return [self[i].index(index) for i,index in enumerate(arr)]
+    return [self[i].index(index) for i, index in enumerate(arr)]
 
-  def size(self, size = []):
+  def size(self, size=[]):
     if self.isall:
       return size
-    return [r.size(size[i] if len(size)> i else 0) for i,r in enumerate(self.dims)]
+    return [r.size(size[i] if len(size) > i else 0) for i, r in enumerate(self.dims)]
 
   def split(self):
     return [Range([dim]) for dim in self.dims]
@@ -652,26 +658,27 @@ class Range(object):
   def __iter__(self):
     return iter(self.dims)
 
+
 def all():
   return Range()
+
 
 def none():
   return Range([Range1D.none(), Range1D.none()])
 
-def __call__(*args):
-  return range(*args)
 
-def from_slice(start, end = -1, step = 1):
+def from_slice(start, end=-1, step=1):
   r = Range()
   r[0].set_slice(start, end, step)
   return r
+
 
 def range(*args):
   if len(args) == 0:
     return all()
   r = Range()
   if isinstance(args[0], list):
-    for i,arr in enumerate(args):
+    for i, arr in enumerate(args):
       if len(arr) == 0:
         continue
       r[i].set_slice(arr[0], arr[1], arr[2])
@@ -680,14 +687,16 @@ def range(*args):
 
   return r
 
+
 def join(*args):
   if len(args) == 0:
     return all()
   r = Range()
   if isinstance(args[0], list):
-    args= args[0]
-  r.dims = [r[0] for r in args]
+    args = args[0]
+  r.dims = [ri[0] for ri in args]
   return r
+
 
 def from_list(*args):
   if len(args) == 0:
@@ -695,28 +704,29 @@ def from_list(*args):
   r = Range()
   if isinstance(args[0], list) and type(args[0][0]) is Range1D:
     r.dims = args[0]
-  elif isinstance(args[0], list): #array mode
-    for i,arr in enumerate(args):
+  elif isinstance(args[0], list):  # array mode
+    for i, arr in enumerate(args):
       if type(arr) is Range1D:
         r[i] = arr
       else:
         r[i].set_list(arr)
-  elif type(args[0]) is int: #single slice mode
+  elif type(args[0]) is int:  # single slice mode
     r[0].set_list(args)
   elif type(args[0]) is Range1D:
     r.dims = args
   return r
 
-#Range EBNF grammar
-#R   = Dim : ',' Dim
-#Dim = '' | SR | '(' SR : ',' SR '  ')'
-#SR  = N [ ':' N [ ':' N ] ]
-#N   = '0'...'9'
-#Str =  '"' literal '"'
-#Name= Str
-#Col = Str
-#GDim= Name Col Dim
-#CDim= Name ':' GDim : ',' GDim  ''
+
+# Range EBNF grammar
+# R   = Dim : ',' Dim
+# Dim = '' | SR | '(' SR : ',' SR '  ')'
+# SR  = N [ ':' N [ ':' N ] ]
+# N   = '0'...'9'
+# Str =  '"' literal '"'
+# Name= Str
+# Col = Str
+# GDim= Name Col Dim
+# CDim= Name ':' GDim : ',' GDim  ''
 def parse_range(code):
   act = 0
   dims = []
@@ -725,36 +735,38 @@ def parse_range(code):
     c = code[act]
     if c == '"':
       act, dim = parse_named_range1d(code, act)
-      act += 1 # skip ,
+      act += 1  # skip ,
       dims.append(dim)
     elif c == ',':
-      act+=1
+      act += 1
       dims.append(Range1D.all())
     else:
       ract, dim = parse_range1d(code, act)
-      act = ract + 1 #skip ,
+      act = ract + 1  # skip ,
       dims.append(dim)
   return Range(dims)
 
+
 def parse_named_range1d(code, act):
-  act += 1  #skip "
+  act += 1  # skip "
   end = code.index('"', act)
   name = code[act:end]
-  act = end +1
+  act = end + 1
   c = code[act]
   if c == '"':
-    end = code.index('"', act +1)
-    ract, dim = parse_range1d(code, end +1)
-    return ract, Range1DGroup(name, code[act+1:end], dim)
+    end = code.index('"', act + 1)
+    ract, dim = parse_range1d(code, end + 1)
+    return ract, Range1DGroup(name, code[act + 1:end], dim)
   elif c == '{':
     groups = []
     while code[act] != '}':
-      ract, dim = parse_named_range1d(code, act +1)
+      ract, dim = parse_named_range1d(code, act + 1)
       groups.append(dim)
       act = ract
-    return act+1, CompositeRange1D(name, groups)
-  else: #error
+    return act + 1, CompositeRange1D(name, groups)
+  else:  # error
     return act, Range1D.all()
+
 
 def parse_range1d(code, act):
   if act >= len(code):
@@ -765,8 +777,8 @@ def parse_range1d(code, act):
     r = Range1D.all()
   elif c == '(':
     n = code.index(')', act)
-    r = Range1D([RangeElem.parse(ni) for ni in code[act+1: n].split(',')])
-    n+=1
+    r = Range1D([RangeElem.parse(ni) for ni in code[act + 1: n].split(',')])
+    n += 1
   else:
     n = code.find(',', act)
     n2 = code.find('}', act)
@@ -777,8 +789,9 @@ def parse_range1d(code, act):
 
     if n < 0:
       n = len(code)
-    r = Range1D([ RangeElem.parse(code[act:n])])
+    r = Range1D([RangeElem.parse(code[act:n])])
   return n, r
+
 
 def parse(*args):
   if len(args) == 0:

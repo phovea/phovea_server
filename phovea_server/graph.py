@@ -1,4 +1,11 @@
-from phovea_server.dataset_def import ADataSetEntry
+###############################################################################
+# Caleydo - Visualization for Molecular Biology - http://caleydo.org
+# Copyright (c) The Caleydo Team. All rights reserved.
+# Licensed under the new BSD license, available at http://caleydo.org/license
+###############################################################################
+
+
+from .dataset_def import ADataSetEntry
 
 
 class GraphNode(object):
@@ -8,10 +15,7 @@ class GraphNode(object):
     self.attrs = {} if attrs is None else attrs
 
   def asjson(self):
-    return dict(
-      type=self.type,
-      id=self.id,
-      attrs=self.attrs)
+    return dict(type=self.type, id=self.id, attrs=self.attrs)
 
 
 class GraphEdge(object):
@@ -106,8 +110,8 @@ class Graph(ADataSetEntry):
 
 
 def _resolve_parser(format):
-  import phovea_server.plugin
-  for p in phovea_server.plugin.list('graph-parser'):
+  from .plugin import list as list_plugins
+  for p in list_plugins('graph-parser'):
     if p.format == format:
       return p.load()
 

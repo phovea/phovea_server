@@ -1,3 +1,11 @@
+###############################################################################
+# Caleydo - Visualization for Molecular Biology - http://caleydo.org
+# Copyright (c) The Caleydo Team. All rights reserved.
+# Licensed under the new BSD license, available at http://caleydo.org/license
+###############################################################################
+from __future__ import print_function
+from werkzeug.utils import cached_property
+
 
 class ApplicationProxy(object):
   """
@@ -5,22 +13,18 @@ class ApplicationProxy(object):
   """
   def __init__(self, namespace, loader):
     self.namespace = namespace
-    #number of suburls to pop
+    # number of suburls to pop
     self.peeks = namespace.count('/')
     self.loader = loader
-    self._impl = None
 
-  @property
+  @cached_property
   def app(self):
-    #cache
-    if self._impl is not None:
-      return self._impl
-    self._impl = self.loader()
-    return self._impl
+    return self.loader()
 
   def match(self, path):
-    #start of a suburl or the whole one
-    return path.startswith(self.namespace+'/') or path == self.namespace
+    # start of a suburl or the whole one
+    return path.startswith(self.namespace + '/') or path == self.namespace
+
 
 class PathDispatcher(object):
   """
@@ -29,8 +33,8 @@ class PathDispatcher(object):
   def __init__(self, default_app, applications):
     self.default_app = default_app
 
-    self.applications = [ ApplicationProxy(key,value) for key,value in applications.iteritems()]
-    #print self.applications
+    self.applications = [ApplicationProxy(key, value) for key, value in applications.items()]
+    # print self.applications
     from threading import Lock
     self.lock = Lock()
 
@@ -48,7 +52,7 @@ class PathDispatcher(object):
       for i in range(app.peeks):
         pop_path_info(environ)
       app = app.app
-      #print get_path_info(environ), app
-    else: #use default app
+      # print get_path_info(environ), app
+    else:  # use default app
       app = self.default_app
     return app(environ, start_response)

@@ -1,25 +1,18 @@
 {
   "dir": "./",
   "pluginDirs": [
-    "${dir}plugins/",
-    "${dir}static/"
+    "p"
   ],
-
   "dataDir": "${dir}/_data",
   "use_reloader": false,
   "multithreaded": true,
-
   "debug": true,
   "nocache": true,
   "error_stack_trace": true,
-
-  "bower_components": "libs/bower_components",
-
   "port": 9000,
   "address": "0.0.0.0",
   "secret_key": "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w",
   "max_file_size": 33554432,
-
   "disable": {
     "plugins": [],
     "extensions": []
@@ -43,10 +36,10 @@
         "stream": "ext://sys.stdout"
       },
       "file": {
-        "class": "logging.handlers.TimedRotatingFileHandler",
+        "class": "phovea_server.TimedRotatingFileHandler",
         "level": "DEBUG",
         "formatter": "line",
-        "filename": "logs/caleydo.log",
+        "filename": "logs/phovea.log",
         "when": "midnight",
         "backupCount": 7
       }

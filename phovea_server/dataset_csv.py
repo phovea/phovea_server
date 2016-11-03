@@ -1,27 +1,36 @@
+###############################################################################
+# Caleydo - Visualization for Molecular Biology - http://caleydo.org
+# Copyright (c) The Caleydo Team. All rights reserved.
+# Licensed under the new BSD license, available at http://caleydo.org/license
+###############################################################################
+
+
 import json
 import csv
 import os
 import numpy as np
-from phovea_server.dataset_def import ADataSetEntry, ADataSetProvider
+from .dataset_def import ADataSetEntry, ADataSetProvider
 
 
 def assign_ids(ids, idtype):
-  import phovea_server.plugin
+  from .plugin import lookup
 
-  manager = phovea_server.plugin.lookup('idmanager')
+  manager = lookup('idmanager')
   return np.array(manager(ids, idtype))
 
+
 def fix_id(fqname):
-  import phovea_server.util
-  return phovea_server.util.fix_id(fqname)
+  from .util import fix_id
+  return fix_id(fqname)
+
 
 class CSVEntry(ADataSetEntry):
   def __init__(self, desc, project):
-    super(CSVEntry, self).__init__(desc['name'], project.id, desc['type'], desc.get('id',None))
+    super(CSVEntry, self).__init__(desc['name'], project.id, desc['type'], desc.get('id', None))
     self._desc = desc
     desc['fqname'] = self.fqname
     desc['id'] = self.id
-    self._path = os.path.join(project.folder+'/data/',self._desc['path'])
+    self._path = os.path.join(project.folder + '/data/', self._desc['path'])
     del self._desc['path']
     self._project = project
 
@@ -33,8 +42,9 @@ class CSVEntry(ADataSetEntry):
 
     data = []
     with open(self._path, 'r') as csvfile:
-      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ',').encode('ascii','ignore'), quotechar='|')
+      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ',').encode('ascii', 'ignore'), quotechar='|')
       data.extend(reader)
+
     # print data
     def to_num(s):
       try:
@@ -43,7 +53,7 @@ class CSVEntry(ADataSetEntry):
         return s
 
     header = data[0]
-    data = [[to_num(v) if i > 0 else v for i,v in enumerate(row)] for row in data[1:]]
+    data = [[to_num(v) if i > 0 else v for i, v in enumerate(row)] for row in data[1:]]
     data.insert(0, header)
 
     # convert to col, row and data
@@ -59,25 +69,28 @@ class CSVEntry(ADataSetEntry):
   def idtypes(self):
     return [v for k, v in self._desc.iteritems() if k in ['rowtype', 'coltype', 'idtype']]
 
+
 def guess_color(name, i):
   name = name.lower()
-  colors = dict(name='blue',female='red',deceased='#e41a1b',living='#377eb8')
+  colors = dict(name='blue', female='red', deceased='#e41a1b', living='#377eb8')
   if name in colors:
     return colors[name]
   l = ['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd',
-          '#ccebc5', '#ffed6f']
-  return l[i%len(l)]
+       '#ccebc5', '#ffed6f']
+  return l[i % len(l)]
 
-def cmpString(a, b):
+
+def cmp_string(a, b):
   if a == b:
     return 0
   return -1 if a < b else +1
+
 
 class CSVStratification(CSVEntry):
   def __init__(self, desc, project):
     super(CSVStratification, self).__init__(desc, project)
     self.idtype = desc['idtype']
-    for i,g in enumerate(desc['groups']):
+    for i, g in enumerate(desc['groups']):
       if 'color' not in g:
         g['color'] = guess_color(g['name'], i)
 
@@ -86,6 +99,7 @@ class CSVStratification(CSVEntry):
       if type(v) is float:
         return str(int(v))
       return str(v)
+
     d = [dict(row=row[0], i=i, cluster=to_string(row[1])) for i, row in enumerate(data[1:])]
 
     groups = [str(g['name']) for g in self._desc['groups']]
@@ -96,10 +110,10 @@ class CSVStratification(CSVEntry):
       if ga != gb:
         return ga - gb
 
-      r = cmpString(a['cluster'],b['cluster'])
+      r = cmp_string(a['cluster'], b['cluster'])
       if r != 0:
         return r
-      return cmpString(a['row'],b['row']) if r == 0 else r
+      return cmp_string(a['row'], b['row']) if r == 0 else r
 
     d.sort(cmp)  # sort by cluster;
     clusters = dict()
@@ -110,14 +124,14 @@ class CSVStratification(CSVEntry):
       else:
         clusters[c] = [di['i']]
 
-    colors= { g['name']: g['color'] for g in self._desc['groups'] }
-    clusters = [dict(name=k, range=clusters.get(k,[]), color=colors.get(k,'gray')) for k in groups]
+    colors = {g['name']: g['color'] for g in self._desc['groups']}
+    clusters = [dict(name=k, range=clusters.get(k, []), color=colors.get(k, 'gray')) for k in groups]
 
-    rows = np.array([d[0] for d in data[1:]])
+    rows = np.array([di[0] for di in data[1:]])
     return {
-      "rows": rows,
-      "rowIds": assign_ids(rows, self.idtype),
-      "groups": clusters
+        'rows': rows,
+        'rowIds': assign_ids(rows, self.idtype),
+        'groups': clusters
     }
 
   def rows(self, range=None):
@@ -139,12 +153,12 @@ class CSVStratification(CSVEntry):
     return self.load()
 
   @staticmethod
-  def parse(data, path, project, id = None):
+  def parse(data, path, project, id=None):
     desc = dict(type='stratification',
-                name=data.get('name','Uploaded File'),
-                path = os.path.basename(path),
-                idtype=data.get('idtype',data.get('rowtype','unknown')))
-    for k,v in data.iteritems():
+                name=data.get('name', 'Uploaded File'),
+                path=os.path.basename(path),
+                idtype=data.get('idtype', data.get('rowtype', 'unknown')))
+    for k, v in data.iteritems():
       if k not in desc:
         desc[k] = v
     if id is not None:
@@ -153,15 +167,15 @@ class CSVStratification(CSVEntry):
       desc['size'] = [int(data['size0'])]
       del desc['size0']
       desc['ngroups'] = int(data['ngroups'])
-    else: #derive from the data
+    else:  # derive from the data
       clusters = set()
       count = 0
       with open(path, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii','ignore'), quotechar='|')
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii', 'ignore'), quotechar='|')
         for row in reader:
-          count+=1
+          count += 1
           clusters.add(row[1])
-      desc['size'] = [ count ]
+      desc['size'] = [count]
       desc['ngroups'] = len(clusters)
 
     return CSVStratification(desc, project)
@@ -183,17 +197,17 @@ class CSVMatrix(CSVEntry):
 
     if is_number:
       vs = map(lambda x: [np.NaN if v == 'NA' or v == '' else v for v in x[1:]], data[1:])
-      #import numpy.ma as ma
-      #dd = ma.masked_equal(np.array(vs), np.NaN)
+      # import numpy.ma as ma
+      # dd = ma.masked_equal(np.array(vs), np.NaN)
       dd = np.array(vs)
     else:
       dd = np.array(map(lambda x: x[1:], data[1:]))
     return {
-      'cols': cols,
-      'colIds': assign_ids(cols, self.coltype),
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.rowtype),
-      'data': dd
+        'cols': cols,
+        'colIds': assign_ids(cols, self.coltype),
+        'rows': rows,
+        'rowIds': assign_ids(rows, self.rowtype),
+        'data': dd
     }
 
   def rows(self, range=None):
@@ -232,18 +246,18 @@ class CSVMatrix(CSVEntry):
     cols = range[1].asslice()
     d = None
     if isinstance(rows, list) and isinstance(cols, list):
-      #fancy indexing in two dimension doesn't work
-      d_help = n[rows,:]
-      d = d_help[:,cols]
+      # fancy indexing in two dimension doesn't work
+      d_help = n[rows, :]
+      d = d_help[:, cols]
     else:
       d = n[rows, cols]
 
     if d.ndim == 1:
-      #two options one row and n columns or the other way around
+      # two options one row and n columns or the other way around
       if rows is Ellipsis or (isinstance(rows, list) and len(rows) > 1):
-        d = d.reshape((d.shape[0],1))
+        d = d.reshape((d.shape[0], 1))
       else:
-        d = d.reshape((1,d.shape[0]))
+        d = d.reshape((1, d.shape[0]))
     return d
 
   def asjson(self, range=None):
@@ -257,46 +271,48 @@ class CSVMatrix(CSVEntry):
     return r
 
   @staticmethod
-  def parse(data, path, project, id = None):
+  def parse(data, path, project, id=None):
     desc = dict(type='matrix',
-                name=data.get('name','Uploaded File'),
-                path = os.path.basename(path),
-                rowtype=data.get('rowtype','unknown'),
-                coltype=data.get('coltype','unknown'),
-                value=dict(type=data.get('value_type','real')))
-    for k,v in data.iteritems():
+                name=data.get('name', 'Uploaded File'),
+                path=os.path.basename(path),
+                rowtype=data.get('rowtype', 'unknown'),
+                coltype=data.get('coltype', 'unknown'),
+                value=dict(type=data.get('value_type', 'real')))
+    for k, v in data.iteritems():
       if k not in desc:
         desc[k] = v
     if id is not None:
       desc['id'] = id
 
-    if all((k in data) for k in ['size0','size1','value_min','value_max']):
-      desc['size'] = [int(data['size0']),int(data['size1'])]
+    if all((k in data) for k in ['size0', 'size1', 'value_min', 'value_max']):
+      desc['size'] = [int(data['size0']), int(data['size1'])]
       del desc['size0']
       del desc['size1']
-      desc['value']['range'] = [float(data['value_min']),float(data['value_max'])]
+      desc['value']['range'] = [float(data['value_min']), float(data['value_max'])]
       del desc['value_min']
       del desc['value_max']
-    else: #derive from the data
+    else:  # derive from the data
       rows = 0
       cols = None
       min_v = None
       max_v = None
       with open(path, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii','ignore'), quotechar='|')
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii', 'ignore'), quotechar='|')
         for row in reader:
           if cols is None:
-            cols = len(row)-1
+            cols = len(row) - 1
           else:
-            rows+=1
+            rows += 1
             min_act = min(map(float, row[1:]))
             min_v = min_act if min_v is None else min(min_act, min_v)
             max_act = max(map(float, row[1:]))
             max_v = max_act if max_v is None else max(max_act, max_v)
       desc['size'] = [rows, cols]
-      desc['value']['range'] = [float(data['value_min']) if 'value_min' in data else min_v, float(data['value_max']) if 'value_max' in data else max_v]
+      desc['value']['range'] = [float(data['value_min']) if 'value_min' in data else min_v,
+                                float(data['value_max']) if 'value_max' in data else max_v]
 
     return CSVMatrix(desc, project)
+
 
 class CSVColumn(object):
   def __init__(self, desc, table):
@@ -305,7 +321,7 @@ class CSVColumn(object):
     self.name = desc['name']
     self.type = desc['value']['type']
 
-  def aslist(self, range = None):
+  def aslist(self, range=None):
     return self.asnumpy(range).tolist()
 
   def asnumpy(self, range=None):
@@ -325,13 +341,13 @@ class CSVTable(CSVEntry):
   def _process(self, data):
     rows = np.array(map(lambda x: x[0], data[1:]))
     import pandas as pd
-    objs = { c.name : map(lambda x: x[i+1], data[1:]) for i,c in enumerate(self.columns) }
+    objs = {c.name: map(lambda x: x[i + 1], data[1:]) for i, c in enumerate(self.columns)}
     df = pd.DataFrame(objs)
     df.index = rows
     return {
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.idtype),
-      'df': df
+        'rows': rows,
+        'rowIds': assign_ids(rows, self.idtype),
+        'df': df
     }
 
   def rows(self, range=None):
@@ -364,7 +380,7 @@ class CSVTable(CSVEntry):
     return r
 
   @staticmethod
-  def parse(data, path, id = None):
+  def parse(data, path, id=None):
     pass
 
 
@@ -380,9 +396,9 @@ class CSVVector(CSVEntry):
   def _process(self, data):
     rows = np.array(map(lambda x: x[0], data[1:]))
     return {
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.idtype),
-      'data': np.array(map(lambda x: x[1], data[1:]))
+        'rows': rows,
+        'rowIds': assign_ids(rows, self.idtype),
+        'data': np.array(map(lambda x: x[1], data[1:]))
     }
 
   def rows(self, range=None):
@@ -415,13 +431,13 @@ class CSVVector(CSVEntry):
     return r
 
   @staticmethod
-  def parse(data, path, project, id = None):
+  def parse(data, path, project, id=None):
     pass
 
 
 def to_files(plugins):
   for plugin in plugins:
-    index = os.path.join(plugin.folder,'data/index.json')
+    index = os.path.join(plugin.folder, 'data/index.json')
     if not os.path.isfile(index):
       continue
     with open(index, 'r') as f:
@@ -439,37 +455,38 @@ def to_files(plugins):
 
 class DataPlugin(object):
   def __init__(self):
-    #add a magic plugin for the static data dir
-    from phovea_server.config import view
+    # add a magic plugin for the static data dir
+    from .config import view
     cc = view('phovea_server')
     self.folder = cc.dataDir
     self.id = 'data'
 
   def save(self, f):
     import werkzeug.utils
-    import phovea_server.util
-    dir_ = os.path.join(self.folder,'data')
+    from .util import random_id
+    dir_ = os.path.join(self.folder, 'data')
     if not os.path.exists(dir_):
       os.makedirs(dir_)
     filename = os.path.basename(f.filename)
-    filename = werkzeug.utils.secure_filename(filename+phovea_server.util.random_id(3)+'.csv')
+    filename = werkzeug.utils.secure_filename(filename + random_id(3) + '.csv')
     path = os.path.join(dir_, filename)
     f.save(path)
     return path
 
   def append(self, desc, path):
     desc['path'] = os.path.basename(path)
-    index = os.path.join(self.folder,'data/index.json')
+    index = os.path.join(self.folder, 'data/index.json')
     old = []
     if os.path.isfile(index):
-      with open(index,'r') as f:
+      with open(index, 'r') as f:
         old = json.load(f)
     old.append(desc)
-    with open(index,'w') as f:
-        json.dump(old, f, indent=1)
+    with open(index, 'w') as f:
+      json.dump(old, f, indent=1)
 
 
 dataPlugin = DataPlugin()
+
 
 class StaticFileProvider(ADataSetProvider):
   def __init__(self, plugins):
@@ -486,11 +503,12 @@ class StaticFileProvider(ADataSetProvider):
 
   def upload(self, data, files, id=None):
     if 'csv' != data.get('_provider', 'csv'):
-      return None #not the right provider
-    type = data.get('type','unknown')
-    parsers = dict(matrix=CSVMatrix.parse,table=CSVTable.parse,vector=CSVVector.parse,stratification=CSVStratification.parse)
+      return None  # not the right provider
+    type = data.get('type', 'unknown')
+    parsers = dict(matrix=CSVMatrix.parse, table=CSVTable.parse, vector=CSVVector.parse,
+                   stratification=CSVStratification.parse)
     if type not in parsers:
-      return None #unknown type
+      return None  # unknown type
     f = files[files.keys()[0]]
     path = dataPlugin.save(f)
     r = parsers[type](data, path, dataPlugin, id)
@@ -498,12 +516,13 @@ class StaticFileProvider(ADataSetProvider):
       dataPlugin.append(r._desc, path)
       self.files.append(r)
     else:
-      os.remove(path) #delete file again
+      os.remove(path)  # delete file again
     return r
+
 
 def create():
   """
   entry point of this plugin
   """
-  import phovea_server.plugin
-  return StaticFileProvider(phovea_server.plugin.plugins())
+  from .plugin import plugins
+  return StaticFileProvider(plugins())
