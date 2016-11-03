@@ -1,7 +1,7 @@
 __author__ = 'Samuel Gratzl'
 
 import json
-import caleydo_server.plugin
+import phovea_server.plugin
 import pandas.json as ujson
 
 class JSONExtensibleEncoder(json.JSONEncoder):
@@ -11,7 +11,7 @@ class JSONExtensibleEncoder(json.JSONEncoder):
   def __init__(self, *args, **kwargs):
     super(JSONExtensibleEncoder, self).__init__(*args, **kwargs)
 
-    self.encoders = [p.load().factory() for p in caleydo_server.plugin.list('json-encoder')]
+    self.encoders = [p.load().factory() for p in phovea_server.plugin.list('json-encoder')]
 
   def default(self, o):
     for encoder in self.encoders:
@@ -41,14 +41,14 @@ def to_json(obj, *args, **kwargs):
 
 def jsonify(obj, *args, **kwargs):
   """
-  similar to flask.jsonify but uses the extended json encoder and an arbitrary object
+  similar to ns.jsonify but uses the extended json encoder and an arbitrary object
   :param obj:
   :param args:
   :param kwargs:
   :return:
   """
-  import flask
-  return flask.Response(to_json(obj, *args, **kwargs), mimetype='application/json; charset=utf-8')
+  from phovea_server import ns
+  return ns.Response(to_json(obj, *args, **kwargs), mimetype='application/json; charset=utf-8')
 
 def glob_recursivly(path, match):
   import os

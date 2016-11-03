@@ -1,9 +1,9 @@
 __author__ = 'Samuel Gratzl'
 
-import flask
+from phovea_server import ns
 import range as ranges
-from caleydo_server.util import jsonify
-import caleydo_server.plugin
+from phovea_server.util import jsonify
+import phovea_server.plugin
 
 def asrange(r):
   if r is None or r == '':
@@ -63,7 +63,7 @@ def format_csv(dataset, range, args):
         yield delimiter.join(map(to_str, line) if dataset.type == 'matrix' else (to_str(line[d.name] for d in dataset.columns)))
         yield '\n'
 
-  return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename='+dataset.name+'.csv'})
+  return ns.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename='+dataset.name+'.csv'})
 
 def _color_palette(arg):
   if arg is None:
@@ -113,13 +113,13 @@ def format_image(dataset, range, args):
   b = io.BytesIO()
   img.save(b, format=format)
   b.seek(0)
-  return flask.send_file(b, mimetype='image/'+format.replace('jpg','jpeg'))
+  return ns.send_file(b, mimetype='image/'+format.replace('jpg','jpeg'))
 
 def resolve_formatter(type, format):
-  for p in caleydo_server.plugin.list(type+'-formatter'):
+  for p in phovea_server.plugin.list(type+'-formatter'):
     if p.format == format:
       return p.load()
-  flask.abort(400,'unknown format "{0}" possible formats are: {1}'.format(format, ','.join((p.format for p in caleydo_server.plugin.list(type+'-formatter')))))
+  ns.abort(400,'unknown format "{0}" possible formats are: {1}'.format(format, ','.join((p.format for p in phovea_server.plugin.list(type+'-formatter')))))
 
 def _add_handler(app, dataset_getter, type):
   def desc_gen(dataset_id):
@@ -130,14 +130,14 @@ def _add_handler(app, dataset_getter, type):
 
   def rows_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
-    r = asrange(flask.request.args.get('range',None))
+    r = asrange(ns.request.args.get('range',None))
     return jsonify(d.rows(r[0] if r is not None else None))
 
   app.add_url_rule('/'+type+'/<dataset_id>/rows','rows_'+type, rows_gen)
 
   def rowids_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
-    r = asrange(flask.request.args.get('range',None))
+    r = asrange(ns.request.args.get('range',None))
     ids = d.rowids(r[0] if r is not None else None)
     return jsonify(str(ranges.from_list(list(ids))))
 
@@ -145,16 +145,16 @@ def _add_handler(app, dataset_getter, type):
 
   def raw_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
-    r = asrange(flask.request.args.get('range',None))
+    r = asrange(ns.request.args.get('range',None))
     return jsonify(d.aslist(r), allow_nan=False)
 
   app.add_url_rule('/'+type+'/<dataset_id>/raw','raw_'+type, raw_gen)
 
   def data_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
-    r = asrange(flask.request.args.get('range',None))
-    formatter = resolve_formatter(type, flask.request.args.get('format','json'))
-    return formatter(d, r, args=flask.request.args)
+    r = asrange(ns.request.args.get('range',None))
+    formatter = resolve_formatter(type, ns.request.args.get('format','json'))
+    return formatter(d, r, args=ns.request.args)
 
   app.add_url_rule('/'+type+'/<dataset_id>/data','data_'+type, data_gen)
 
@@ -164,22 +164,22 @@ def add_table_handler(app, dataset_getter):
     d = dataset_getter(dataset_id, 'table')
     if hasattr(d, 'views') and view_name in d.views:
       view = d.views[view_name]
-      args = flask.request.args.to_dict()
+      args = ns.request.args.to_dict()
       return view, args
-    flask.abort(404)
+    ns.abort(404)
 
   def col_table(dataset_id, column):
     d = dataset_getter(dataset_id, 'table')
-    r = asrange(flask.request.args.get('range',None))
+    r = asrange(ns.request.args.get('range',None))
     for col in d.columns:
       if col.name == column:
         return jsonify(col.aslist(r), allow_nan=False)
-    flask.abort(404)
+    ns.abort(404)
 
   def view_table(dataset_id, view_name):
     view, args = find_view(dataset_id, view_name)
-    formatter = resolve_formatter('table', flask.request.args.get('format','json'))
-    return formatter(view, args, args=flask.request.args)
+    formatter = resolve_formatter('table', ns.request.args.get('format','json'))
+    return formatter(view, args, args=ns.request.args)
 
   def view_raw_table(dataset_id, view_name):
     view, args = find_view(dataset_id, view_name)
@@ -207,10 +207,10 @@ def add_vector_handler(app, dataset_getter):
 
   def hist_vector(dataset_id):
     d = dataset_getter(dataset_id, 'vector')
-    r = asrange(flask.request.args.get('range',None))
+    r = asrange(ns.request.args.get('range',None))
     import numpy as np
     data = d.asnumpy(r)
-    hist, bin_edges = np.histogram(data, bins=int(flask.request.args.get('bins',np.sqrt(len(data)))), range=d.range)
+    hist, bin_edges = np.histogram(data, bins=int(ns.request.args.get('bins',np.sqrt(len(data)))), range=d.range)
     return jsonify(hist)
 
   app.add_url_rule('/vector/<dataset_id>/hist','hist_vector', hist_vector)
@@ -227,14 +227,14 @@ def add_matrix_handler(app, dataset_getter):
 
   def cols_matrix(dataset_id):
     d = dataset_getter(dataset_id, 'matrix')
-    r = asrange(flask.request.args.get('range',None))
+    r = asrange(ns.request.args.get('range',None))
     return jsonify(d.cols(r[0] if r is not None else None))
 
   app.add_url_rule('/matrix/<dataset_id>/cols','cols_matrix', cols_matrix)
 
   def colids_matrix(dataset_id):
     d = dataset_getter(dataset_id, 'matrix')
-    r = asrange(flask.request.args.get('range',None))
+    r = asrange(ns.request.args.get('range',None))
     ids = d.colids(r[0] if r is not None else None)
     return jsonify(str(ranges.from_list(list(ids))))
 
@@ -242,10 +242,10 @@ def add_matrix_handler(app, dataset_getter):
 
   def hist_matrix(dataset_id):
     d = dataset_getter(dataset_id, 'matrix')
-    r = asrange(flask.request.args.get('range',None))
+    r = asrange(ns.request.args.get('range',None))
     data = d.asnumpy(r)
     import numpy as np
-    hist, bin_edges = np.histogram(data, bins=int(flask.request.args.get('bins',np.sqrt(len(data)))), range=d.range)
+    hist, bin_edges = np.histogram(data, bins=int(ns.request.args.get('bins',np.sqrt(len(data)))), range=d.range)
     return jsonify(hist)
 
   app.add_url_rule('/matrix/<dataset_id>/hist','hist_matrix', hist_matrix)

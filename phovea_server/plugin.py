@@ -9,8 +9,8 @@ def _get_registry():
   if _registry is None:
     import _plugin_parser as pp
     metadata = pp.parse()
-    import caleydo_server.config
-    caleydo_server.config.merge_plugin_configs(metadata.plugins)
+    import phovea_server.config
+    phovea_server.config.merge_plugin_configs(metadata.plugins)
     _registry = Registry(metadata.plugins, metadata.server_extensions, metadata)
   return _registry
 

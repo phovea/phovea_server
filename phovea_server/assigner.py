@@ -61,9 +61,9 @@ class DBIDAssigner(object):
   """
   def __init__(self):
     import anydbm
-    import caleydo_server.config
+    import phovea_server.config
     import os
-    base_dir = caleydo_server.config.get('caleydo_server.dataDir')
+    base_dir = phovea_server.config.get('phovea_server.dataDir')
     if not os.path.exists(base_dir):
       os.makedirs(base_dir)
     self._db = anydbm.open(base_dir+'/mapping.dbm','c')
@@ -136,9 +136,9 @@ class SqliteIDAssigner(object):
   """
   def __init__(self):
     import sqlite3
-    import caleydo_server.config
+    import phovea_server.config
     import os
-    base_dir = caleydo_server.config.get('caleydo_server.dataDir')
+    base_dir = phovea_server.config.get('phovea_server.dataDir')
     if not os.path.exists(base_dir):
       os.makedirs(base_dir)
     self._db = sqlite3.connect(base_dir+'/mapping.sqlite3')

@@ -1,20 +1,20 @@
-import flask
+from phovea_server import ns
 import os
 import os.path
-import caleydo_server.plugin
-import caleydo_server.config
+import phovea_server.plugin
+import phovea_server.config
 
-app = flask.Flask(__name__)
+app = ns.Namespace(__name__)
 
 #deliver bower
 @app.route('/bower_components/<path:path>')
 def bowercomponents(path):
-  return flask.send_from_directory(os.path.abspath(caleydo_server.config.get('bower_components','caleydo_server')), path)
+  return ns.send_from_directory(os.path.abspath(phovea_server.config.get('bower_components','phovea_server')), path)
 
 #alternative name redirects
 @app.route('/<string:app>/plugins/<path:path>')
 def deliver_plugins(app, path):
-  return flask.redirect('/' + path)
+  return ns.redirect('/' + path)
 
 import re
 black_list = re.compile(r'(.*\.(py|pyc|gitignore|gitattributes)|(\w+)/((config|package)\.json|_deploy/.*))')
@@ -35,13 +35,13 @@ def deliver(path):
   if is_on_black_list(path):
     return 'This page does not exist', 404
 
-  for d in caleydo_server.config.getlist('pluginDirs','caleydo_server'):
+  for d in phovea_server.config.getlist('pluginDirs','phovea_server'):
     d = os.path.abspath(d)
-    dpath = flask.safe_join(d, path)
+    dpath = ns.safe_join(d, path)
     if os.path.exists(dpath):
       # send_static_file will guess the correct MIME type
       #print 'sending',dpath
-      return flask.send_from_directory(d, path)
+      return ns.send_from_directory(d, path)
   return 'This page does not exist', 404
 
 def default_app():

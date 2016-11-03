@@ -1,11 +1,11 @@
-from flask import Flask
-from flask.ext.restplus import Api, apidoc
+from phovea_server.ns import Namespace
+from ns.ext.restplus import Api, apidoc
 
 def create_api(name, **kwargs):
   """
   utility function for creating an flask restplus api having the docu accessable under /doc and not the root
   """
-  app = Flask(name)
+  app = Namespace(name)
   app.debug = True
   api = Api(app, ui=False, **kwargs)
 

@@ -3,9 +3,9 @@ import os
 import os.path
 from _utils import *
 
-import caleydo_server.config
+import phovea_server.config
 
-cc = caleydo_server.config.view('caleydo_server')
+cc = phovea_server.config.view('phovea_server')
 
 def is_disabled_plugin(p):
   def check(disable):
@@ -63,11 +63,11 @@ class PluginMetaData(object):
 
     self.plugins = filter(lambda x: not is_disabled_plugin(x), map(Plugin, data['plugins']))
     by_folder= { p.folder_name : p for p in self.plugins }
-    self.caleydo_server_plugins = filter(lambda x : x['folder'] in by_folder and not is_disabled_extension(x, 'python', by_folder[x['folder']]), data['extensions']['python'])
+    self.phovea_server_plugins = filter(lambda x : x['folder'] in by_folder and not is_disabled_extension(x, 'python', by_folder[x['folder']]), data['extensions']['python'])
 
   @property
   def server_extensions(self):
-    return _resolve_server_config(self.caleydo_server_plugins)
+    return _resolve_server_config(self.phovea_server_plugins)
 
 def parse():
   p = PluginMetaData()

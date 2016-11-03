@@ -1,6 +1,6 @@
 __author__ = 'Samuel Gratzl'
 
-import caleydo_server.plugin as p
+import phovea_server.plugin as p
 import sys
 
 class User(object):

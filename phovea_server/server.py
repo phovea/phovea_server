@@ -6,10 +6,10 @@ import sys
 
 
 sys.path.append('plugins/')
-import caleydo_server.config
+import phovea_server.config
 
 #append the plugin directories as primary lookup path
-cc = caleydo_server.config.view('caleydo_server')
+cc = phovea_server.config.view('phovea_server')
 
 #configure logging
 import logging.config
@@ -22,7 +22,7 @@ _log.debug('extent with plugin directory %s',str(cc.getlist('pluginDirs')))
 sys.path.extend(cc.getlist('pluginDirs'))
 
 #set configured registry
-import caleydo_server.plugin
+import phovea_server.plugin
 
 import dispatcher
 import mainapp
@@ -66,10 +66,10 @@ def _init_app(app, is_default_app = False):
   if cc.max_file_size:
     app.config['MAX_CONTENT_LENGTH'] = cc.max_file_size
 
-  import caleydo_server.security
-  caleydo_server.security.init_app(app)
+  import phovea_server.security
+  phovea_server.security.init_app(app)
   if is_default_app:
-    caleydo_server.security.add_login_routes(app)
+    phovea_server.security.add_login_routes(app)
 
 #helper to plugin in function scope
 def _loader(p):
@@ -83,7 +83,7 @@ def _loader(p):
 #create a path dispatcher
 _default_app = mainapp.default_app()
 _init_app(_default_app, True)
-_applications = { p.namespace : _loader(p) for p in caleydo_server.plugin.list('namespace') }
+_applications = { p.namespace : _loader(p) for p in phovea_server.plugin.list('namespace') }
 
 #create a dispatcher for all the applications
 application = dispatcher.PathDispatcher(_default_app, _applications)
@@ -95,8 +95,8 @@ application = ProxyFix(application)
 def run():
   import argparse
   parser = argparse.ArgumentParser(description='Caleydo Web Server')
-  parser.add_argument('--port', '-p', type=int, default=caleydo_server.config.getint('port','caleydo_server'), help='server port')
-  parser.add_argument('--address', '-a', default=caleydo_server.config.get('address','caleydo_server'), help='server address')
+  parser.add_argument('--port', '-p', type=int, default=phovea_server.config.getint('port','phovea_server'), help='server port')
+  parser.add_argument('--address', '-a', default=phovea_server.config.get('address','phovea_server'), help='server address')
   parser.add_argument('--use_reloader', action='store_true', help='whether to automatically reload the server')
   args = parser.parse_args()
 
@@ -107,4 +107,4 @@ def run():
   http_server.serve_forever()
 
   #from werkzeug.serving import run_simple
-  #run_simple(args.address, args.port, application, use_reloader=args.use_reloader or caleydo_server.config.getboolean('use_reloader','caleydo_server'))
+  #run_simple(args.address, args.port, application, use_reloader=args.use_reloader or phovea_server.config.getboolean('use_reloader','phovea_server'))

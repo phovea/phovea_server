@@ -20,8 +20,8 @@ class ADataSetEntry(object):
     self.name = name
     self.fqname = project + '/'+ name
     self.type = type
-    import caleydo_server.util
-    self.id = id if id is not None else caleydo_server.util.fix_id(self.fqname)
+    import phovea_server.util
+    self.id = id if id is not None else phovea_server.util.fix_id(self.fqname)
 
   def idtypes(self):
     """

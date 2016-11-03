@@ -1,24 +1,24 @@
-import flask
-import caleydo_server.plugin
-import caleydo_server.range
-import caleydo_server.util
+from phovea_server import ns
+import phovea_server.plugin
+import phovea_server.range
+import phovea_server.util
 
 from .dataset import *
 
-app = flask.Flask(__name__)
-app_idtype = flask.Flask(__name__)
+app = ns.Namespace(__name__)
+app_idtype = ns.Namespace(__name__)
 
 import logging
 _log = logging.getLogger(__name__)
 
 @app.errorhandler(ValueError)
 def on_value_error(error):
-  _log.error('ValueError: ('+str(error.message)+') at '+str(flask.request.environ))
+  _log.error('ValueError: ('+str(error.message)+') at '+str(ns.request.environ))
   _log.error(error)
   return '<strong>{2} - {0}</strong><pre>{1}</pre>'.format('ValueError', error.message, 500), 500
 
 def _list_format_json(data):
-  return caleydo_server.util.jsonify(data)
+  return phovea_server.util.jsonify(data)
 
 def _list_format_treejson(data):
   r = dict()
@@ -30,10 +30,10 @@ def _list_format_treejson(data):
         act[level] = dict()
       act = act[level]
     act[d['name']] = d
-  return caleydo_server.util.jsonify(r, indent=1)
+  return phovea_server.util.jsonify(r, indent=1)
 
 def _list_format_csv(data):
-  delimiter = flask.request.args.get('f_delimiter',';')
+  delimiter = ns.request.args.get('f_delimiter',';')
   def to_size(size):
     if size is None:
       return ''
@@ -44,8 +44,8 @@ def _list_format_csv(data):
     yield delimiter.join(['ID','Name','FQName','Type','Size','Entry'])
     for d in data:
       yield '\n'
-      yield delimiter.join([str(d['id']), d['name'], d['fqname'], d['type'], to_size(d.get('size',None)), caleydo_server.util.to_json(d)])
-  return flask.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=dataset.csv'})
+      yield delimiter.join([str(d['id']), d['name'], d['fqname'], d['type'], to_size(d.get('size',None)), phovea_server.util.to_json(d)])
+  return ns.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=dataset.csv'})
 
 def _to_query(query):
   keys = ['name', 'id', 'fqname', 'type']
@@ -59,51 +59,51 @@ def _to_query(query):
 
 @app.route('/', methods=['GET','POST'])
 def _list_datasets():
-  if flask.request.method == 'GET':
-    query = _to_query(flask.request.values)
+  if ns.request.method == 'GET':
+    query = _to_query(ns.request.values)
     data = [d.to_description() for d in iter() if query(d)]
 
-    limit = flask.request.values.get('limit',-1)
+    limit = ns.request.values.get('limit',-1)
     if 0 < limit < len(data):
       data = data[:limit]
 
-    format = flask.request.args.get('format','json')
+    format = ns.request.args.get('format','json')
     formats = dict(json=_list_format_json,treejson=_list_format_treejson,csv=_list_format_csv)
     if format not in formats:
-      flask.abort(flask.make_response('invalid format: "{0}" possible ones: {1}'.format(format,','.join(formats.keys())), 400))
+      ns.abort(ns.make_response('invalid format: "{0}" possible ones: {1}'.format(format,','.join(formats.keys())), 400))
     return formats[format](data)
   else:
-    return _upload_dataset(flask.request)
+    return _upload_dataset(ns.request)
 
 @app.route('/<dataset_id>', methods=['PUT','GET', 'DELETE', 'POST'])
 def _get_dataset(dataset_id):
-  if flask.request.method == 'PUT':
-    return _update_dataset(dataset_id, flask.request)
-  elif flask.request.method == 'POST':
-    return _modify_dataset(dataset_id, flask.request)
-  elif flask.request.method == 'DELETE':
+  if ns.request.method == 'PUT':
+    return _update_dataset(dataset_id, ns.request)
+  elif ns.request.method == 'POST':
+    return _modify_dataset(dataset_id, ns.request)
+  elif ns.request.method == 'DELETE':
     return _remove_dataset(dataset_id)
   d = get(dataset_id)
   if d is None:
     return 'invalid dataset id "'+str(dataset_id)+'"', 404
-  r = flask.request.args.get('range', None)
+  r = ns.request.args.get('range', None)
   if r is not None:
     r = range.parse(r)
-  return caleydo_server.util.jsonify(d.asjson(r))
+  return phovea_server.util.jsonify(d.asjson(r))
 
 @app.route('/<dataset_id>/desc')
 def _get_dataset_desc(dataset_id):
   d = get(dataset_id)
-  return caleydo_server.util.jsonify(d.to_description())
+  return phovea_server.util.jsonify(d.to_description())
 
 def _dataset_getter(dataset_id, dataset_type):
   if isinstance(dataset_id, int) and dataset_id < 0:
     return [d for d in list_datasets() if d.type == dataset_type]
   t = get(dataset_id)
   if t is None:
-    flask.abort(404,'invalid dataset id "'+str(dataset_id)+'"')
+    ns.abort(404,'invalid dataset id "'+str(dataset_id)+'"')
   if t.type != dataset_type:
-    flask.abort(400,'the given dataset "'+str(dataset_id)+'" is not a '+dataset_type)
+    ns.abort(400,'the given dataset "'+str(dataset_id)+'" is not a '+dataset_type)
   return t
 
 def _to_upload_desc(data_dict):
@@ -117,7 +117,7 @@ def _upload_dataset(request, id=None):
     #first choose the provider to handle the upload
     r = add(_to_upload_desc(request.values), request.files, id)
     if r:
-      return caleydo_server.util.jsonify(r.to_description(),indent=1)
+      return phovea_server.util.jsonify(r.to_description(),indent=1)
     #invalid upload
     return 'invalid upload', 400
   except ValueError as e:
@@ -130,7 +130,7 @@ def _update_dataset(dataset_id, request):
       return _upload_dataset(request, dataset_id)
     r = old.update(_to_upload_desc(request.values), request.files)
     if r:
-      return caleydo_server.util.jsonify(old.to_description(),indent=1)
+      return phovea_server.util.jsonify(old.to_description(),indent=1)
     #invalid upload
     return 'invalid upload', 400
   except ValueError as e:
@@ -143,7 +143,7 @@ def _modify_dataset(dataset_id, request):
       return 'invalid dataset id "'+str(dataset_id)+'"', 404
     r = old.modify(_to_upload_desc(request.values), request.files)
     if r:
-      return caleydo_server.util.jsonify(old.to_description(),indent=1)
+      return phovea_server.util.jsonify(old.to_description(),indent=1)
       #invalid upload
     return 'invalid upload', 400
   except ValueError as e:
@@ -155,7 +155,7 @@ def _remove_dataset(dataset_id):
     return 'invalid dataset id "'+str(dataset_id)+'"', 404
   r = remove(dataset_id)
   if r:
-    return caleydo_server.util.jsonify(dict(state='success',msg='Successfully deleted dataset '+dataset_id,id=dataset_id),indent=1)
+    return phovea_server.util.jsonify(dict(state='success',msg='Successfully deleted dataset '+dataset_id,id=dataset_id),indent=1)
   return 'invalid request', 400
 
 def create_dataset():
@@ -163,29 +163,29 @@ def create_dataset():
 
 @app_idtype.route('/')
 def _list_idtypes():
-  return caleydo_server.util.jsonify(list_idtypes())
+  return phovea_server.util.jsonify(list_idtypes())
 
 @app_idtype.route('/<idtype>/map')
 def _map_ids(idtype):
-  name = flask.request.args.get('id',None)
+  name = ns.request.args.get('id',None)
   if name is not None:
     return get_idmanager()([name], idtype)[0]
-  names = flask.request.args.getlist('ids[]')
-  return caleydo_server.util.jsonify(get_idmanager()(names, idtype))
+  names = ns.request.args.getlist('ids[]')
+  return phovea_server.util.jsonify(get_idmanager()(names, idtype))
 
 @app_idtype.route('/<idtype>/unmap')
 def _unmap_ids(idtype):
-  name = flask.request.args.get('id',None)
+  name = ns.request.args.get('id',None)
   if name is not None:
     return get_idmanager().unmap([int(name)], idtype)[0]
-  names = caleydo_server.range.parse(flask.request.args.get('ids',''))[0].tolist()
-  return caleydo_server.util.jsonify(get_idmanager().unmap(names, idtype))
+  names = phovea_server.range.parse(ns.request.args.get('ids',''))[0].tolist()
+  return phovea_server.util.jsonify(get_idmanager().unmap(names, idtype))
 
 @app_idtype.route('/<idtype>/')
 def _maps_to(idtype):
   mapper = get_mappingmanager()
   target_id_types = mapper.maps_to(idtype)
-  return caleydo_server.util.jsonify(target_id_types)
+  return phovea_server.util.jsonify(target_id_types)
 
 @app_idtype.route('/<idtype>/<to_idtype>')
 def _mapping_to(idtype, to_idtype):
@@ -193,7 +193,7 @@ def _mapping_to(idtype, to_idtype):
 
 def _do_mapping(idtype, to_idtype, to_ids):
   mapper = get_mappingmanager()
-  args = flask.request.args
+  args = ns.request.args
   first_only = args.get('mode','all') == 'first'
   single = False
 
@@ -201,12 +201,12 @@ def _do_mapping(idtype, to_idtype, to_ids):
     names = get_idmanager().unmap([int(args['id'])], idtype)
     single = True
   elif 'ids' in args:
-    names = get_idmanager().unmap(caleydo_server.range.parse(args['ids'])[0].tolist(), idtype)
+    names = get_idmanager().unmap(phovea_server.range.parse(args['ids'])[0].tolist(), idtype)
   elif 'q' in args:
     names = args['q'].split(',')
     single = len(names) == 1
   else:
-    flask.abort(400)
+    ns.abort(400)
     return
 
   mapped_list = mapper(idtype, to_idtype, names)
@@ -221,9 +221,9 @@ def _do_mapping(idtype, to_idtype, to_ids):
       mapped_list = [m(entry, to_idtype) for entry in mapped_list]
 
   if single:
-    return mapped_list[0] if first_only else caleydo_server.util.jsonify(mapped_list[0])
+    return mapped_list[0] if first_only else phovea_server.util.jsonify(mapped_list[0])
 
-  return caleydo_server.util.jsonify(mapped_list)
+  return phovea_server.util.jsonify(mapped_list)
 
 @app_idtype.route('/<idtype>/<to_idtype>/map')
 def _mapping_to_id(idtype, to_idtype):
@@ -231,7 +231,7 @@ def _mapping_to_id(idtype, to_idtype):
 
 
 #add all specific handler
-for handler in caleydo_server.plugin.list('dataset-specific-handler'):
+for handler in phovea_server.plugin.list('dataset-specific-handler'):
   p = handler.load()
   p(app, _dataset_getter)
 

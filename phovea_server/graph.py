@@ -1,4 +1,4 @@
-from caleydo_server.dataset_def import ADataSetEntry
+from phovea_server.dataset_def import ADataSetEntry
 
 
 class GraphNode(object):
@@ -106,8 +106,8 @@ class Graph(ADataSetEntry):
 
 
 def _resolve_parser(format):
-  import caleydo_server.plugin
-  for p in caleydo_server.plugin.list('graph-parser'):
+  import phovea_server.plugin
+  for p in phovea_server.plugin.list('graph-parser'):
     if p.format == format:
       return p.load()
 

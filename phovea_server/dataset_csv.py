@@ -2,18 +2,18 @@ import json
 import csv
 import os
 import numpy as np
-from caleydo_server.dataset_def import ADataSetEntry, ADataSetProvider
+from phovea_server.dataset_def import ADataSetEntry, ADataSetProvider
 
 
 def assign_ids(ids, idtype):
-  import caleydo_server.plugin
+  import phovea_server.plugin
 
-  manager = caleydo_server.plugin.lookup('idmanager')
+  manager = phovea_server.plugin.lookup('idmanager')
   return np.array(manager(ids, idtype))
 
 def fix_id(fqname):
-  import caleydo_server.util
-  return caleydo_server.util.fix_id(fqname)
+  import phovea_server.util
+  return phovea_server.util.fix_id(fqname)
 
 class CSVEntry(ADataSetEntry):
   def __init__(self, desc, project):
@@ -440,19 +440,19 @@ def to_files(plugins):
 class DataPlugin(object):
   def __init__(self):
     #add a magic plugin for the static data dir
-    from caleydo_server.config import view
-    cc = view('caleydo_server')
+    from phovea_server.config import view
+    cc = view('phovea_server')
     self.folder = cc.dataDir
     self.id = 'data'
 
   def save(self, f):
     import werkzeug.utils
-    import caleydo_server.util
+    import phovea_server.util
     dir_ = os.path.join(self.folder,'data')
     if not os.path.exists(dir_):
       os.makedirs(dir_)
     filename = os.path.basename(f.filename)
-    filename = werkzeug.utils.secure_filename(filename+caleydo_server.util.random_id(3)+'.csv')
+    filename = werkzeug.utils.secure_filename(filename+phovea_server.util.random_id(3)+'.csv')
     path = os.path.join(dir_, filename)
     f.save(path)
     return path
@@ -505,5 +505,5 @@ def create():
   """
   entry point of this plugin
   """
-  import caleydo_server.plugin
-  return StaticFileProvider(caleydo_server.plugin.plugins())
+  import phovea_server.plugin
+  return StaticFileProvider(phovea_server.plugin.plugins())

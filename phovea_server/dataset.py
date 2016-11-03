@@ -1,6 +1,6 @@
-import caleydo_server.plugin
-import caleydo_server.range
-import caleydo_server.util
+import phovea_server.plugin
+import phovea_server.range
+import phovea_server.util
 import itertools
 
 
@@ -8,7 +8,7 @@ _providers_r = None
 def _providers():
   global _providers_r
   if _providers_r is None:
-    _providers_r = [p.load().factory() for p in caleydo_server.plugin.list('dataset-provider')]
+    _providers_r = [p.load().factory() for p in phovea_server.plugin.list('dataset-provider')]
   return _providers_r
 
 def iter():
@@ -87,6 +87,6 @@ def list_idtypes():
   return tmp.values()
 
 def get_idmanager():
-  return caleydo_server.plugin.lookup('idmanager')
+  return phovea_server.plugin.lookup('idmanager')
 def get_mappingmanager():
-  return caleydo_server.plugin.lookup('mappingmanager')
+  return phovea_server.plugin.lookup('mappingmanager')
