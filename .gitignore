@@ -1,9 +1,19 @@
-
+# general things to ignore
+/.tscache
+/.idea
+/build/
+/dist/
+*.egg-info/
+*.egg
+*.py[cod]
+__pycache__/
+*.so
+*~
 *.log
 *.pot
 *.pyc
 *.swp
 *.lock
-*.map
-*.css
-*.js
+# due to using tox and pytest
+.tox
+.cache
