@@ -6,8 +6,8 @@ env:
 
 install:
   - sudo apt-get install cython
-  - pip install --user -r requirements_dev.txt
-  - pip install --user -r requirements.txt
+  - pip install -r requirements_dev.txt
+  - pip install -r requirements.txt
 
 script: npm run dist
 
