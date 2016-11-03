@@ -1,0 +1,208 @@
+body {
+  font-family: Yantramanav, Helvetica, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  text-rendering: optimizeLegibility;
+  font-size: 16px;
+  text-align: center; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  text-rendering: optimizeLegibility; }
+
+h1, h2, h3, h4, h5, h5 {
+  font-family: Yantramanav, Helvetica, sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  margin-bottom: 10px;
+  padding-left: 5px;
+  padding-bottom: 0; }
+
+.container {
+  width: 650px;
+  margin: 0 auto; }
+
+h1 {
+  display: inline-block;
+  font-size: 2.3em;
+  margin: 25px auto;
+  -webkit-user-select: none;
+  /* Chrome all / Safari all */
+  -moz-user-select: none;
+  /* Firefox all */
+  -ms-user-select: none;
+  /* IE 10+ */
+  user-select: none;
+  /* Likely future */ }
+  h1 img {
+    margin-right: 5px;
+    position: relative;
+    top: 7px; }
+
+input[type=text], input[type=search], textarea {
+  -webkit-transition: all 0.30s ease-in-out;
+  -moz-transition: all 0.30s ease-in-out;
+  -ms-transition: all 0.30s ease-in-out;
+  -o-transition: all 0.30s ease-in-out;
+  outline: none;
+  border: 1px solid #ddd; }
+
+input[type=text]:focus, input[type=search]:focus, textarea:focus {
+  box-shadow: 0 0 5px #999;
+  border: 1px solid #999; }
+
+#search {
+  border: 1px solid #ddd;
+  padding: 0.5em;
+  width: 100%;
+  font-size: 1em;
+  font-family: Yantramanav, Helvetica, sans-serif;
+  font-weight: 400; }
+
+.keyboard-navigation-hint {
+  display: flex;
+  justify-content: flex-end;
+  margin: 5px 0 25px;
+  font-size: 0.7em;
+  color: #999; }
+  .keyboard-navigation-hint span {
+    margin: 0 0.5em; }
+
+ul {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0; }
+  ul.nothing-found:after {
+    margin: 50px 0;
+    font-size: 1.3em;
+    font-weight: 300;
+    color: #999;
+    content: "Your search did not match any apps."; }
+  ul li {
+    position: relative;
+    flex: 1 1 100%;
+    border-bottom: 2px solid #ddd;
+    transition: background 0.2s ease; }
+    ul li:last-child {
+      border-bottom: 0; }
+    ul li .title,
+    ul li .name {
+      font-weight: 500; }
+    ul li .title:not(:empty) ~ .name {
+      color: #999;
+      padding-left: 5px;
+      font-size: 0.8em;
+      font-weight: 400; }
+      ul li .title:not(:empty) ~ .name:before {
+        content: "("; }
+      ul li .title:not(:empty) ~ .name:after {
+        content: ")"; }
+    ul li .description {
+      display: block;
+      margin-top: 5px;
+      font-size: 0.8em;
+      color: #444; }
+    ul li .description:empty {
+      display: none; }
+    ul li a.appinfo {
+      display: block;
+      text-decoration: none;
+      color: #000;
+      font-size: 1em;
+      text-align: left;
+      padding: 0.75em 0.5em; }
+    ul li.active a.appinfo,
+    ul li a.appinfo:active,
+    ul li a.appinfo:focus,
+    ul li a.appinfo:hover {
+      background: #f0f0f0;
+      position: relative; }
+      ul li.active a.appinfo:after,
+      ul li a.appinfo:active:after,
+      ul li a.appinfo:focus:after,
+      ul li a.appinfo:hover:after {
+        content: '';
+        background: url("/assets/icon_arrow_right.svg");
+        width: 20px;
+        height: 20px;
+        background-size: cover;
+        position: absolute;
+        left: -25px;
+        top: 0.7em;
+        opacity: 0.2; }
+    ul li div.links {
+      position: absolute;
+      top: 0.9em;
+      right: 0.7em;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+      font-size: 0.8em; }
+      ul li div.links a {
+        display: block;
+        width: 20px;
+        height: 20px;
+        position: relative;
+        margin-left: 0.7em;
+        flex: 1; }
+        ul li div.links a:after {
+          opacity: 0.3;
+          content: '';
+          width: 20px;
+          height: 20px;
+          background-size: cover;
+          position: absolute;
+          right: 0; }
+        ul li div.links a.homepage:after {
+          background-image: url("/assets/icon_home.svg"); }
+        ul li div.links a.github:after {
+          background-image: url("/assets/icon_github.svg"); }
+        ul li div.links a:active:after, ul li div.links a:focus:after, ul li div.links a:hover:after {
+          opacity: 0.8; }
+        ul li div.links a span {
+          position: absolute;
+          bottom: 30px;
+          left: 50%;
+          margin-left: -55px;
+          z-index: 999;
+          width: 110px;
+          color: #FFFFFF;
+          background: #000000;
+          height: 30px;
+          line-height: 30px;
+          text-align: center;
+          border-radius: 4px;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.3s ease; }
+        ul li div.links a span:after {
+          content: '';
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          margin-left: -8px;
+          width: 0;
+          height: 0;
+          border-top: 8px solid #000000;
+          border-right: 8px solid transparent;
+          border-left: 8px solid transparent; }
+        ul li div.links a:active span, ul li div.links a:focus span, ul li div.links a:hover span {
+          opacity: 0.8; }
+
+footer {
+  margin-top: 25px; }
+  footer img {
+    display: block;
+    margin: 0 auto 0.4em; }
+  footer a {
+    color: #111;
+    text-decoration: none;
+    padding: 0.5em; }
+    footer a:active, footer a:hover, footer a:focus {
+      text-decoration: underline; }
+
+/*# sourceMappingURL=main.css.map */
