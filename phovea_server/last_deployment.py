@@ -27,11 +27,8 @@ def _last_deployment():
   """
   path = os.path.normpath(os.path.join(os.getcwd(), 'package.json'))
 
-  if not os.path.exists(path):
-    path = os.path.normpath(os.path.join(os.getcwd(), 'registry.json'))
-
   date = modification_date(path)
-  print('modification date of %s = %s', path, date)
+  print('modification date of {} = {}'.format(path, date))
   return jsonify(dict(timestamp=date))
 
 
