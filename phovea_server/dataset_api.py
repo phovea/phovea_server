@@ -5,7 +5,8 @@
 ###############################################################################
 
 
-from . import ns, plugin, range, util
+from . import ns, plugin, range
+from .util import jsonify, to_json
 import logging
 from .dataset import list_idtypes, get_idmanager, iter, get_mappingmanager, get, list_datasets, add, remove
 
@@ -24,7 +25,7 @@ def on_value_error(error):
 
 
 def _list_format_json(data):
-  return util.jsonify(data)
+  return jsonify(data)
 
 
 def _list_format_treejson(data):
@@ -37,7 +38,7 @@ def _list_format_treejson(data):
         act[level] = dict()
       act = act[level]
     act[d['name']] = d
-  return util.jsonify(r, indent=1)
+  return jsonify(r, indent=1)
 
 
 def _list_format_csv(data):
@@ -55,7 +56,7 @@ def _list_format_csv(data):
     for d in data:
       yield '\n'
       yield delimiter.join(
-          [str(d['id']), d['name'], d['fqname'], d['type'], to_size(d.get('size', None)), util.to_json(d)])
+          [str(d['id']), d['name'], d['fqname'], d['type'], to_size(d.get('size', None)), to_json(d)])
 
   return ns.Response(gen(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=dataset.csv'})
 
@@ -107,13 +108,13 @@ def _get_dataset(dataset_id):
   r = ns.request.args.get('range', None)
   if r is not None:
     r = range.parse(r)
-  return util.jsonify(d.asjson(r))
+  return jsonify(d.asjson(r))
 
 
 @app.route('/<dataset_id>/desc')
 def _get_dataset_desc(dataset_id):
   d = get(dataset_id)
-  return util.jsonify(d.to_description())
+  return jsonify(d.to_description())
 
 
 def _dataset_getter(dataset_id, dataset_type):
@@ -139,7 +140,7 @@ def _upload_dataset(request, id=None):
     # first choose the provider to handle the upload
     r = add(_to_upload_desc(request.values), request.files, id)
     if r:
-      return util.jsonify(r.to_description(), indent=1)
+      return jsonify(r.to_description(), indent=1)
     # invalid upload
     return 'invalid upload', 400
   except ValueError as e:
@@ -153,7 +154,7 @@ def _update_dataset(dataset_id, request):
       return _upload_dataset(request, dataset_id)
     r = old.update(_to_upload_desc(request.values), request.files)
     if r:
-      return util.jsonify(old.to_description(), indent=1)
+      return jsonify(old.to_description(), indent=1)
     # invalid upload
     return 'invalid upload', 400
   except ValueError as e:
@@ -167,7 +168,7 @@ def _modify_dataset(dataset_id, request):
       return 'invalid dataset id "' + str(dataset_id) + '"', 404
     r = old.modify(_to_upload_desc(request.values), request.files)
     if r:
-      return util.jsonify(old.to_description(), indent=1)
+      return jsonify(old.to_description(), indent=1)
       # invalid upload
     return 'invalid upload', 400
   except ValueError as e:
@@ -180,7 +181,7 @@ def _remove_dataset(dataset_id):
     return 'invalid dataset id "' + str(dataset_id) + '"', 404
   r = remove(dataset_id)
   if r:
-    return util.jsonify(
+    return jsonify(
         dict(state='success', msg='Successfully deleted dataset ' + dataset_id, id=dataset_id), indent=1)
   return 'invalid request', 400
 
@@ -191,7 +192,7 @@ def create_dataset():
 
 @app_idtype.route('/')
 def _list_idtypes():
-  return util.jsonify(list_idtypes())
+  return jsonify(list_idtypes())
 
 
 @app_idtype.route('/<idtype>/map')
@@ -200,7 +201,7 @@ def _map_ids(idtype):
   if name is not None:
     return get_idmanager()([name], idtype)[0]
   names = ns.request.args.getlist('ids[]')
-  return util.jsonify(get_idmanager()(names, idtype))
+  return jsonify(get_idmanager()(names, idtype))
 
 
 @app_idtype.route('/<idtype>/unmap')
@@ -209,14 +210,14 @@ def _unmap_ids(idtype):
   if name is not None:
     return get_idmanager().unmap([int(name)], idtype)[0]
   names = range.parse(ns.request.args.get('ids', ''))[0].tolist()
-  return util.jsonify(get_idmanager().unmap(names, idtype))
+  return jsonify(get_idmanager().unmap(names, idtype))
 
 
 @app_idtype.route('/<idtype>/')
 def _maps_to(idtype):
   mapper = get_mappingmanager()
   target_id_types = mapper.maps_to(idtype)
-  return util.jsonify(target_id_types)
+  return jsonify(target_id_types)
 
 
 @app_idtype.route('/<idtype>/<to_idtype>')
@@ -254,9 +255,9 @@ def _do_mapping(idtype, to_idtype, to_ids):
       mapped_list = [m(entry, to_idtype) for entry in mapped_list]
 
   if single:
-    return mapped_list[0] if first_only else util.jsonify(mapped_list[0])
+    return mapped_list[0] if first_only else jsonify(mapped_list[0])
 
-  return util.jsonify(mapped_list)
+  return jsonify(mapped_list)
 
 
 @app_idtype.route('/<idtype>/<to_idtype>/map')
