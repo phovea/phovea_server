@@ -83,6 +83,9 @@ class CaleydoConfigSection(object):
   def get(self, item, section=None, default=None):
     return get(item, self._expand(section), default=default)
 
+  def set(self, item, value, section=None):
+    return set(item, value, self._expand(section))
+
   def getint(self, item, section=None, default=0):
     return getint(item, self._expand(section), default=default)
 
