@@ -116,6 +116,15 @@ def create_application():
   return ProxyFix(application)
 
 
+def _config_files():
+  """
+  list all known config files
+  :return:
+  """
+  from .plugin import plugins
+  return [p for p in (p.config_file() for p in plugins()) if p is not None]
+
+
 def run():
   import argparse
   from geventwebsocket.handler import WebSocketHandler
@@ -138,8 +147,13 @@ def run():
   application = create_application()
   http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
 
-  _log.info('start serving...')
-  http_server.serve_forever()
+  if args.use_reloader:
+    _log.info('start using reloader...')
+    from werkzeug._reloader import run_with_reloader
+    run_with_reloader(http_server.serve_forever, extra_files=_config_files())
+  else:
+    _log.info('start serving...')
+    http_server.serve_forever()
 
   # from werkzeug.serving import run_simple
   # run_simple(args.address, args.port, application, use_reloader=args.use_reloader or phovea_server.config.getboolean('use_reloader','phovea_server'))

@@ -1,6 +1,7 @@
 {
   "scripts": {
     "start": "python __main__.py",
+    "watch": "python __main__.py --use_reloader",
     "check": "flake8",
     "pretest": "npm run check",
     "test": "python setup.py test",
