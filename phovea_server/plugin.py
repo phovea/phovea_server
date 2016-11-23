@@ -64,7 +64,7 @@ class AExtensionDesc(object):
     self.version = '1.0'
     self.description = ''
     # copy all values
-    for key, value in list(desc.items()):
+    for key, value in desc.items():
       self.__dict__[key] = value
 
 
@@ -144,7 +144,7 @@ class Registry(object):
       _log.info('creating singleton %s %s', v[0].id, getattr(v[0], 'module', 'server'))
       return loader(v[0])
 
-    self._singletons = {k: select(v) for k, v in list(mm.items())}
+    self._singletons = {k: select(v) for k, v in mm.items()}
 
     return self._singletons
 
@@ -162,7 +162,7 @@ class Registry(object):
       return self
     if not hasattr(plugin_type, '__call__'):  # not a callable
       return [x for x in self if x.type == plugin_type]
-    return list(filter(plugin_type, self))
+    return [x for x in self if plugin_type(x)]
 
   def lookup(self, singleton_id):
     if singleton_id in self.singletons:

@@ -28,7 +28,7 @@ class MemoryIDAssigner(object):
     cache = self._idsmapping[idtype]
 
     def lookup(id):
-      for k, v in list(cache.items()):
+      for k, v in cache.items():
         if v == id:
           return k
       return None
@@ -109,7 +109,7 @@ class DBIDAssigner(object):
     # assuming incremental ids
     if idtype in self._db:
       # clear old data
-      for key in list(self._db.keys()):
+      for key in self._db.keys():
         if key.startswith(idtype + '2id.') or key.startswith('id2' + idtype + '.'):
           del self._db[key]
 
@@ -162,7 +162,7 @@ class SqliteIDAssigner(object):
     existing = self.get_cache(idtype)
 
     def lookup(id):
-      for k, v in list(existing.items()):
+      for k, v in existing.items():
         if v == id:
           return k
       return None

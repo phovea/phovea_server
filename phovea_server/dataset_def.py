@@ -56,7 +56,7 @@ class ADataSetEntry(object):
     def to_desc(t):
       return dict(id=t, name=t, names=to_plural(t))
 
-    return list(map(to_desc, self.idtypes()))
+    return [to_desc(t) for t in self.idtypes()]
 
   def update(self, args, files):
     """

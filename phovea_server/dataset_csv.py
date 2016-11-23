@@ -306,9 +306,9 @@ class CSVMatrix(CSVEntry):
             cols = len(row) - 1
           else:
             rows += 1
-            min_act = min(list(map(float, row[1:])))
+            min_act = min((float(f) for f in row[1:]))
             min_v = min_act if min_v is None else min(min_act, min_v)
-            max_act = max(list(map(float, row[1:])))
+            max_act = max((float(f) for f in row[1:]))
             max_v = max_act if max_v is None else max(max_act, max_v)
       desc['size'] = [rows, cols]
       desc['value']['range'] = [float(data['value_min']) if 'value_min' in data else min_v,

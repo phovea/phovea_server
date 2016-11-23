@@ -119,7 +119,7 @@ class RangeElem(object):
     s = abs(self.step)
     if d <= 0:
       return 0
-    return math.floor(old_div(d, s))
+    return (d // s)
 
   def reverse(self):
     t = self.start if self.start < 0 else self.start + 1
