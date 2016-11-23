@@ -1,17 +1,14 @@
-from __future__ import division
-from __future__ import absolute_import
 ###############################################################################
 # Caleydo - Visualization for Molecular Biology - http://caleydo.org
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-
+from __future__ import division
+from __future__ import absolute_import
 from builtins import zip
 from builtins import str
-from builtins import map
 from past.builtins import basestring
-from past.utils import old_div
 from . import ns
 from . import range as ranges
 from .util import jsonify
@@ -36,7 +33,6 @@ def format_csv(dataset, range, args):  # noqa
   include_cols = bool(args.get('f_cols', False))
   delimiter = args.get('f_delimiter', ';')
 
-  import itertools
   import numpy as np
   import numpy.ma as ma
 

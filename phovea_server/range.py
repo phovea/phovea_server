@@ -7,12 +7,10 @@ from __future__ import division
 
 
 from builtins import str
-from builtins import range
+from builtins import range as number_range
 from past.builtins import basestring
-from past.utils import old_div
 from builtins import object
 import itertools
-import math
 from functools import reduce
 
 all_f = all
@@ -135,7 +133,7 @@ class RangeElem(object):
     return self.iter()
 
   def iter(self, size=0):
-    return iter(range(fix(self.start, size), fix(self.end, size), self.step))
+    return iter(number_range(fix(self.start, size), fix(self.end, size), self.step))
 
   def contains(self, value, size=0):
     f = fix(self.start, size)

@@ -5,7 +5,6 @@
 ###############################################################################
 
 
-from builtins import filter
 from builtins import object
 import logging
 

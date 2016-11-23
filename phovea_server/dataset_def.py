@@ -4,9 +4,9 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-
-from builtins import map
 from builtins import object
+
+
 def to_plural(s):
   if s[len(s) - 1] == 'y':
     return s[0:len(s) - 1] + 'ies'

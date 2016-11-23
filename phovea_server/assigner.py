@@ -65,10 +65,6 @@ class MemoryIDAssigner(object):
     return [add(id) for id in ids]
 
 
-def ascii(s):
-  return s.encode('ascii', 'ignore')
-
-
 class DBIDAssigner(object):
   """
   assigns ids to object using a dbm database
