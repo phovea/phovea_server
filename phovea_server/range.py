@@ -221,7 +221,7 @@ class Range1D(object):
         if abs(deltas[start]) == 1:
           r.append(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]))
         else:
-          for i in range(start, act):
+          for i in number_range(start, act):
             r.append(RangeElem.single(indices[i]))
       start = act
       act += 1
@@ -292,7 +292,7 @@ class Range1D(object):
     if ntimes == 1:
       return self
     r = []
-    for i in range(ntimes):
+    for i in number_range(ntimes):
       r.extend(self._elems)
     return Range1D(r)
 
@@ -545,7 +545,7 @@ class Range(object):
   def __getitem__(self, item):
     if len(self.dims) > item:
       return self.dims[item]
-    for i in range(len(self.dims), item + 1):
+    for i in number_range(len(self.dims), item + 1):
       self.dims.append(Range1D.all())
     return self.dims[item]
 
