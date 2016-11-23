@@ -1,4 +1,3 @@
-from __future__ import division
 ###############################################################################
 # Caleydo - Visualization for Molecular Biology - http://caleydo.org
 # Copyright (c) The Caleydo Team. All rights reserved.
@@ -6,6 +5,7 @@ from __future__ import division
 ###############################################################################
 
 
+from __future__ import division
 from builtins import str
 from builtins import range as number_range
 from past.builtins import basestring
