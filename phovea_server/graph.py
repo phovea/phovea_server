@@ -5,6 +5,7 @@
 ###############################################################################
 
 
+from builtins import object
 from .dataset_def import ADataSetEntry
 
 

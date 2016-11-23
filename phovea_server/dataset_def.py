@@ -5,6 +5,8 @@
 ###############################################################################
 
 
+from builtins import map
+from builtins import object
 def to_plural(s):
   if s[len(s) - 1] == 'y':
     return s[0:len(s) - 1] + 'ies'
@@ -54,7 +56,7 @@ class ADataSetEntry(object):
     def to_desc(t):
       return dict(id=t, name=t, names=to_plural(t))
 
-    return map(to_desc, self.idtypes())
+    return list(map(to_desc, self.idtypes()))
 
   def update(self, args, files):
     """

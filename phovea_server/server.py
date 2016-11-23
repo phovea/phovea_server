@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 ###############################################################################
 # Caleydo - Visualization for Molecular Biology - http://caleydo.org
 # Copyright (c) The Caleydo Team. All rights reserved.
@@ -85,8 +86,8 @@ def _loader(p):
 
 
 def _create_application():
-  import dispatcher
-  import mainapp
+  from . import dispatcher
+  from . import mainapp
   from .plugin import list as list_plugins
   from werkzeug.contrib.fixers import ProxyFix
 

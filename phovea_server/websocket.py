@@ -5,6 +5,7 @@
 ###############################################################################
 
 
+from builtins import object
 from flask_sockets import Sockets as Socket  # noqa 
 from geventwebsocket import WebSocketError  # noqa 
 import logging

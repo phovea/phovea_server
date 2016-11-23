@@ -1,3 +1,4 @@
+from __future__ import division
 ###############################################################################
 # Caleydo - Visualization for Molecular Biology - http://caleydo.org
 # Copyright (c) The Caleydo Team. All rights reserved.
@@ -5,6 +6,10 @@
 ###############################################################################
 
 
+from builtins import zip
+from builtins import range
+from builtins import object
+from past.utils import old_div
 def _mix(a, b, alpha):
   if isinstance(a, tuple):
     return tuple([_mix(ai, bi, alpha) for ai, bi in zip(a, b)])
@@ -24,14 +29,14 @@ class ColorPalette(object):
     elif l == 2:
       a = self._colors[0]
       b = self._colors[1]
-      return [_mix(a, b, i / 256.) for i in xrange(256)]
+      return [_mix(a, b, old_div(i, 256.)) for i in range(256)]
     elif l == 3:
       a = self._colors[0]
       center = self._colors[1]
       b = self._colors[2]
-      center_a = _mix(a, center, 127.5 / 128)
-      center_b = _mix(center, b, 0.5 / 128)
-      return [_mix(a, center_a, i / 128.) for i in xrange(128)] + [_mix(center_b, b, i / 128.) for i in xrange(128)]
+      center_a = _mix(a, center, old_div(127.5, 128))
+      center_b = _mix(center, b, old_div(0.5, 128))
+      return [_mix(a, center_a, old_div(i, 128.)) for i in range(128)] + [_mix(center_b, b, old_div(i, 128.)) for i in range(128)]
     return None  # not yet done
 
 

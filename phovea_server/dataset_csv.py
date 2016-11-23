@@ -5,6 +5,9 @@
 ###############################################################################
 
 
+from builtins import str
+from builtins import map
+from builtins import object
 import json
 import csv
 import os
@@ -67,7 +70,7 @@ class CSVEntry(ADataSetEntry):
     return self._desc
 
   def idtypes(self):
-    return [v for k, v in self._desc.iteritems() if k in ['rowtype', 'coltype', 'idtype']]
+    return [v for k, v in self._desc.items() if k in ['rowtype', 'coltype', 'idtype']]
 
 
 def guess_color(name, i):
@@ -158,7 +161,7 @@ class CSVStratification(CSVEntry):
                 name=data.get('name', 'Uploaded File'),
                 path=os.path.basename(path),
                 idtype=data.get('idtype', data.get('rowtype', 'unknown')))
-    for k, v in data.iteritems():
+    for k, v in data.items():
       if k not in desc:
         desc[k] = v
     if id is not None:
@@ -192,16 +195,16 @@ class CSVMatrix(CSVEntry):
 
   def _process(self, data):
     cols = np.array(data[0][1:])
-    rows = np.array(map(lambda x: x[0], data[1:]))
+    rows = np.array([x[0] for x in data[1:]])
     is_number = self.value == 'real' or self.value == 'int'
 
     if is_number:
-      vs = map(lambda x: [np.NaN if v == 'NA' or v == '' else v for v in x[1:]], data[1:])
+      vs = [[np.NaN if v == 'NA' or v == '' else v for v in x[1:]] for x in data[1:]]
       # import numpy.ma as ma
       # dd = ma.masked_equal(np.array(vs), np.NaN)
       dd = np.array(vs)
     else:
-      dd = np.array(map(lambda x: x[1:], data[1:]))
+      dd = np.array([x[1:] for x in data[1:]])
     return {
         'cols': cols,
         'colIds': assign_ids(cols, self.coltype),
@@ -278,7 +281,7 @@ class CSVMatrix(CSVEntry):
                 rowtype=data.get('rowtype', 'unknown'),
                 coltype=data.get('coltype', 'unknown'),
                 value=dict(type=data.get('value_type', 'real')))
-    for k, v in data.iteritems():
+    for k, v in data.items():
       if k not in desc:
         desc[k] = v
     if id is not None:
@@ -303,9 +306,9 @@ class CSVMatrix(CSVEntry):
             cols = len(row) - 1
           else:
             rows += 1
-            min_act = min(map(float, row[1:]))
+            min_act = min(list(map(float, row[1:])))
             min_v = min_act if min_v is None else min(min_act, min_v)
-            max_act = max(map(float, row[1:]))
+            max_act = max(list(map(float, row[1:])))
             max_v = max_act if max_v is None else max(max_act, max_v)
       desc['size'] = [rows, cols]
       desc['value']['range'] = [float(data['value_min']) if 'value_min' in data else min_v,
@@ -339,9 +342,9 @@ class CSVTable(CSVEntry):
     self.shape = desc['size']
 
   def _process(self, data):
-    rows = np.array(map(lambda x: x[0], data[1:]))
+    rows = np.array([x[0] for x in data[1:]])
     import pandas as pd
-    objs = {c.name: map(lambda x: x[i + 1], data[1:]) for i, c in enumerate(self.columns)}
+    objs = {c.name: [x[i + 1] for x in data[1:]] for i, c in enumerate(self.columns)}
     df = pd.DataFrame(objs)
     df.index = rows
     return {
@@ -394,11 +397,11 @@ class CSVVector(CSVEntry):
     self.shape = desc['size']
 
   def _process(self, data):
-    rows = np.array(map(lambda x: x[0], data[1:]))
+    rows = np.array([x[0] for x in data[1:]])
     return {
         'rows': rows,
         'rowIds': assign_ids(rows, self.idtype),
-        'data': np.array(map(lambda x: x[1], data[1:]))
+        'data': np.array([x[1] for x in data[1:]])
     }
 
   def rows(self, range=None):
@@ -509,7 +512,7 @@ class StaticFileProvider(ADataSetProvider):
                    stratification=CSVStratification.parse)
     if type not in parsers:
       return None  # unknown type
-    f = files[files.keys()[0]]
+    f = files[list(files.keys())[0]]
     path = dataPlugin.save(f)
     r = parsers[type](data, path, dataPlugin, id)
     if r:

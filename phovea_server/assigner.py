@@ -5,6 +5,11 @@
 ###############################################################################
 
 
+from builtins import ascii
+from builtins import map
+from builtins import str
+from builtins import range
+from builtins import object
 import logging
 
 _log = logging.getLogger(__name__)
@@ -23,11 +28,11 @@ class MemoryIDAssigner(object):
     cache = self._idsmapping[idtype]
 
     def lookup(id):
-      for k, v in cache.items():
+      for k, v in list(cache.items()):
         if v == id:
           return k
       return None
-    return map(lookup, uids)
+    return list(map(lookup, uids))
 
   def load(self, idtype, mapping):
     """
@@ -47,7 +52,7 @@ class MemoryIDAssigner(object):
     if idtype not in self._idsmapping:
       self._idsmapping[idtype] = {id: i for i, id in enumerate(ids)}
       # 1 to 1 mapping
-      return range(len(ids))
+      return list(range(len(ids)))
 
     cache = self._idsmapping[idtype]
 
@@ -91,7 +96,7 @@ class DBIDAssigner(object):
     def lookup(id):
       key = self.to_backward_key(idtype, id)
       return self._db.get(key, None)
-    return map(lookup, uids)
+    return list(map(lookup, uids))
 
   def load(self, idtype, mapping):
     """
@@ -104,7 +109,7 @@ class DBIDAssigner(object):
     # assuming incremental ids
     if idtype in self._db:
       # clear old data
-      for key in self._db.keys():
+      for key in list(self._db.keys()):
         if key.startswith(idtype + '2id.') or key.startswith('id2' + idtype + '.'):
           del self._db[key]
 
@@ -157,11 +162,11 @@ class SqliteIDAssigner(object):
     existing = self.get_cache(idtype)
 
     def lookup(id):
-      for k, v in existing.items():
+      for k, v in list(existing.items()):
         if v == id:
           return k
       return None
-    return map(lookup, uids)
+    return list(map(lookup, uids))
 
   def get_cache(self, idtype):
     existing = self._cache.get(idtype, None)

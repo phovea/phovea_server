@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 ###############################################################################
 # Caleydo - Visualization for Molecular Biology - http://caleydo.org
 # Copyright (c) The Caleydo Team. All rights reserved.
@@ -5,8 +7,13 @@
 ###############################################################################
 
 
+from builtins import zip
+from builtins import str
+from builtins import map
+from past.builtins import basestring
+from past.utils import old_div
 from . import ns
-import range as ranges
+from . import range as ranges
 from .util import jsonify
 from .plugin import list as list_plugins
 
@@ -61,15 +68,15 @@ def format_csv(dataset, range, args):  # noqa
 
     if include_rows:
       # extend with the row ids
-      for row, line in itertools.izip(rows, d):
+      for row, line in zip(rows, d):
         yield row
         yield delimiter
-        l = map(to_str, line) if dataset.type == 'matrix' else (to_str(line[d.name] for d in dataset.columns))
+        l = list(map(to_str, line)) if dataset.type == 'matrix' else (to_str(line[d.name] for d in dataset.columns))
         yield delimiter.join(l)
         yield '\n'
     else:
       for line in d:
-        l = map(to_str, line) if dataset.type == 'matrix' else (to_str(line[d.name] for d in dataset.columns))
+        l = list(map(to_str, line)) if dataset.type == 'matrix' else (to_str(line[d.name] for d in dataset.columns))
         yield delimiter.join(l)
         yield '\n'
 
@@ -108,13 +115,13 @@ def format_image(dataset, range, args):
 
   if 'format_w' in args:
     width = int(args.get('format_w'))
-    wpercent = (width / float(img.size[0]))
+    wpercent = (old_div(width, float(img.size[0])))
     height = int(args.get('format_h', (float(img.size[1]) * float(wpercent))))
     from PIL.Image import NEAREST
     img = img.resize((width, height), NEAREST)
   elif 'format_h' in args:
     height = int(args.get('format_h'))
-    hpercent = (height / float(img.size[1]))
+    hpercent = (old_div(height, float(img.size[1])))
     width = int(float(img.size[0]) * float(hpercent))
     from PIL.Image import NEAREST
     img = img.resize((width, height), NEAREST)
