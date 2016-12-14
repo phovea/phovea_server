@@ -1,5 +1,5 @@
 {
-  "env": "development",
+  "env": "dev",
   "debug": false,
   "nocache": true,
   "error_stack_trace": false,
@@ -40,7 +40,7 @@
         "class": "phovea_server.TimedRotatingFileHandler",
         "level": "DEBUG",
         "formatter": "line",
-        "filename": "logs/phovea.log",
+        "filename": "/var/log/phovea/phovea.log",
         "when": "midnight",
         "backupCount": 7
       }

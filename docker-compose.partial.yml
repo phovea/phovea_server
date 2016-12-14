@@ -1,0 +1,8 @@
+services:
+  api:
+    build: '.'
+    ports: 
+    - '9000:9000'
+    volumes:
+    - .:/phovea
+    - ./_logs:/var/log/phovea
