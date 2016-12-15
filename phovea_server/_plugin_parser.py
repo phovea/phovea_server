@@ -245,7 +245,7 @@ class PluginMetaData(object):
     entrypoint_ids = frozenset([p.id for p in self.plugins])
 
     if is_development_mode():
-      _log.info('looking for develpment neighbors')
+      _log.info('looking for development neighbors')
       neigbhors = _find_development_neighbor_plugins()
     else:
       _log.info('looking for production neighbors')

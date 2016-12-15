@@ -91,9 +91,7 @@ def phovea(registry):
       'format': 'json',
       'factory': 'parse_json'
   })
-  # register default server command = start web server
-  registry.append('command', 'default', 'phovea_server.server', {})
-  registry.append('command', 'web', 'phovea_server.server', {})
+  registry.append('command', 'api', 'phovea_server.server', {'isDefault': True})
 
 
 def phovea_config():

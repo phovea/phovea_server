@@ -107,4 +107,4 @@ def create(parser):
 
     return http_server.serve_forever
 
-  return _laucher
+  return _launcher
