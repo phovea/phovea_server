@@ -2,6 +2,7 @@
   "generator-phovea": {
     "type": "service",
     "name": "phovea_server",
+	"serviceName": "api",
     "author": "The Caleydo Team",
     "githubAccount": "phovea",
     "modules": [],
