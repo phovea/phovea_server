@@ -4,18 +4,17 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 from __future__ import print_function
-import gevent.monkey
 import logging
-
-gevent.monkey.patch_all()  # ensure the standard libraries are patched
 
 # set configured registry
 def _get_config():
   from . import config
   return config.view('phovea_server')
 
+
 cc = _get_config()
 _log = logging.getLogger(__name__)
+
 
 def enable_dev_mode():
   _log.info('enabling development mode')
@@ -24,12 +23,14 @@ def enable_dev_mode():
   cc.set('error_stack_trace', True)
   cc.set('nocache', True)
 
+
 def enable_prod_mode():
   _log.info('enabling production mode')
   cc.set('env', 'production')
   cc.set('debug', False)
   cc.set('error_stack_trace', False)
   cc.set('nocache', False)
+
 
 def _config_files():
   """
@@ -38,6 +39,7 @@ def _config_files():
   """
   from .plugin import plugins
   return [p for p in (p.config_file() for p in plugins()) if p is not None]
+
 
 def _resolve_launcher(launcher):
   """
@@ -55,6 +57,7 @@ def _resolve_launcher(launcher):
     return m[function_name]
 
   return launcher
+
 
 def set_default_subparser(parser, name, args=None):
   """default subparser selection. Call after setup, just before parse_args()
@@ -87,18 +90,20 @@ def set_default_subparser(parser, name, args=None):
       else:
         args.insert(0, name)
 
+
 def _resolve_commands(parser):
   from .plugin import list as list_plugins
   subparsers = parser.add_subparsers(dest='cmd')
   default_command = None
   for command in list_plugins('command'):
-    print(command.id, command.file)
+    _log.debug('add command ' + command.id)
     if hasattr(command, 'isDefault') and command.isDefault:
       default_command = command.id
     cmdparser = subparsers.add_parser(command.id)
     instance = command.load().factory(cmdparser)
     cmdparser.set_defaults(launcher=instance)
   return default_command
+
 
 def run():
   import argparse

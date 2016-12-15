@@ -3,6 +3,8 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
+import gevent.monkey
+gevent.monkey.patch_all()  # ensure the standard libraries are patched
 
 import logging.config
 
