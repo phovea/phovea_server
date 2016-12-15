@@ -4,12 +4,12 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 from __future__ import print_function
-from phovea_server.server import run, create_application
+import phovea_server.__main__ as main_wrapper
 
 
 if __name__ == '__main__':
   print('run as standalone version')
-  run()
+  main_wrapper.run()
 else:
-  application = create_application()
   print('run as embedded version: %s', application)
+  application = main_wrapper.create_application()
