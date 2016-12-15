@@ -6,6 +6,7 @@
 from __future__ import print_function
 import logging
 
+
 # set configured registry
 def _get_config():
   from . import config
@@ -122,7 +123,7 @@ def run():
   else:
     enable_prod_mode()
 
-  main = (args.launcher or default_instance)(args)
+  main = args.launcher(args)
 
   if args.use_reloader:
     _log.info('start using reloader...')

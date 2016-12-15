@@ -4,14 +4,17 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 import gevent.monkey
+import logging.config
+
+
 gevent.monkey.patch_all()  # ensure the standard libraries are patched
 
-import logging.config
 
 # set configured registry
 def _get_config():
   from . import config
   return config.view('phovea_server')
+
 
 # append the plugin directories as primary lookup path
 cc = _get_config()
@@ -80,6 +83,7 @@ def _loader(p):
 
   return load_app
 
+
 def create_application():
   import dispatcher
   import mainapp
@@ -94,6 +98,7 @@ def create_application():
   # create a dispatcher for all the applications
   application = dispatcher.PathDispatcher(_default_app, _applications)
   return ProxyFix(application)
+
 
 def create(parser):
   parser.add_argument('--port', '-p', type=int, default=cc.getint('port'),
