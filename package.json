@@ -1,12 +1,14 @@
 {
   "scripts": {
-    "start": "python __main__.py",
-    "watch": "python __main__.py --use_reloader",
+    "start": "python phovea_server --use_reloader --env dev api",
     "check": "flake8",
     "pretest": "npm run check",
     "test": "python setup.py test",
     "predist": "npm run test",
-    "dist": "python setup.py bdist_egg"
+    "dist": "python setup.py bdist_egg",
+    "predocker": "npm run build",
+    "docker": "docker build -t phovea_server -f deploy/Dockerfile .",
+    "docker:dev": "docker build -t phovea_server -f deploy/Dockerfile_dev ."
   },
   "files": [
     "phovea_server",
