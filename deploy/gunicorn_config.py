@@ -1,6 +1,9 @@
 # to tune see http://gunicorn-docs.readthedocs.org/en/latest/settings.html
 
-import multiprocessing, os
+import multiprocessing
+import os
+
+
 # to serve directly via TCP:
 bind = os.getenv('GUNICORN_BIND', '0.0.0.0:9000')
 # for nginx or other proxy:
@@ -12,7 +15,7 @@ preload_app = True
 
 worker_class = 'sync'
 # only relevant for async workers:
-#worker_connections = 1000
+# worker_connections = 1000
 
 user = 'root'
 group = 'root'
