@@ -9,7 +9,7 @@ CMD ["supervisord", "-n"]
 
 RUN pip install -U gunicorn
 COPY ./deploy/gunicorn_config.py /phovea/
-EXPOSE 9000
+EXPOSE 80
 
 COPY ./deploy/supervisord.conf /etc/supervisor/conf.d/phovea_service.conf
 

@@ -5,7 +5,7 @@ import os
 
 
 # to serve directly via TCP:
-bind = os.getenv('GUNICORN_BIND', '0.0.0.0:9000')
+bind = os.getenv('GUNICORN_BIND', '0.0.0.0:80')
 # for nginx or other proxy:
 # bind = "unix:/deploy/run/gunicorn.sock"
 #
