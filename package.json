@@ -4,7 +4,9 @@
     "check": "flake8",
     "pretest": "npm run check",
     "test": "python setup.py test",
-    "predist": "npm run test",
+    "prebuild": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test",
+    "build": "python -c \"from distutils.dir_util import mkpath ; mkpath('./build/source')\" && (tar -c ./taco_server --exclude '*.pyc' | tar -xC build/source)",
+    "predist": "npm run build",
     "dist": "python setup.py bdist_egg",
     "predocker": "npm run build",
     "docker": "docker build -t phovea_server -f deploy/Dockerfile .",
@@ -17,8 +19,7 @@
     "build",
     "requirements.txt",
     "requirements_dev.txt",
-    "debian_packages.txt",
-    "redhat_packages.txt"
+    "docker_packages.txt"
   ],
   "name": "phovea_server",
   "description": "Python server implementation of Phovea",
