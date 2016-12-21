@@ -1,7 +1,7 @@
 {
-  "env": "dev",
+  "env": "production",
   "debug": false,
-  "nocache": true,
+  "nocache": false,
   "error_stack_trace": false,
 
   "port": 80,
