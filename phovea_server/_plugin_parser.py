@@ -230,7 +230,7 @@ def _find_production_neighbor_plugins():
   import glob
   base_dir = p.dirname(p.dirname(__file__))
   # all dirs having both __init__.py and config.json contained
-  dirs = [p.abspath(pi) for pi in glob.glob(base_dir + '*/__init__.py')]
+  dirs = [p.dirname(p.abspath(pi)) for pi in glob.glob(base_dir + '/*/__init__.py')]
   dirs = [d for d in dirs if p.exists(p.join(d, 'config.json'))]
   # files contains all plugins
   return [DirectoryProductionPlugin(d) for d in dirs]
