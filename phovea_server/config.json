@@ -32,7 +32,6 @@
     "handlers": {
       "console": {
         "class": "logging.StreamHandler",
-        "level": "INFO",
         "formatter": "simple",
         "stream": "ext://sys.stdout"
       },
@@ -55,10 +54,9 @@
       }
     },
     "root": {
-      "level": "DEBUG",
+      "level": "INFO",
       "handlers": [
-        "console",
-        "file"
+        "console"
       ]
     }
   }
