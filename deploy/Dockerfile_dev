@@ -12,5 +12,6 @@ COPY requirements*.txt docker_packages.txt ./
 RUN (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs apt-get install -y)) && pip install --no-cache-dir -r requirements.txt && (pip install --no-cache-dir -r requirements_dev.txt)
 
 ARG env=dev
-CMD ["python", "phovea_server", "--use_reloader", "--env", $env, "api"]
+ARG service=api
+CMD ["python", "phovea_server", "--use_reloader", "--env", $env, $service]
 EXPOSE 80

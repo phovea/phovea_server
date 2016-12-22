@@ -12,5 +12,6 @@ RUN (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs apt-get 
 COPY ./build/source ./phovea/
 
 ARG env=production
-CMD ["python", "phovea_server", "--env", $env, "api"]
+ARG service=api
+CMD ["python", "phovea_server", "--env", $env, $service]
 EXPOSE 80
