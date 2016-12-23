@@ -108,7 +108,6 @@ def _resolve_commands(parser):
 
 def run():
   import argparse
-  import sys
 
   parser = argparse.ArgumentParser(description='Phovea Server')
   parser.add_argument('--use_reloader', action='store_true', help='whether to automatically reload the server')
