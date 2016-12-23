@@ -1,4 +1,4 @@
-FROM python:2.7-slim
+FROM python:2.7
 
 MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
 WORKDIR /phovea
