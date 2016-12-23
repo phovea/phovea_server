@@ -4,7 +4,7 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 from __future__ import print_function
-import logging
+import logging.config
 
 
 # set configured registry
@@ -97,7 +97,7 @@ def _resolve_commands(parser):
   subparsers = parser.add_subparsers(dest='cmd')
   default_command = None
   for command in list_plugins('command'):
-    _log.debug('add command ' + command.id)
+    _log.info('add command ' + command.id)
     if hasattr(command, 'isDefault') and command.isDefault:
       default_command = command.id
     cmdparser = subparsers.add_parser(command.id)
@@ -108,20 +108,24 @@ def _resolve_commands(parser):
 
 def run():
   import argparse
+  import sys
 
   parser = argparse.ArgumentParser(description='Phovea Server')
   parser.add_argument('--use_reloader', action='store_true', help='whether to automatically reload the server')
   parser.add_argument('--env', default=cc.get('env'), help='environment mode (dev or prod)')
+
+  # parse before to enable correct plugin discovery
+  args = parser.parse_known_args()[0]
+  if args.env.startswith('dev'):
+    enable_dev_mode()
+  else:
+    enable_prod_mode()
+
   default_command = _resolve_commands(parser)
   if default_command is not None:
     set_default_subparser(parser, default_command)
 
   args = parser.parse_args()
-
-  if args.env.startswith('dev'):
-    enable_dev_mode()
-  else:
-    enable_prod_mode()
 
   main = args.launcher(args)
 
