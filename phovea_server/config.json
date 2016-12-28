@@ -1,22 +1,23 @@
 {
-  "dir": "./",
-  "pluginDirs": [
-    "p"
-  ],
-  "dataDir": "${dir}/_data",
-  "use_reloader": false,
-  "multithreaded": true,
-  "debug": true,
+  "env": "development",
+  "debug": false,
   "nocache": true,
-  "error_stack_trace": true,
+  "error_stack_trace": false,
+
   "port": 9000,
   "address": "0.0.0.0",
+
+  "dir": "./",
+  "dataDir": "${dir}/_data",
+
   "secret_key": "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w",
   "max_file_size": 33554432,
+
   "disable": {
     "plugins": [],
     "extensions": []
   },
+
   "logging": {
     "version": 1,
     "formatters": {

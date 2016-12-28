@@ -84,7 +84,23 @@ def _loader(p):
   return load_app
 
 
-def _create_application():
+def enable_dev_mode():
+  _log.info('enabling development mode')
+  cc.set('env', 'development')
+  cc.set('debug', True)
+  cc.set('error_stack_trace', True)
+  cc.set('nocache', True)
+
+
+def enable_prod_mode():
+  _log.info('enabling production mode')
+  cc.set('env', 'production')
+  cc.set('debug', False)
+  cc.set('error_stack_trace', False)
+  cc.set('nocache', False)
+
+
+def create_application():
   import dispatcher
   import mainapp
   from .plugin import list as list_plugins
@@ -99,9 +115,6 @@ def _create_application():
   application = dispatcher.PathDispatcher(_default_app, _applications)
   return ProxyFix(application)
 
-# the public wsgi application
-application = _create_application()
-
 
 def run():
   import argparse
@@ -114,8 +127,18 @@ def run():
   parser.add_argument('--address', '-a', default=cc.get('address'),
                       help='server address')
   parser.add_argument('--use_reloader', action='store_true', help='whether to automatically reload the server')
+  parser.add_argument('--env', default=cc.get('env'), help='environment mode (dev or prod)')
   args = parser.parse_args()
+
+  if args.env.startswith('dev'):
+    enable_dev_mode()
+  else:
+    enable_prod_mode()
+
+  application = create_application()
   http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
+
+  _log.info('start serving...')
   http_server.serve_forever()
 
   # from werkzeug.serving import run_simple
