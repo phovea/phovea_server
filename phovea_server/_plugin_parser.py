@@ -255,6 +255,8 @@ class PluginMetaData(object):
 
     self.plugins.sort(key=lambda p: p.id)
 
+    _log.info('discovered %d plugins: %s', len(self.plugins), [d.id for d in self.plugins])
+
     self.server_extensions = []
     for p in self.plugins:
       reg = RegHelper(p)
