@@ -5,6 +5,9 @@ info:
   version: "0.0.1"
   title: IDType API
 
+produces:
+  - application/json
+
 parameters:
   source:
     name: source
@@ -38,6 +41,7 @@ parameters:
     type: array
     items:
       type: string
+    collectionFormat: multi
   uid:
     name: uid
     in: path
@@ -50,12 +54,16 @@ parameters:
     description: source uids as range string
     required: false
     type: string
+    format: range
   q:
     name: q
     in: query
     description: source uids separated by ,
     required: false
-    type: string
+    type: array
+    items:
+      type: string
+    collectionFormat: csv
 
 # Describe your paths here
 paths:

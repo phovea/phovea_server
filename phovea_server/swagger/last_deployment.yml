@@ -5,6 +5,7 @@ info:
   version: "0.0.1"
   title: Last Deployment API
 
+
 # Describe your paths here
 paths:
   # This is a path endpoint. Change it.
@@ -15,6 +16,8 @@ paths:
       description: |
         returns the last deployment timestamp
       # Expected responses for this operation:
+      produces:
+        - text/plain
       responses:
         # Response code
         200:

@@ -1,0 +1,245 @@
+swagger: "2.0"
+
+# This is your document metadata
+info:
+  version: "0.0.1"
+  title: Dataset API
+
+produces:
+  - application/json
+
+paths:
+  /:
+    get:
+      description: list all datasets
+      parameters:
+        - $ref: "#/parameters/query_limit"
+        - $ref: "#/parameters/query_id"
+        - $ref: "#/parameters/query_name"
+        - $ref: "#/parameters/query_fqname"
+        - $ref: "#/parameters/query_type"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ArrayOfDatsets
+            type: array
+            items:
+              $ref: "#/definitions/dataset"
+    post:
+      description: add a new dataset
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: "#/parameters/desc"
+        - $ref: "#/parameters/file"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/dataset"
+  /.csv:
+    get:
+      description: list all datasets as csv file
+      parameters:
+        - $ref: "#/parameters/query_limit"
+        - $ref: "#/parameters/query_id"
+        - $ref: "#/parameters/query_name"
+        - $ref: "#/parameters/query_fqname"
+        - $ref: "#/parameters/query_type"
+      produces:
+        - text/csv
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: CSV File
+            type: string
+  /.tree.json:
+    get:
+      description: list all datasets as tree
+      parameters:
+        - $ref: "#/parameters/query_limit"
+        - $ref: "#/parameters/query_id"
+        - $ref: "#/parameters/query_name"
+        - $ref: "#/parameters/query_fqname"
+        - $ref: "#/parameters/query_type"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/datasetnode"
+  /<datsetid>:
+    parameters:
+      - $ref: "#/parameters/datasetid"
+    get:
+      description: get the data of this dataset
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: dataset object
+            type: object
+        404:
+          description: Invalid dataset id
+          $ref: "#/schemas/error"
+    put:
+      description: updates this dataset
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: "#/parameters/desc"
+        - $ref: "#/parameters/file"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/dataset"
+        404:
+          description: Invalid dataset id
+          $ref: "#/schemas/error"
+    post:
+      description: modifies this dataset
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: "#/parameters/desc"
+        - $ref: "#/parameters/file"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/dataset"
+        404:
+          description: Invalid dataset id
+          $ref: "#/schemas/error"
+    delete:
+      description: deletes this dataset
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/dataset_deleted"
+        404:
+          description: Invalid dataset id
+          schema:
+            $ref: "#/definitions/error"
+  /<datsetid>/desc:
+    parameters:
+      - $ref: "#/parameters/datasetid"
+    get:
+      description: get the description of this dataset
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/dataset"
+        404:
+          description: Invalid dataset id
+          $ref: "#/schemas/error"
+
+parameters:
+  datasetid:
+    name: datasetid
+    in: path
+    description: dataset id
+    required: true
+    type: string
+  desc:
+    name: desc
+    in: formData
+    description: dataset desc
+    required: true
+    type: string
+    format: json
+  desc_optional:
+    name: desc
+    in: formData
+    description: dataset desc
+    required: false
+    type: string
+    format: json
+  file:
+    name: file
+    in: formData
+    description: uploaded file
+    required: false
+    type: file
+  query_limit:
+    name: limit
+    in: query
+    required: false
+    description: limit the number of returned items
+    type: integer
+  query_type:
+    name: type
+    in: query
+    required: false
+    description: filter by type regex
+    type: string
+    format: regex
+  query_name:
+    name: name
+    in: query
+    required: false
+    description: filter by name regex
+    type: string
+    format: regex
+  query_fqname:
+    name: fqname
+    in: query
+    required: false
+    description: filter by fqname regex
+    type: string
+    format: regex
+  query_id:
+    name: id
+    in: query
+    required: false
+    description: filter by id regex
+    type: string
+    format: regex
+
+definitions:
+  dataset:
+    type: object
+    description: a dataset
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      fqname:
+        type: string
+      type:
+        type: string
+      creator:
+        type: string
+      ts:
+        type: number
+  dataset_deleted:
+    type: object
+    description: status info
+    properties:
+      status:
+        type: string
+      msg:
+        type: string
+      id:
+        type: string
+  datasetnode:
+    type: object
+    description: a dataset node
+    properties:
+      name:
+        type: string
+      data:
+        $ref: "#/definitions/dataset"
+      children:
+        type: array
+        items:
+          $ref: "#/definitions/datasetnode"
+  error:
+    title: Error
+    type: string
+
