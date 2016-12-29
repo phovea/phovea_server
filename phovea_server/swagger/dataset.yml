@@ -1,8 +1,8 @@
-swagger: "2.0"
+swagger: '2.0'
 
 # This is your document metadata
 info:
-  version: "0.0.1"
+  version: '0.0.1'
   title: Dataset API
 
 produces:
@@ -13,11 +13,11 @@ paths:
     get:
       description: list all datasets
       parameters:
-        - $ref: "#/parameters/query_limit"
-        - $ref: "#/parameters/query_id"
-        - $ref: "#/parameters/query_name"
-        - $ref: "#/parameters/query_fqname"
-        - $ref: "#/parameters/query_type"
+        - $ref: '#/parameters/query_limit'
+        - $ref: '#/parameters/query_id'
+        - $ref: '#/parameters/query_name'
+        - $ref: '#/parameters/query_fqname'
+        - $ref: '#/parameters/query_type'
       responses:
         200:
           description: Successful response
@@ -25,28 +25,28 @@ paths:
             title: ArrayOfDatsets
             type: array
             items:
-              $ref: "#/definitions/dataset"
+              $ref: '#/definitions/dataset'
     post:
       description: add a new dataset
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: "#/parameters/desc"
-        - $ref: "#/parameters/file"
+        - $ref: '#/parameters/desc'
+        - $ref: '#/parameters/file'
       responses:
         200:
           description: Successful response
           schema:
-            $ref: "#/definitions/dataset"
+            $ref: '#/definitions/dataset'
   /.csv:
     get:
       description: list all datasets as csv file
       parameters:
-        - $ref: "#/parameters/query_limit"
-        - $ref: "#/parameters/query_id"
-        - $ref: "#/parameters/query_name"
-        - $ref: "#/parameters/query_fqname"
-        - $ref: "#/parameters/query_type"
+        - $ref: '#/parameters/query_limit'
+        - $ref: '#/parameters/query_id'
+        - $ref: '#/parameters/query_name'
+        - $ref: '#/parameters/query_fqname'
+        - $ref: '#/parameters/query_type'
       produces:
         - text/csv
       responses:
@@ -59,19 +59,19 @@ paths:
     get:
       description: list all datasets as tree
       parameters:
-        - $ref: "#/parameters/query_limit"
-        - $ref: "#/parameters/query_id"
-        - $ref: "#/parameters/query_name"
-        - $ref: "#/parameters/query_fqname"
-        - $ref: "#/parameters/query_type"
+        - $ref: '#/parameters/query_limit'
+        - $ref: '#/parameters/query_id'
+        - $ref: '#/parameters/query_name'
+        - $ref: '#/parameters/query_fqname'
+        - $ref: '#/parameters/query_type'
       responses:
         200:
           description: Successful response
           schema:
-            $ref: "#/definitions/datasetnode"
+            $ref: '#/definitions/datasetnode'
   /<datsetid>:
     parameters:
-      - $ref: "#/parameters/datasetid"
+      - $ref: '#/parameters/datasetid'
     get:
       description: get the data of this dataset
       responses:
@@ -81,62 +81,58 @@ paths:
             title: dataset object
             type: object
         404:
-          description: Invalid dataset id
-          $ref: "#/schemas/error"
+          $ref: '#/responses/notFound'
     put:
       description: updates this dataset
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: "#/parameters/desc"
-        - $ref: "#/parameters/file"
+        - $ref: '#/parameters/desc'
+        - $ref: '#/parameters/file'
       responses:
         200:
           description: Successful response
           schema:
-            $ref: "#/definitions/dataset"
+            $ref: '#/definitions/dataset'
         404:
-          description: Invalid dataset id
-          $ref: "#/schemas/error"
+          $ref: '#/responses/notFound'
     post:
       description: modifies this dataset
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: "#/parameters/desc"
-        - $ref: "#/parameters/file"
+        - $ref: '#/parameters/desc'
+        - $ref: '#/parameters/file'
       responses:
         200:
           description: Successful response
           schema:
-            $ref: "#/definitions/dataset"
+            $ref: '#/definitions/dataset'
         404:
-          description: Invalid dataset id
-          $ref: "#/schemas/error"
+          $ref: '#/responses/notFound'
     delete:
       description: deletes this dataset
       responses:
         200:
           description: Successful response
           schema:
-            $ref: "#/definitions/dataset_deleted"
+            $ref: '#/definitions/dataset_deleted'
         404:
           description: Invalid dataset id
-          schema:
-            $ref: "#/definitions/error"
+        404:
+          $ref: '#/responses/notFound'
   /<datsetid>/desc:
     parameters:
-      - $ref: "#/parameters/datasetid"
+      - $ref: '#/parameters/datasetid'
     get:
       description: get the description of this dataset
       responses:
         200:
           description: Successful response
           schema:
-            $ref: "#/definitions/dataset"
+            $ref: '#/definitions/dataset'
         404:
-          description: Invalid dataset id
-          $ref: "#/schemas/error"
+          $ref: '#/responses/notFound'
 
 parameters:
   datasetid:
@@ -234,12 +230,15 @@ definitions:
       name:
         type: string
       data:
-        $ref: "#/definitions/dataset"
+        $ref: '#/definitions/dataset'
       children:
         type: array
         items:
-          $ref: "#/definitions/datasetnode"
-  error:
-    title: Error
-    type: string
+          $ref: '#/definitions/datasetnode'
 
+responses:
+  notFound:
+    description: Not Found
+    schema:
+      title: Error
+      type: string

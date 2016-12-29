@@ -163,7 +163,6 @@ paths:
             title: ArrayOfIDNames
             type: array
             items:
-              title: IDName
               type: string
         400:
           description: Invalid arguments
@@ -199,7 +198,6 @@ paths:
             title: ArrayOfUIDs
             type: array
             items:
-              title: UID
               type: integer
         400:
           description: Invalid arguments
