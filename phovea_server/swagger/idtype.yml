@@ -1,0 +1,223 @@
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "0.0.1"
+  title: IDType API
+
+parameters:
+  source:
+    name: source
+    in: path
+    description: source id type
+    required: true
+    type: string
+  target:
+    name: target
+    in: path
+    description: target id type
+    required: true
+    type: string
+  idtype:
+    name: idtype
+    in: path
+    description: id type
+    required: true
+    type: string
+  id:
+    name: id
+    in: path
+    description: source id name
+    required: true
+    type: integer
+  ids:
+    name: ids
+    in: query
+    description: source id names
+    required: true
+    type: array
+    items:
+      type: string
+  uid:
+    name: uid
+    in: path
+    description: source uid
+    required: true
+    type: integer
+  uids:
+    name: uids
+    in: query
+    description: source uids as range string
+    required: false
+    type: string
+  q:
+    name: q
+    in: query
+    description: source uids separated by ,
+    required: false
+    type: string
+
+# Describe your paths here
+paths:
+  /:
+    get:
+      description: list all idtypes
+      responses:
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: ArrayOfIDTypes
+            type: array
+            items:
+              $ref: '#/definitions/idtype'
+  /{idtype}/:
+    parameters:
+      - $ref: '#/parameters/idtype'
+    get:
+      description: returns a list of all mapable types
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ArrayOfIDTypesIDs
+            type: array
+            items:
+              type: string
+  /{idtype}/map:
+    parameters:
+      - $ref: '#/parameters/idtype'
+    get:
+      description: returns the uids for the given id names
+      parameters:
+        - $ref: '#/parameters/ids'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ArrayOfUIDs
+            type: array
+            items:
+              type: integer
+  /{idtype}/map/{id}:
+    parameters:
+      - $ref: '#/parameters/idtype'
+      - $ref: '#/parameters/id'
+    get:
+      description: returns the uid for the given id name
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ID name
+            type: string
+  /{idtype}/unmap:
+    parameters:
+      - $ref: '#/parameters/idtype'
+    get:
+      description: returns the id names for the given uids
+      parameters:
+        - $ref: '#/parameters/ids'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ArrayOfIDNames
+            type: array
+            items:
+              type: string
+  /{idtype}/unmap/{uid}:
+    parameters:
+      - $ref: '#/parameters/idtype'
+      - $ref: '#/parameters/uid'
+    get:
+      description: returns the id name for the given uid
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ID Name
+            type: string
+  /{source}/{target}:
+    parameters:
+      - $ref: '#/parameters/source'
+      - $ref: '#/parameters/target'
+    get:
+      description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
+      parameters:
+        - $ref: '#/parameters/uids'
+        - $ref: '#/parameters/q'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ArrayOfIDNames
+            type: array
+            items:
+              title: IDName
+              type: string
+        400:
+          description: Invalid arguments
+  /{source}/{target}/{uid}:
+    parameters:
+      - $ref: '#/parameters/source'
+      - $ref: '#/parameters/target'
+      - $ref: '#/parameters/uid'
+    get:
+      description: maps is between given source idtype to the target idtype returning the id names of the target idtype
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # Use JSON Schema format
+          schema:
+            title: IDName
+            type: string
+  /{source}/{target}/map:
+    parameters:
+      - $ref: '#/parameters/source'
+      - $ref: '#/parameters/target'
+    get:
+      description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
+      parameters:
+        - $ref: '#/parameters/uids'
+        - $ref: '#/parameters/q'
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            title: ArrayOfUIDs
+            type: array
+            items:
+              title: UID
+              type: integer
+        400:
+          description: Invalid arguments
+  /{source}/{target}/map/{id}:
+    parameters:
+      - $ref: '#/parameters/source'
+      - $ref: '#/parameters/target'
+      - $ref: '#/parameters/id'
+    get:
+      description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: UID
+            type: integer
+
+definitions:
+  idtype:
+    type: object
+    description: an IDType
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      names:
+        type: string
+

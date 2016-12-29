@@ -1,0 +1,26 @@
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "0.0.1"
+  title: Last Deployment API
+
+# Describe your paths here
+paths:
+  # This is a path endpoint. Change it.
+  /:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        returns the last deployment timestamp
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            title: Timestamp as string
+            type: string
