@@ -1,0 +1,5 @@
+name: datasetid
+in: path
+description: dataset id
+required: true
+type: string

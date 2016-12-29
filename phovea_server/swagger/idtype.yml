@@ -8,63 +8,6 @@ info:
 produces:
   - application/json
 
-parameters:
-  source:
-    name: source
-    in: path
-    description: source id type
-    required: true
-    type: string
-  target:
-    name: target
-    in: path
-    description: target id type
-    required: true
-    type: string
-  idtype:
-    name: idtype
-    in: path
-    description: id type
-    required: true
-    type: string
-  id:
-    name: id
-    in: path
-    description: source id name
-    required: true
-    type: integer
-  ids:
-    name: ids
-    in: query
-    description: source id names
-    required: true
-    type: array
-    items:
-      type: string
-    collectionFormat: multi
-  uid:
-    name: uid
-    in: path
-    description: source uid
-    required: true
-    type: integer
-  uids:
-    name: uids
-    in: query
-    description: source uids as range string
-    required: false
-    type: string
-    format: range
-  q:
-    name: q
-    in: query
-    description: source uids separated by ,
-    required: false
-    type: array
-    items:
-      type: string
-    collectionFormat: csv
-
 # Describe your paths here
 paths:
   /:
@@ -215,10 +158,72 @@ paths:
             title: UID
             type: integer
 
+
+parameters:
+  source:
+    name: source
+    in: path
+    description: source id type
+    required: true
+    type: string
+  target:
+    name: target
+    in: path
+    description: target id type
+    required: true
+    type: string
+  idtype:
+    name: idtype
+    in: path
+    description: id type
+    required: true
+    type: string
+  id:
+    name: id
+    in: path
+    description: source id name
+    required: true
+    type: integer
+  ids:
+    name: ids
+    in: query
+    description: source id names
+    required: true
+    type: array
+    items:
+      type: string
+    collectionFormat: multi
+  uid:
+    name: uid
+    in: path
+    description: source uid
+    required: true
+    type: integer
+  uids:
+    name: uids
+    in: query
+    description: source uids as range string
+    required: false
+    type: string
+    format: range
+  q:
+    name: q
+    in: query
+    description: source uids separated by ,
+    required: false
+    type: array
+    items:
+      type: string
+    collectionFormat: csv
+
 definitions:
   idtype:
     type: object
     description: an IDType
+    required:
+      - id
+      - name
+      - names
     properties:
       id:
         type: string

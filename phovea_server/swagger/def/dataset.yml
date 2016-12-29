@@ -1,0 +1,20 @@
+type: object
+description: a dataset
+required:
+  - id
+  - name
+  - fqname
+  - type
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  fqname:
+    type: string
+  type:
+    type: string
+  creator:
+    type: string
+  ts:
+    type: number

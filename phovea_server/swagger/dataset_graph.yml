@@ -1,0 +1,252 @@
+swagger: '2.0'
+
+info:
+  version: "0.0.1"
+  title: DataSet Graph API
+
+produces:
+  - application/json
+
+paths:
+  /graph/{datasetid}/desc:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      description: get the description of this dataset
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/graph_dataset'
+        404:
+          $ref: 'def/notFound.yml'
+  /graph/{datasetid}/data:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      description: get the description of this dataset
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/graph_data'
+        404:
+          $ref: 'def/notFound.yml'
+  /graph/{datasetid}/desc:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      description: get the description of this dataset
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/graph_dataset'
+        404:
+          $ref: 'def/notFound.yml'
+  /graph/{datasetid}/node:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      description: get all nodes
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/graph_node'
+        404:
+          $ref: 'def/notFound.yml'
+   post:
+      description: add a new node
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: 'def/desc.yml'
+      responses:
+        200:
+          $ref: '#/responses/success_desc'
+        404:
+          $ref: 'def/notFound.yml'
+   delete:
+      description: clear all nodes
+      responses:
+        200:
+          $ref: '#/responses/success_desc'
+        404:
+          $ref: 'def/notFound.yml'
+  /graph/{datasetid}/node/{nodeid}:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+      - name: nodeid
+        in: path
+        required: true
+        type: integer
+    get:
+      description: get node
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/graph_node'
+        404:
+          $ref: 'def/notFound.yml'
+   put:
+      description: update node
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: 'def/desc.yml'
+      responses:
+        200:
+          $ref: '#/responses/success_desc'
+        404:
+          $ref: 'def/notFound.yml'
+   delete:
+      description: delete node
+      responses:
+        200:
+          $ref: '#/responses/success_desc'
+        404:
+          $ref: 'def/notFound.yml'
+  /graph/{datasetid}/edge:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      description: get all edges
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/graph_node'
+        404:
+          $ref: 'def/notFound.yml'
+   post:
+      description: add a new edge
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: 'def/desc.yml'
+      responses:
+        200:
+          $ref: '#/responses/success_desc'
+        404:
+          $ref: 'def/notFound.yml'
+   delete:
+      description: clear all edge
+      responses:
+        200:
+          $ref: '#/responses/success_desc'
+        404:
+          $ref: 'def/notFound.yml'
+  /graph/{datasetid}/edge/{edgeid}:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+      - name: edgeid
+        in: path
+        required: true
+        type: integer
+    get:
+      description: get edge
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/graph_edge'
+        404:
+          $ref: 'def/notFound.yml'
+   put:
+      description: update edge
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: 'def/desc.yml'
+      responses:
+        200:
+          $ref: '#/responses/success_desc'
+        404:
+          $ref: 'def/notFound.yml'
+   delete:
+      description: delete edge
+      responses:
+        200:
+          $ref: '#/responses/success_desc'
+        404:
+          $ref: 'def/notFound.yml'
+
+definitions:
+  attr_container:
+    type: object
+    properties:
+      attrs:
+        type: object
+  graph_dataset:
+    type: object
+    description: a graph dataset
+    additionalProperties:
+      - $ref: 'def/dataset.yml'
+      - $ref: '#/definitions/attr_container'
+    required:
+      - size
+    properties:
+      size:
+        type: array
+        items:
+          type: integer
+      attrs:
+        type: object
+  graph_data:
+    type: object
+    description: graph as json
+    properties:
+      nodes:
+        type: array
+        items:
+          $ref: '#/definitions/graph_node'
+      edges:
+        type: array
+        items:
+          $ref: '#/definitions/graph_edge'
+    required:
+      - nodes
+      - edges
+  graph_node:
+    type_object:
+    description: a graph node
+    properties:
+      type:
+        type: string
+      id:
+        type: integer
+    required:
+      - type
+      - id
+    additionalProperties:
+      - $ref: '#/definitions/attr_container'
+  graph_edge:
+    type_object:
+    description: a graph edge
+    properties:
+      type:
+        type: string
+      id:
+        type: integer
+      source:
+        type: integer
+      target:
+        type: integer
+    required:
+      - type
+      - id
+      - source
+      - target
+    additionalProperties:
+      - $ref: '#/definitions/attr_container'
+responses:
+  success_desc:
+    description: Successful response
+    schema:
+      $ref: '#/definitions/graph_dataset'

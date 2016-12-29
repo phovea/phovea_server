@@ -25,19 +25,19 @@ paths:
             title: ArrayOfDatsets
             type: array
             items:
-              $ref: '#/definitions/dataset'
+              $ref: 'def/dataset.yml'
     post:
       description: add a new dataset
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: '#/parameters/desc'
+        - $ref: 'def/desc.yml'
         - $ref: '#/parameters/file'
       responses:
         200:
           description: Successful response
           schema:
-            $ref: '#/definitions/dataset'
+            $ref: 'def/dataset.yml'
   /.csv:
     get:
       description: list all datasets as csv file
@@ -69,9 +69,9 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/datasetnode'
-  /<datsetid>:
+  /{datasetid}:
     parameters:
-      - $ref: '#/parameters/datasetid'
+      - $ref: 'def/datasetid.yml'
     get:
       description: get the data of this dataset
       responses:
@@ -81,35 +81,35 @@ paths:
             title: dataset object
             type: object
         404:
-          $ref: '#/responses/notFound'
+          $ref: 'def/notFound.yml'
     put:
       description: updates this dataset
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: '#/parameters/desc'
+        - $ref: '#/parameters/desc_optional'
         - $ref: '#/parameters/file'
       responses:
         200:
           description: Successful response
           schema:
-            $ref: '#/definitions/dataset'
+            $ref: 'def/dataset.yml'
         404:
-          $ref: '#/responses/notFound'
+          $ref: 'def/notFound.yml'
     post:
       description: modifies this dataset
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: '#/parameters/desc'
+        - $ref: '#/parameters/desc_optional'
         - $ref: '#/parameters/file'
       responses:
         200:
           description: Successful response
           schema:
-            $ref: '#/definitions/dataset'
+            $ref: 'def/dataset.yml'
         404:
-          $ref: '#/responses/notFound'
+          $ref: 'def/notFound.yml'
     delete:
       description: deletes this dataset
       responses:
@@ -120,34 +120,21 @@ paths:
         404:
           description: Invalid dataset id
         404:
-          $ref: '#/responses/notFound'
-  /<datsetid>/desc:
+          $ref: 'def/notFound.yml'
+  /{datasetid}/desc:
     parameters:
-      - $ref: '#/parameters/datasetid'
+      - $ref: 'def/datasetid.yml'
     get:
       description: get the description of this dataset
       responses:
         200:
           description: Successful response
           schema:
-            $ref: '#/definitions/dataset'
+            $ref: 'def/dataset.yml'
         404:
-          $ref: '#/responses/notFound'
+          $ref: 'def/notFound.yml'
 
 parameters:
-  datasetid:
-    name: datasetid
-    in: path
-    description: dataset id
-    required: true
-    type: string
-  desc:
-    name: desc
-    in: formData
-    description: dataset desc
-    required: true
-    type: string
-    format: json
   desc_optional:
     name: desc
     in: formData
@@ -197,22 +184,6 @@ parameters:
     format: regex
 
 definitions:
-  dataset:
-    type: object
-    description: a dataset
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-      fqname:
-        type: string
-      type:
-        type: string
-      creator:
-        type: string
-      ts:
-        type: number
   dataset_deleted:
     type: object
     description: status info
@@ -230,15 +201,8 @@ definitions:
       name:
         type: string
       data:
-        $ref: '#/definitions/dataset'
+        $ref: 'def/dataset.yml'
       children:
         type: array
         items:
           $ref: '#/definitions/datasetnode'
-
-responses:
-  notFound:
-    description: Not Found
-    schema:
-      title: Error
-      type: string

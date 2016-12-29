@@ -1,0 +1,4 @@
+description: Not Found
+schema:
+  title: Error
+  type: string
