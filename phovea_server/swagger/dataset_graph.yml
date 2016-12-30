@@ -171,6 +171,7 @@ definitions:
     properties:
       attrs:
         type: object
+        additionalProperties: true
   graph_dataset:
     type: object
     description: a graph dataset

@@ -127,7 +127,7 @@ paths:
             items:
               type: array
               items:
-                x-type: any
+                format: any
                 type: string
         404:
           $ref: 'def/notFound.yml'
@@ -148,7 +148,7 @@ paths:
           schema:
             type: array
             items:
-              x-type: any
+              format: any
               type: string
         404:
           $ref: 'def/notFound.yml'
@@ -270,7 +270,7 @@ paths:
             items:
               type: array
               items:
-                x-type: any
+                format: any
                 type: string
         404:
           $ref: 'def/notFound.yml'
@@ -309,7 +309,7 @@ definitions:
         items:
           type: array
           items:
-            x-type: any
+            format: any
             type: string
       rows:
         type: array

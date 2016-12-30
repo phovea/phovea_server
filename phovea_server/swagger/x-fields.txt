@@ -1,0 +1,6 @@
+format: json ... json parseable string
+format: range ... range parseable string
+formta: any ... anything
+x-values: <name> ... store the values (get+post parameter) in this parameter
+x-module
+x-method

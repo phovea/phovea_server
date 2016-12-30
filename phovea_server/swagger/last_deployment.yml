@@ -10,8 +10,10 @@ info:
 paths:
   # This is a path endpoint. Change it.
   /:
+    x-module: last_deployment
     # This is a HTTP operation
     get:
+      x-method: get_last_deployment
       # Describe this verb here. Note: you can use markdown
       description: |
         returns the last deployment timestamp
@@ -26,4 +28,8 @@ paths:
           # Use JSON Schema format
           schema:
             title: Timestamp as string
-            type: string
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time

@@ -125,7 +125,7 @@ paths:
           schema:
             type: array
             items:
-              x-type: any
+              format: any
               type: string
         404:
           $ref: 'def/notFound.yml'
@@ -175,7 +175,7 @@ definitions:
       data:
         type: array
         items:
-          x-type: any
+          format: any
           type: string
       rows:
         type: array
