@@ -77,6 +77,8 @@ paths:
       responses:
         200:
           description: Successful response
+          schema:
+            type: file
         404:
           $ref: 'def/notFound.yml'
   /matrix/{datasetid}/data.png:
@@ -96,7 +98,7 @@ paths:
           format: double
           required: false
         - name: format_palette
-          description: color palette one of: blue_white_red, white_red
+          description: 'color palette one of: blue_white_red, white_red'
           in: query
           type: string
           required: false
@@ -117,6 +119,8 @@ paths:
       responses:
         200:
           description: Successful response
+          schema:
+            type: file
         404:
           $ref: 'def/notFound.yml'
   /matrix/{datasetid}/data.jpg:
@@ -136,7 +140,7 @@ paths:
           format: double
           required: false
         - name: format_palette
-          description: color palette one of: blue_white_red, white_red
+          description: 'color palette one of: blue_white_red, white_red'
           in: query
           type: string
           required: false
@@ -157,6 +161,8 @@ paths:
       responses:
         200:
           description: Successful response
+          schema:
+            type: file
         404:
           $ref: 'def/notFound.yml'
   /matrix/{datasetid}/rows:
@@ -237,7 +243,8 @@ paths:
             items:
               type: array
               items:
-                type: any
+                x-type: any
+                type: string
         404:
           $ref: 'def/notFound.yml'
 
@@ -265,24 +272,25 @@ definitions:
   matrix_dataset:
     type: object
     description: a matrix dataset
-    additionalProperties:
+    allOf:
       - $ref: 'def/dataset.yml'
-    required:
-      - size
-      - value
-      - rowtype
-      - coltype
-    properties:
-      rowtype:
-        type: string
-      coltype:
-        type: string
-      size:
-        type: array
-        items:
-          type: integer
-      value:
-        $ref: 'def/valuetype.yml'
+      - type: object
+        required:
+          - size
+          - value
+          - rowtype
+          - coltype
+        properties:
+          rowtype:
+            type: string
+          coltype:
+            type: string
+          size:
+            type: array
+            items:
+              type: integer
+          value:
+            $ref: 'def/valuetype.yml'
   matrix_data:
     type: object
     description: matrix as json
@@ -292,7 +300,8 @@ definitions:
         items:
           type: array
           items:
-            type: any
+            x-type: any
+            type: string
       rows:
         type: array
         items:

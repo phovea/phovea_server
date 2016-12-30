@@ -77,6 +77,8 @@ paths:
       responses:
         200:
           description: Successful response
+          schema:
+            type: file
         404:
           $ref: 'def/notFound.yml'
   /vector/{datasetid}/rows:
@@ -123,7 +125,8 @@ paths:
           schema:
             type: array
             items:
-              type: any
+              x-type: any
+              type: string
         404:
           $ref: 'def/notFound.yml'
 
@@ -151,19 +154,20 @@ definitions:
   vector_dataset:
     type: object
     description: a vector dataset
-    additionalProperties:
+    allOf:
       - $ref: 'def/dataset.yml'
-    required:
-      - size
-      - value
-      - idtype
-    properties:
-      idtype:
-        type: string
-      size:
-        type: integer
-      value:
-        $ref: 'def/valuetype.yml'
+      - type: object
+        required:
+          - size
+          - value
+          - idtype
+        properties:
+          idtype:
+            type: string
+          size:
+            type: integer
+          value:
+            $ref: 'def/valuetype.yml'
   vector_data:
     type: object
     description: vector as json
@@ -171,7 +175,8 @@ definitions:
       data:
         type: array
         items:
-          type: any
+          x-type: any
+          type: string
       rows:
         type: array
         items:

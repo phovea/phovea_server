@@ -77,6 +77,8 @@ paths:
       responses:
         200:
           description: Successful response
+          schema:
+            type: file
         404:
           $ref: 'def/notFound.yml'
   /table/{datasetid}/rows:
@@ -123,7 +125,10 @@ paths:
           schema:
             type: array
             items:
-              type: any
+              type: array
+              items:
+                x-type: any
+                type: string
         404:
           $ref: 'def/notFound.yml'
 
@@ -143,7 +148,8 @@ paths:
           schema:
             type: array
             items:
-              type: any
+              x-type: any
+              type: string
         404:
           $ref: 'def/notFound.yml'
 
@@ -187,8 +193,6 @@ paths:
     parameters:
       - $ref: 'def/datasetid.yml'
       - $ref: '#/parameters/viewname'
-    parameters:
-      - $ref: 'def/datasetid.yml'
     get:
       parameters:
         # any parameter for view
@@ -210,6 +214,8 @@ paths:
       responses:
         200:
           description: Successful response
+          schema:
+            type: file
         404:
           $ref: 'def/notFound.yml'
   /table/{datasetid}/view/{viewname}/rows:
@@ -262,7 +268,10 @@ paths:
           schema:
             type: array
             items:
-              type: any
+              type: array
+              items:
+                x-type: any
+                type: string
         404:
           $ref: 'def/notFound.yml'
 
@@ -277,19 +286,20 @@ definitions:
   table_dataset:
     type: object
     description: a table dataset
-    additionalProperties:
+    allOf:
       - $ref: 'def/dataset.yml'
-    required:
-      - size
-      - value
-      - idtype
-    properties:
-      idtype:
-        type: string
-      size:
-        type: integer
-      value:
-        $ref: 'def/valuetype.yml'
+      - type: object
+        required:
+          - size
+          - value
+          - idtype
+        properties:
+          idtype:
+            type: string
+          size:
+            type: integer
+          value:
+            $ref: 'def/valuetype.yml'
   table_data:
     type: object
     description: table as json
@@ -297,7 +307,10 @@ definitions:
       data:
         type: array
         items:
-          type: any
+          type: array
+          items:
+            x-type: any
+            type: string
       rows:
         type: array
         items:

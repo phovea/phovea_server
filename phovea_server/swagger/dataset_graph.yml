@@ -46,7 +46,7 @@ paths:
               $ref: '#/definitions/graph_node'
         404:
           $ref: 'def/notFound.yml'
-   post:
+    post:
       description: add a new node
       consumes:
         - application/x-www-form-urlencoded
@@ -57,7 +57,7 @@ paths:
           $ref: '#/responses/success_desc'
         404:
           $ref: 'def/notFound.yml'
-   delete:
+    delete:
       description: clear all nodes
       responses:
         200:
@@ -80,7 +80,7 @@ paths:
             $ref: '#/definitions/graph_node'
         404:
           $ref: 'def/notFound.yml'
-   put:
+    put:
       description: update node
       consumes:
         - application/x-www-form-urlencoded
@@ -91,7 +91,7 @@ paths:
           $ref: '#/responses/success_desc'
         404:
           $ref: 'def/notFound.yml'
-   delete:
+    delete:
       description: delete node
       responses:
         200:
@@ -112,7 +112,7 @@ paths:
               $ref: '#/definitions/graph_node'
         404:
           $ref: 'def/notFound.yml'
-   post:
+    post:
       description: add a new edge
       consumes:
         - application/x-www-form-urlencoded
@@ -123,7 +123,7 @@ paths:
           $ref: '#/responses/success_desc'
         404:
           $ref: 'def/notFound.yml'
-   delete:
+    delete:
       description: clear all edge
       responses:
         200:
@@ -146,7 +146,7 @@ paths:
             $ref: '#/definitions/graph_edge'
         404:
           $ref: 'def/notFound.yml'
-   put:
+    put:
       description: update edge
       consumes:
         - application/x-www-form-urlencoded
@@ -157,7 +157,7 @@ paths:
           $ref: '#/responses/success_desc'
         404:
           $ref: 'def/notFound.yml'
-   delete:
+    delete:
       description: delete edge
       responses:
         200:
@@ -174,18 +174,17 @@ definitions:
   graph_dataset:
     type: object
     description: a graph dataset
-    additionalProperties:
+    allOf:
       - $ref: 'def/dataset.yml'
       - $ref: '#/definitions/attr_container'
-    required:
-      - size
-    properties:
-      size:
-        type: array
-        items:
-          type: integer
-      attrs:
-        type: object
+      - type: object
+        required:
+          - size
+        properties:
+          size:
+            type: array
+            items:
+              type: integer
   graph_data:
     type: object
     description: graph as json
@@ -202,37 +201,39 @@ definitions:
       - nodes
       - edges
   graph_node:
-    type_object:
+    type: object
     description: a graph node
-    properties:
-      type:
-        type: string
-      id:
-        type: integer
-    required:
-      - type
-      - id
-    additionalProperties:
+    allOf:
       - $ref: '#/definitions/attr_container'
+      - type: object
+        properties:
+          type:
+            type: string
+          id:
+            type: integer
+        required:
+          - type
+          - id
   graph_edge:
-    type_object:
+    type: object
     description: a graph edge
-    properties:
-      type:
-        type: string
-      id:
-        type: integer
-      source:
-        type: integer
-      target:
-        type: integer
-    required:
-      - type
-      - id
-      - source
-      - target
-    additionalProperties:
+    allOf:
       - $ref: '#/definitions/attr_container'
+      - type: object
+        properties:
+          type:
+            type: string
+          id:
+            type: integer
+          source:
+            type: integer
+          target:
+            type: integer
+        required:
+          - type
+          - id
+          - source
+          - target
 responses:
   success_desc:
     description: Successful response

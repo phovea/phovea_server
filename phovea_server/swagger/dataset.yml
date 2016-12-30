@@ -54,7 +54,7 @@ paths:
           description: Successful response
           schema:
             title: CSV File
-            type: string
+            type: file
   /.tree.json:
     get:
       description: list all datasets as tree
@@ -117,8 +117,6 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/dataset_deleted'
-        404:
-          description: Invalid dataset id
         404:
           $ref: 'def/notFound.yml'
   /{datasetid}/desc:
