@@ -1,0 +1,322 @@
+swagger: '2.0'
+
+info:
+  version: "0.0.1"
+  title: DataSet Graph API
+
+produces:
+  - application/json
+
+paths:
+  /matrix/{datasetid}:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/matrix_dataset'
+        404:
+          $ref: 'def/notFound.yml'
+  /matrix/{datasetid}/data:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/matrix_data'
+        404:
+          $ref: 'def/notFound.yml'
+  /matrix/{datasetid}/data.json:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/matrix_data'
+        404:
+          $ref: 'def/notFound.yml'
+  /matrix/{datasetid}/data.csv:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+        - name: f_rows
+          in: query
+          type: boolean
+          required: false
+        - name: f_cols
+          in: query
+          type: boolean
+          required: false
+        - name: f_delimiter
+          in: query
+          type: string
+          default: ;
+          required: false
+      produces:
+        - text/csv
+      responses:
+        200:
+          description: Successful response
+        404:
+          $ref: 'def/notFound.yml'
+  /matrix/{datasetid}/data.png:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+        - name: format_min
+          in: query
+          type: number
+          format: double
+          required: false
+        - name: format_max
+          in: query
+          type: number
+          format: double
+          required: false
+        - name: format_palette
+          description: color palette one of: blue_white_red, white_red
+          in: query
+          type: string
+          required: false
+        - name: format_w
+          in: query
+          type: integer
+          required: false
+        - name: format_h
+          in: query
+          type: integer
+          required: false
+        - name: format_transpose
+          in: query
+          type: boolean
+          required: false
+      produces:
+        - image/png
+      responses:
+        200:
+          description: Successful response
+        404:
+          $ref: 'def/notFound.yml'
+  /matrix/{datasetid}/data.jpg:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+        - name: format_min
+          in: query
+          type: number
+          format: double
+          required: false
+        - name: format_max
+          in: query
+          type: number
+          format: double
+          required: false
+        - name: format_palette
+          description: color palette one of: blue_white_red, white_red
+          in: query
+          type: string
+          required: false
+        - name: format_w
+          in: query
+          type: integer
+          required: false
+        - name: format_h
+          in: query
+          type: integer
+          required: false
+        - name: format_transpose
+          in: query
+          type: boolean
+          required: false
+      produces:
+        - image/jpeg
+      responses:
+        200:
+          description: Successful response
+        404:
+          $ref: 'def/notFound.yml'
+  /matrix/{datasetid}/rows:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        404:
+          $ref: 'def/notFound.yml'
+
+  /matrix/{datasetid}/rowsIds:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        404:
+          $ref: 'def/notFound.yml'
+
+  /matrix/{datasetid}/cols:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        404:
+          $ref: 'def/notFound.yml'
+
+  /matrix/{datasetid}/colsIds:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        404:
+          $ref: 'def/notFound.yml'
+
+  /matrix/{datasetid}/raw:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: any
+        404:
+          $ref: 'def/notFound.yml'
+
+  /matrix/{datasetid}/hist:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+        - name: bins
+          in: query
+          required: false
+          type: integer
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        404:
+          $ref: 'def/notFound.yml'
+
+definitions:
+  matrix_dataset:
+    type: object
+    description: a matrix dataset
+    additionalProperties:
+      - $ref: 'def/dataset.yml'
+    required:
+      - size
+      - value
+      - rowtype
+      - coltype
+    properties:
+      rowtype:
+        type: string
+      coltype:
+        type: string
+      size:
+        type: array
+        items:
+          type: integer
+      value:
+        $ref: 'def/valuetype.yml'
+  matrix_data:
+    type: object
+    description: matrix as json
+    properties:
+      data:
+        type: array
+        items:
+          type: array
+          items:
+            type: any
+      rows:
+        type: array
+        items:
+          type: string
+      cols:
+        type: array
+        items:
+          type: string
+      rowIds:
+        type: array
+        items:
+          type: integer
+      colIds:
+        type: array
+        items:
+          type: integer
+    required:
+      - data
+      - cols
+      - rows
+      - colIds
+      - rowIds
+responses:
+  success_desc:
+    description: Successful response
+    schema:
+      $ref: '#/definitions/matrix_dataset'

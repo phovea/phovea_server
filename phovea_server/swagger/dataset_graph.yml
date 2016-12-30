@@ -8,7 +8,7 @@ produces:
   - application/json
 
 paths:
-  /graph/{datasetid}/desc:
+  /graph/{datasetid}:
     parameters:
       - $ref: 'def/datasetid.yml'
     get:
@@ -30,18 +30,6 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/graph_data'
-        404:
-          $ref: 'def/notFound.yml'
-  /graph/{datasetid}/desc:
-    parameters:
-      - $ref: 'def/datasetid.yml'
-    get:
-      description: get the description of this dataset
-      responses:
-        200:
-          description: Successful response
-          schema:
-            $ref: '#/definitions/graph_dataset'
         404:
           $ref: 'def/notFound.yml'
   /graph/{datasetid}/node:
