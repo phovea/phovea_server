@@ -1,0 +1,317 @@
+swagger: '2.0'
+
+info:
+  version: "0.0.1"
+  title: DataSet Graph API
+
+produces:
+  - application/json
+
+paths:
+  /table/{datasetid}:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_dataset'
+        404:
+          $ref: 'def/notFound.yml'
+  /table/{datasetid}/data:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_data'
+        404:
+          $ref: 'def/notFound.yml'
+  /table/{datasetid}/data.json:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_data'
+        404:
+          $ref: 'def/notFound.yml'
+  /table/{datasetid}/data.csv:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+        - name: f_rows
+          in: query
+          type: boolean
+          required: false
+        - name: f_cols
+          in: query
+          type: boolean
+          required: false
+        - name: f_delimiter
+          in: query
+          type: string
+          default: ;
+          required: false
+      produces:
+        - text/csv
+      responses:
+        200:
+          description: Successful response
+        404:
+          $ref: 'def/notFound.yml'
+  /table/{datasetid}/rows:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        404:
+          $ref: 'def/notFound.yml'
+
+  /table/{datasetid}/rowsIds:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        404:
+          $ref: 'def/notFound.yml'
+
+  /table/{datasetid}/raw:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: any
+        404:
+          $ref: 'def/notFound.yml'
+
+  /table/{datasetid}/col/{column}:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+      - name: column
+        in: path
+        required: true
+        type: string
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: any
+        404:
+          $ref: 'def/notFound.yml'
+
+  /table/{datasetid}/view/{viewname}:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+      - $ref: '#/parameters/viewname'
+    get:
+      parameters:
+        # any parameter for view
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_data'
+        404:
+          $ref: 'def/notFound.yml'
+  /table/{datasetid}/view/{viewname}.json:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+      - $ref: '#/parameters/viewname'
+    get:
+      parameters:
+        # any parameter for view
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_data'
+        404:
+          $ref: 'def/notFound.yml'
+  /table/{datasetid}/view/{viewname}.csv:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+      - $ref: '#/parameters/viewname'
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        # any parameter for view
+        - name: f_rows
+          in: query
+          type: boolean
+          required: false
+        - name: f_cols
+          in: query
+          type: boolean
+          required: false
+        - name: f_delimiter
+          in: query
+          type: string
+          default: ;
+          required: false
+      produces:
+        - text/csv
+      responses:
+        200:
+          description: Successful response
+        404:
+          $ref: 'def/notFound.yml'
+  /table/{datasetid}/view/{viewname}/rows:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+      - $ref: '#/parameters/viewname'
+    get:
+      parameters:
+        # any parameter for view
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        404:
+          $ref: 'def/notFound.yml'
+
+  /table/{datasetid}/view/{viewname}/rowsIds:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+      - $ref: '#/parameters/viewname'
+    get:
+      parameters:
+        # any parameter for view
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        404:
+          $ref: 'def/notFound.yml'
+
+  /table/{datasetid}/view/{viewname}/raw:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+      - $ref: '#/parameters/viewname'
+    get:
+      parameters:
+        # any parameter for view
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: any
+        404:
+          $ref: 'def/notFound.yml'
+
+parameters:
+  viewname:
+    name: viewname
+    in: path
+    required: true
+    type: string
+
+definitions:
+  table_dataset:
+    type: object
+    description: a table dataset
+    additionalProperties:
+      - $ref: 'def/dataset.yml'
+    required:
+      - size
+      - value
+      - idtype
+    properties:
+      idtype:
+        type: string
+      size:
+        type: integer
+      value:
+        $ref: 'def/valuetype.yml'
+  table_data:
+    type: object
+    description: table as json
+    properties:
+      data:
+        type: array
+        items:
+          type: any
+      rows:
+        type: array
+        items:
+          type: string
+      rowIds:
+        type: array
+        items:
+          type: integer
+    required:
+      - data
+      - rows
+      - rowIds
+responses:
+  success_desc:
+    description: Successful response
+    schema:
+      $ref: '#/definitions/table_dataset'

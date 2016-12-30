@@ -79,6 +79,21 @@ paths:
           description: Successful response
         404:
           $ref: 'def/notFound.yml'
+  /vector/{datasetid}/rows:
+    parameters:
+      - $ref: 'def/datasetid.yml'
+    get:
+      parameters:
+        - $ref: 'def/range.yml'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        404:
+          $ref: 'def/notFound.yml'
 
   /vector/{datasetid}/rowsIds:
     parameters:
