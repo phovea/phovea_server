@@ -8,10 +8,12 @@ info:
 produces:
   - application/json
 
+x-module: idtype_api
 # Describe your paths here
 paths:
   /:
     get:
+      x-function: list_idtypes
       description: list all idtypes
       responses:
         200:
@@ -23,26 +25,14 @@ paths:
             type: array
             items:
               $ref: '#/definitions/idtype'
-  /{idtype}/:
-    parameters:
-      - $ref: '#/parameters/idtype'
-    get:
-      description: returns a list of all mapable types
-      responses:
-        200:
-          description: Successful response
-          schema:
-            title: ArrayOfIDTypesIDs
-            type: array
-            items:
-              type: string
   /{idtype}/map:
     parameters:
       - $ref: '#/parameters/idtype'
     get:
+      x-function: get_map
       description: returns the uids for the given id names
       parameters:
-        - $ref: '#/parameters/ids'
+        - $ref: '#/parameters/idnames'
       responses:
         200:
           description: Successful response
@@ -51,11 +41,12 @@ paths:
             type: array
             items:
               type: integer
-  /{idtype}/map/{id}:
+  /{idtype}/map/{idname}:
     parameters:
       - $ref: '#/parameters/idtype'
-      - $ref: '#/parameters/id'
+      - $ref: '#/parameters/idname'
     get:
+      x-function: get_map_single
       description: returns the uid for the given id name
       responses:
         200:
@@ -67,9 +58,10 @@ paths:
     parameters:
       - $ref: '#/parameters/idtype'
     get:
+      x-function: get_unmap
       description: returns the id names for the given uids
       parameters:
-        - $ref: '#/parameters/ids'
+        - $ref: '#/parameters/idnames'
       responses:
         200:
           description: Successful response
@@ -83,6 +75,7 @@ paths:
       - $ref: '#/parameters/idtype'
       - $ref: '#/parameters/uid'
     get:
+      x-function: get_unmap_single
       description: returns the id name for the given uid
       responses:
         200:
@@ -90,15 +83,31 @@ paths:
           schema:
             title: ID Name
             type: string
+  /{idtype}/:
+    parameters:
+      - $ref: '#/parameters/idtype'
+    get:
+      x-function: get_maps_to
+      description: returns a list of all mapable types
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ArrayOfIDTypesIDs
+            type: array
+            items:
+              type: string
   /{source}/{target}:
     parameters:
       - $ref: '#/parameters/source'
       - $ref: '#/parameters/target'
     get:
+      x-function: get_convert
       description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
       parameters:
         - $ref: '#/parameters/uids'
         - $ref: '#/parameters/q'
+        - $ref: '#/parameters/mode'
       responses:
         200:
           description: Successful response
@@ -115,7 +124,10 @@ paths:
       - $ref: '#/parameters/target'
       - $ref: '#/parameters/uid'
     get:
+      x-function: get_convert_single
       description: maps is between given source idtype to the target idtype returning the id names of the target idtype
+      parameters:
+        - $ref: '#/parameters/mode'
       responses:
         # Response code
         200:
@@ -129,10 +141,12 @@ paths:
       - $ref: '#/parameters/source'
       - $ref: '#/parameters/target'
     get:
+      x-function: get_convert_id
       description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
       parameters:
         - $ref: '#/parameters/uids'
         - $ref: '#/parameters/q'
+        - $ref: '#/parameters/mode'
       responses:
         # Response code
         200:
@@ -144,13 +158,16 @@ paths:
               type: integer
         400:
           description: Invalid arguments
-  /{source}/{target}/map/{id}:
+  /{source}/{target}/map/{idname}:
     parameters:
       - $ref: '#/parameters/source'
       - $ref: '#/parameters/target'
-      - $ref: '#/parameters/id'
+      - $ref: '#/parameters/idname'
     get:
+      x-function: get_convert_id_single
       description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
+      parameters:
+        - $ref: '#/parameters/mode'
       responses:
         200:
           description: Successful response
@@ -178,14 +195,14 @@ parameters:
     description: id type
     required: true
     type: string
-  id:
-    name: id
+  idname:
+    name: idname
     in: path
     description: source id name
     required: true
     type: integer
-  ids:
-    name: ids
+  idnames:
+    name: idnames
     in: query
     description: source id names
     required: true
@@ -206,6 +223,13 @@ parameters:
     required: false
     type: string
     format: range
+  mode:
+    name: mode
+    in: query
+    description: 'mapping mode: all|single'
+    required: false
+    type: string
+    default: all
   q:
     name: q
     in: query
