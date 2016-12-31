@@ -135,8 +135,3 @@ def run():
   else:
     _log.info('start...')
     main()
-
-
-def create_embedded():
-  from .server import create_application
-  return create_application()
