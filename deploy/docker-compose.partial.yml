@@ -5,7 +5,8 @@ services:
       context: .
       dockerfile: deploy/Dockerfile_dev
     ports:
-    - '2222:22'
     - '9000:80'
+#    - '2222:22'
+#    command: /usr/sbin/sshd -D
     volumes:
     - .:/phovea
