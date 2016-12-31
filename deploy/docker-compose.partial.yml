@@ -4,7 +4,8 @@ services:
     build:
       context: .
       dockerfile: deploy/Dockerfile_dev
-    ports: 
+    ports:
+    - '2222:22'
     - '9000:80'
     volumes:
     - .:/phovea
