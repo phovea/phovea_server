@@ -8,12 +8,27 @@ info:
 produces:
   - application/json
 
+tags:
+  - name: general
+    description: general dataset api
+  - name: graph
+    description: graph specific api
+  - name: matrix
+    description: matrix specific api
+  - name: table
+    description: table specific api
+  - name: vector
+    description: vector specific api
+
+
 paths:
   /:
     get:
       x-swagger-router-controller: phovea_server
       operationId: dataset_api.list_dataset
       description: list all datasets
+      tags:
+        - general
       parameters:
         - $ref: '#/parameters/query_limit'
         - $ref: '#/parameters/query_id'
@@ -32,6 +47,8 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: dataset_api.upload_dataset
       description: add a new dataset
+      tags:
+        - general
       consumes:
         - application/x-www-form-urlencoded
       parameters:
@@ -47,6 +64,8 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: dataset_api.list_dataset_csv
       description: list all datasets as csv file
+      tags:
+        - general
       parameters:
         - $ref: '#/parameters/query_limit'
         - $ref: '#/parameters/query_id'
@@ -66,11 +85,14 @@ paths:
           schema:
             title: CSV File
             type: string
+            format: csv
   /.tree.json:
     get:
       x-swagger-router-controller: phovea_server
       operationId: dataset_api.list_dataset_tree
       description: list all datasets as tree
+      tags:
+        - general
       parameters:
         - $ref: '#/parameters/query_limit'
         - $ref: '#/parameters/query_id'
@@ -89,6 +111,8 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: dataset_api.get_dataset
       description: get the data of this dataset
+      tags:
+        - general
       parameters:
         - $ref: '#/parameters/range'
       responses:
@@ -103,6 +127,8 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: dataset_api.put_dataset
       description: updates this dataset
+      tags:
+        - general
       consumes:
         - application/x-www-form-urlencoded
       parameters:
@@ -121,6 +147,8 @@ paths:
       description: modifies this dataset
       x-swagger-router-controller: phovea_server
       operationId: dataset_api.post_dataset
+      tags:
+        - general
       consumes:
         - application/x-www-form-urlencoded
       parameters:
@@ -141,6 +169,8 @@ paths:
       description: deletes this dataset
       x-swagger-router-controller: phovea_server
       operationId: dataset_api.delete_dataset
+      tags:
+        - general
       responses:
         '200':
           description: Successful response
@@ -157,6 +187,8 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: dataset_api.get_dataset_desc
       description: get the description of this dataset
+      tags:
+        - general
       responses:
         '200':
           description: Successful response
@@ -164,8 +196,1032 @@ paths:
             $ref: '#/definitions/dataset'
         '404':
           $ref: '#/responses/notFound'
+  /graph/{datasetid}:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.get_graph
+      tags:
+        -graph
+      description: get the description of this graph
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/graph_dataset'
+        '404':
+          $ref: '#/responses/notFound'
+  /graph/{datasetid}/data:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.get_graph_data
+      tags:
+        -graph
+      description: get the data of this graph
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/graph_data'
+        '404':
+          $ref: '#/responses/notFound'
+  /graph/{datasetid}/node:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.list_graph_node
+      tags:
+        -graph
+      description: get all nodes
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/graph_node'
+        '404':
+          $ref: '#/responses/notFound'
+    post:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.post_graph_node
+      tags:
+        -graph
+      description: add a new node
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: 'def/desc.yml'
+      responses:
+        '200':
+          $ref: '#/responses/success_graph_desc'
+        '404':
+          $ref: '#/responses/notFound'
+    delete:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.clear_graph_node
+      tags:
+        -graph
+      description: clear all nodes
+      responses:
+        '200':
+          $ref: '#/responses/success_graph_desc'
+        '404':
+          $ref: '#/responses/notFound'
+  /graph/{datasetid}/node/{nodeid}:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+      - name: nodeid
+        in: path
+        required: true
+        type: integer
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.get_graph_node
+      tags:
+        -graph
+      description: get node
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/graph_node'
+        '404':
+          $ref: '#/responses/notFound'
+    put:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.put_graph_node
+      tags:
+        -graph
+      description: update node
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: 'def/desc.yml'
+      responses:
+        '200':
+          $ref: '#/responses/success_graph_desc'
+        '404':
+          $ref: '#/responses/notFound'
+    delete:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.delete_graph_node
+      tags:
+        -graph
+      description: delete node
+      responses:
+        '200':
+          $ref: '#/responses/success_graph_desc'
+        '404':
+          $ref: '#/responses/notFound'
+  /graph/{datasetid}/edge:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.list_graph_edge
+      tags:
+        -graph
+      description: get all edges
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/graph_node'
+        '404':
+          $ref: '#/responses/notFound'
+    post:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.post_graph_edge
+      tags:
+        -graph
+      description: add a new edge
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: 'def/desc.yml'
+      responses:
+        '200':
+          $ref: '#/responses/success_graph_desc'
+        '404':
+          $ref: '#/responses/notFound'
+    delete:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.clear_graph_edge
+      tags:
+        -graph
+      description: clear all edges
+      responses:
+        '200':
+          $ref: '#/responses/success_graph_desc'
+        '404':
+          $ref: '#/responses/notFound'
+  /graph/{datasetid}/edge/{edgeid}:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+      - name: edgeid
+        in: path
+        required: true
+        type: integer
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.get_graph_edge
+      tags:
+        -graph
+      description: get edge
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/graph_edge'
+        '404':
+          $ref: '#/responses/notFound'
+    put:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.put_graph_edge
+      tags:
+        -graph
+      description: update edge
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - $ref: 'def/desc.yml'
+      responses:
+        '200':
+          $ref: '#/responses/success_graph_desc'
+        '404':
+          $ref: '#/responses/notFound'
+    delete:
+      x-swagger-router-controller: phovea_server
+      operationId: graph_api.delete_graph_edge
+      tags:
+        -graph
+      description: delete edge
+      responses:
+        '200':
+          $ref: '#/responses/success_graph_desc'
+        '404':
+          $ref: '#/responses/notFound'
+  /matrix/{datasetid}:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.list_matrix
+      tags:
+        -matrix
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/matrix_dataset'
+        '404':
+          $ref: '#/responses/notFound'
+  /matrix/{datasetid}/data:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_data
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/matrix_data'
+        '404':
+          $ref: '#/responses/notFound'
+  /matrix/{datasetid}/data.json:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_data
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/matrix_data'
+        '404':
+          $ref: '#/responses/notFound'
+  /matrix/{datasetid}/data.csv:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_csv
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: f_rows
+          in: query
+          type: boolean
+          required: false
+        - name: f_cols
+          in: query
+          type: boolean
+          required: false
+        - name: f_delimiter
+          in: query
+          type: string
+          default: ;
+          required: false
+      produces:
+        - text/csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: string
+            format: csv
+        '404':
+          $ref: '#/responses/notFound'
+  /matrix/{datasetid}/data.png:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_data_png
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: format_min
+          in: query
+          type: number
+          format: double
+          required: false
+        - name: format_max
+          in: query
+          type: number
+          format: double
+          required: false
+        - name: format_palette
+          description: 'color palette one of: blue_white_red, white_red'
+          in: query
+          type: string
+          required: false
+        - name: format_w
+          in: query
+          type: integer
+          required: false
+        - name: format_h
+          in: query
+          type: integer
+          required: false
+        - name: format_transpose
+          in: query
+          type: boolean
+          required: false
+      produces:
+        - image/png
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: file
+        '404':
+          $ref: '#/responses/notFound'
+  /matrix/{datasetid}/data.jpg:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_data_jpg
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: format_min
+          in: query
+          type: number
+          format: double
+          required: false
+        - name: format_max
+          in: query
+          type: number
+          format: double
+          required: false
+        - name: format_palette
+          description: 'color palette one of: blue_white_red, white_red'
+          in: query
+          type: string
+          required: false
+        - name: format_w
+          in: query
+          type: integer
+          required: false
+        - name: format_h
+          in: query
+          type: integer
+          required: false
+        - name: format_transpose
+          in: query
+          type: boolean
+          required: false
+      produces:
+        - image/jpeg
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: file
+        '404':
+          $ref: '#/responses/notFound'
+  /matrix/{datasetid}/rows:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_rows
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        '404':
+          $ref: '#/responses/notFound'
 
+  /matrix/{datasetid}/rowsIds:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_row_ids
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        '404':
+          $ref: '#/responses/notFound'
+
+  /matrix/{datasetid}/cols:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_cols
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        '404':
+          $ref: '#/responses/notFound'
+
+  /matrix/{datasetid}/colsIds:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_col_ids
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        '404':
+          $ref: '#/responses/notFound'
+
+  /matrix/{datasetid}/raw:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_raw
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                format: any
+                type: string
+        '404':
+          $ref: '#/responses/notFound'
+
+  /matrix/{datasetid}/hist:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: matrix_api.get_matrix_hist
+      tags:
+        -matrix
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: bins
+          in: query
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        '404':
+          $ref: '#/responses/notFound'
+
+  /table/{datasetid}:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table
+      tags:
+        -table
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_dataset'
+        '404':
+          $ref: '#/responses/notFound'
+  /table/{datasetid}/data:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_data
+      tags:
+        -table
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_data'
+        '404':
+          $ref: '#/responses/notFound'
+  /table/{datasetid}/data.json:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table
+      tags:
+        -table
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_data'
+        '404':
+          $ref: '#/responses/notFound'
+  /table/{datasetid}/data.csv:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_csv
+      tags:
+        -table
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: f_rows
+          in: query
+          type: boolean
+          required: false
+        - name: f_cols
+          in: query
+          type: boolean
+          required: false
+        - name: f_delimiter
+          in: query
+          type: string
+          default: ;
+          required: false
+      produces:
+        - text/csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: string
+            format: csv
+        '404':
+          $ref: '#/responses/notFound'
+  /table/{datasetid}/rows:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_rows
+      tags:
+        -table
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        '404':
+          $ref: '#/responses/notFound'
+
+  /table/{datasetid}/rowsIds:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_row_ids
+      tags:
+        -table
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        '404':
+          $ref: '#/responses/notFound'
+
+  /table/{datasetid}/raw:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_raw
+      tags:
+        -table
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                format: any
+                type: string
+        '404':
+          $ref: '#/responses/notFound'
+
+  /table/{datasetid}/col/{column}:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+      - name: column
+        in: path
+        required: true
+        type: string
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_column
+      tags:
+        -table
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              format: any
+              type: string
+        '404':
+          $ref: '#/responses/notFound'
+
+  /table/{datasetid}/view/{viewname}:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+      - $ref: '#/parameters/viewname'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_view
+      tags:
+        -table
+      parameters:
+        # any parameter for view
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_data'
+        '404':
+          $ref: '#/responses/notFound'
+  /table/{datasetid}/view/{viewname}.json:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+      - $ref: '#/parameters/viewname'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_view
+      tags:
+        -table
+      parameters:
+        # any parameter for view
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/table_data'
+        '404':
+          $ref: '#/responses/notFound'
+  /table/{datasetid}/view/{viewname}.csv:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+      - $ref: '#/parameters/viewname'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_view_csv
+      tags:
+        -table
+      parameters:
+        # any parameter for view
+        - name: f_rows
+          in: query
+          type: boolean
+          required: false
+        - name: f_cols
+          in: query
+          type: boolean
+          required: false
+        - name: f_delimiter
+          in: query
+          type: string
+          default: ;
+          required: false
+      produces:
+        - text/csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: string
+            format: csv
+        '404':
+          $ref: '#/responses/notFound'
+  /table/{datasetid}/view/{viewname}/rows:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+      - $ref: '#/parameters/viewname'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_view_rows
+      tags:
+        -table
+      parameters:
+        # any parameter for view
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        '404':
+          $ref: '#/responses/notFound'
+
+  /table/{datasetid}/view/{viewname}/rowsIds:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+      - $ref: '#/parameters/viewname'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_view_row_ids
+      tags:
+        -table
+      parameters:
+        # any parameter for view
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        '404':
+          $ref: '#/responses/notFound'
+
+  /table/{datasetid}/view/{viewname}/raw:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+      - $ref: '#/parameters/viewname'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: table_api.get_table_view_raw
+      tags:
+        -table
+      parameters:
+        # any parameter for view
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                format: any
+                type: string
+        '404':
+          $ref: '#/responses/notFound'
+
+  /vector/{datasetid}:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: vector_api.get_vector
+      tags:
+        -vector
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/vector_dataset'
+        '404':
+          $ref: '#/responses/notFound'
+  /vector/{datasetid}/data:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: vector_api.get_vector_data
+      tags:
+        -vector
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/vector_data'
+        '404':
+          $ref: '#/responses/notFound'
+  /vector/{datasetid}/data.json:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: vector_api.get_vector_data
+      tags:
+        -vector
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: f_pretty_print
+          in: query
+          type: boolean
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/vector_data'
+        '404':
+          $ref: '#/responses/notFound'
+  /vector/{datasetid}/data.csv:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: vector_api.get_vector_csv
+      tags:
+        -vector
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: f_rows
+          in: query
+          type: boolean
+          required: false
+        - name: f_cols
+          in: query
+          type: boolean
+          required: false
+        - name: f_delimiter
+          in: query
+          type: string
+          default: ;
+          required: false
+      produces:
+        - text/csv
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: string
+            format: csv
+        '404':
+          $ref: '#/responses/notFound'
+  /vector/{datasetid}/rows:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: vector_api.get_vector_rows
+      tags:
+        -vector
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+        '404':
+          $ref: '#/responses/notFound'
+
+  /vector/{datasetid}/rowsIds:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: vector_api.get_vector_row_ids
+      tags:
+        -vector
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        '404':
+          $ref: '#/responses/notFound'
+
+  /vector/{datasetid}/raw:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: vector_api.get_vector_raw
+      tags:
+        -vector
+      parameters:
+        - $ref: '#/definitions/range'
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              format: any
+              type: string
+        '404':
+          $ref: '#/responses/notFound'
+
+  /vector/{datasetid}/hist:
+    parameters:
+      - $ref: '#/parameters/datasetid'
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: vector_api.get_vector_hist
+      tags:
+        -vector
+      parameters:
+        - $ref: '#/definitions/range'
+        - name: bins
+          in: query
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+        '404':
+          $ref: '#/responses/notFound'
 parameters:
+  viewname:
+    name: viewname
+    in: path
+    required: true
+    type: string
   datasetid:
     name: datasetid
     in: path
@@ -236,6 +1292,84 @@ parameters:
     format: regex
 
 definitions:
+  valuetype:
+    type: object
+    properties:
+      type:
+        type: string
+    required:
+      - type
+    additionalProperties: true
+
+  attr_container:
+    type: object
+    properties:
+      attrs:
+        type: object
+        additionalProperties: true
+  graph_dataset:
+    type: object
+    description: a graph dataset
+    allOf:
+      - $ref: '#/definitions/dataset'
+      - $ref: '#/definitions/attr_container'
+      - type: object
+        required:
+          - size
+        properties:
+          size:
+            type: array
+            items:
+              type: integer
+  graph_data:
+    type: object
+    description: graph as json
+    properties:
+      nodes:
+        type: array
+        items:
+          $ref: '#/definitions/graph_node'
+      edges:
+        type: array
+        items:
+          $ref: '#/definitions/graph_edge'
+    required:
+      - nodes
+      - edges
+  graph_node:
+    type: object
+    description: a graph node
+    allOf:
+      - $ref: '#/definitions/attr_container'
+      - type: object
+        properties:
+          type:
+            type: string
+          id:
+            type: integer
+        required:
+          - type
+          - id
+  graph_edge:
+    type: object
+    description: a graph edge, source and target are the node ids
+    allOf:
+      - $ref: '#/definitions/attr_container'
+      - type: object
+        properties:
+          type:
+            type: string
+          id:
+            type: integer
+          source:
+            type: integer
+          target:
+            type: integer
+        required:
+          - type
+          - id
+          - source
+          - target
   dataset:
     type: object
     description: a dataset definition
@@ -281,8 +1415,156 @@ definitions:
           $ref: '#/definitions/datasetnode'
     required:
       - name
-
+  matrix_dataset:
+    type: object
+    description: a matrix dataset
+    allOf:
+      - $ref: '#/definitions/dataset'
+      - type: object
+        required:
+          - size
+          - value
+          - rowtype
+          - coltype
+        properties:
+          rowtype:
+            type: string
+          coltype:
+            type: string
+          size:
+            type: array
+            items:
+              type: integer
+          value:
+            $ref: '#/definitions/valuetype'
+  matrix_data:
+    type: object
+    description: matrix as json
+    properties:
+      data:
+        type: array
+        items:
+          type: array
+          items:
+            format: any
+            type: string
+      rows:
+        type: array
+        items:
+          type: string
+      cols:
+        type: array
+        items:
+          type: string
+      rowIds:
+        type: array
+        items:
+          type: integer
+      colIds:
+        type: array
+        items:
+          type: integer
+    required:
+      - data
+      - cols
+      - rows
+      - colIds
+      - rowIds
+  table_dataset:
+    type: object
+    description: a table dataset
+    allOf:
+      - $ref: '#/definitions/dataset'
+      - type: object
+        required:
+          - size
+          - value
+          - idtype
+        properties:
+          idtype:
+            type: string
+          size:
+            type: integer
+          value:
+            $ref: '#/definitions/valuetype'
+  table_data:
+    type: object
+    description: table as json
+    properties:
+      data:
+        type: array
+        items:
+          type: array
+          items:
+            format: any
+            type: string
+      rows:
+        type: array
+        items:
+          type: string
+      rowIds:
+        type: array
+        items:
+          type: integer
+    required:
+      - data
+      - rows
+      - rowIds
+  vector_dataset:
+    type: object
+    description: a vector dataset
+    allOf:
+      - $ref: '#/definitions/dataset'
+      - type: object
+        required:
+          - size
+          - value
+          - idtype
+        properties:
+          idtype:
+            type: string
+          size:
+            type: integer
+          value:
+            $ref: '#/definitions/valuetype'
+  vector_data:
+    type: object
+    description: vector as json
+    properties:
+      data:
+        type: array
+        items:
+          format: any
+          type: string
+      rows:
+        type: array
+        items:
+          type: string
+      rowIds:
+        type: array
+        items:
+          type: integer
+    required:
+      - data
+      - rows
+      - rowIds
 responses:
+  success_graph_desc:
+    description: Successful response
+    schema:
+      $ref: '#/definitions/graph_dataset'
+  success_matrix_desc:
+    description: Successful response
+    schema:
+      $ref: '#/definitions/matrix_dataset'
+  success_table_desc:
+    description: Successful response
+    schema:
+      $ref: '#/definitions/table_dataset'
+  success_vector_desc:
+    description: Successful response
+    schema:
+      $ref: '#/definitions/vector_dataset'
   error:
     description: Internal Server Error
     schema:

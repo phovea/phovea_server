@@ -1,6 +1,0 @@
-name: range
-in: query
-description: range to subset
-required: false
-type: string
-format: range
