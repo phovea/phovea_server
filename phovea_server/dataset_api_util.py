@@ -5,11 +5,9 @@
 ###############################################################################
 
 
-from . import plugin, range
 from .swagger import abort
 import logging
-from .dataset import list_idtypes, get_idmanager, iter, get_mappingmanager, get, list_datasets as list_dataset_impl, \
-  add, remove
+from .dataset import get
 
 _log = logging.getLogger(__name__)
 
@@ -45,3 +43,17 @@ def to_query(**query):
     return all((re.match(v, getattr(elem, k, '')) for k, v in act_query.iteritems()))
 
   return filter_elem
+
+def to_range(r):
+  if r is None or r == '':
+    return None
+  import range as ranges
+  return ranges.parse(r)
+
+def from_json(s):
+  if s is None or s == '':
+    return None
+  if isinstance(s, dict) or isinstance(s, list):
+    return s
+  import json
+  return json.loads(s)

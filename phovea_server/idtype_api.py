@@ -5,15 +5,14 @@
 ###############################################################################
 
 
-from . import plugin, range
 import logging
-from .dataset import list_idtypes, get_idmanager, iter, get_mappingmanager, get, list_datasets, add, remove
+from .dataset import get_idmanager, get_mappingmanager
 
 _log = logging.getLogger(__name__)
 
 
 def get_map(idtype, idnames):
-  return jsonify(get_idmanager()(idnames, idtype))
+  return get_idmanager()(idnames, idtype)
 
 
 def get_map_single(idtype, idname):
@@ -22,7 +21,7 @@ def get_map_single(idtype, idname):
 
 def get_unmap(idtype, ids):
   names = ids.tolist()
-  return jsonify(get_idmanager().unmap(names, idtype))
+  return get_idmanager().unmap(names, idtype)
 
 
 def get_unmap_single(idtype, id):

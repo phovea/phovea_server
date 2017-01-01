@@ -4,15 +4,9 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-
-from . import plugin, range
-from .util import jsonify, to_json
-from .swagger import abort
-import logging
-from .dataset import list_idtypes, get_idmanager, iter, get_mappingmanager, get, list_datasets as list_dataset_impl, \
-  add, remove
-from .dataset_api_util import on_invalid_id, to_query, on_value_error
-
+from .swagger import to_json
+from .dataset import iter, get, add, remove
+from .dataset_api_util import on_invalid_id, to_query, on_value_error, to_range, from_json
 
 def list_dataset(limit=-1, id=None, name=None, fqname=None, type=None):
   query = to_query(id=id, name=name, fqname=fqname, type=type)
@@ -57,6 +51,7 @@ def list_dataset_tree(limit=-1, id=None, name=None, fqname=None, type=None):
 
 
 def upload_dataset(desc, file=None):
+  desc = from_json(desc)
   try:
     # first choose the provider to handle the upload
     r = add(desc, file, desc.get('id', None))
@@ -69,13 +64,15 @@ def upload_dataset(desc, file=None):
 
 
 def get_dataset(datasetid, range=None):
+  range = to_range(range)
   d = get(datasetid)
   if d is None:
     return on_invalid_id(datasetid)
-  return d.asjson(range)
+  return d.asjson()
 
 
 def put_dataset(datasetid, desc, file=None):
+  desc = from_json(desc)
   try:
     old = get(datasetid)
     if old is None:
@@ -91,6 +88,7 @@ def put_dataset(datasetid, desc, file=None):
 
 
 def post_dataset(datasetid, desc, file=None):
+  desc = from_json(desc)
   try:
     old = get(datasetid)
     if old is None:

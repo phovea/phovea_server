@@ -433,7 +433,7 @@ paths:
         -matrix
       parameters:
         - $ref: '#/definitions/range'
-        - name: f_pretty_print
+        - name: pretty_print
           in: query
           type: boolean
           required: false
@@ -454,7 +454,7 @@ paths:
         -matrix
       parameters:
         - $ref: '#/definitions/range'
-        - name: f_pretty_print
+        - name: pretty_print
           in: query
           type: boolean
           required: false
@@ -475,15 +475,15 @@ paths:
         -matrix
       parameters:
         - $ref: '#/definitions/range'
-        - name: f_rows
+        - name: include_rows
           in: query
           type: boolean
           required: false
-        - name: f_cols
+        - name: include_cols
           in: query
           type: boolean
           required: false
-        - name: f_delimiter
+        - name: delimiter
           in: query
           type: string
           default: ;
@@ -508,30 +508,30 @@ paths:
         -matrix
       parameters:
         - $ref: '#/definitions/range'
-        - name: format_min
+        - name: min
           in: query
           type: number
           format: double
           required: false
-        - name: format_max
+        - name: max
           in: query
           type: number
           format: double
           required: false
-        - name: format_palette
+        - name: palette
           description: 'color palette one of: blue_white_red, white_red'
           in: query
           type: string
           required: false
-        - name: format_w
+        - name: width
           in: query
           type: integer
           required: false
-        - name: format_h
+        - name: height
           in: query
           type: integer
           required: false
-        - name: format_transpose
+        - name: transpose
           in: query
           type: boolean
           required: false
@@ -541,7 +541,7 @@ paths:
         '200':
           description: Successful response
           schema:
-            type: file
+            type: object
         '404':
           $ref: '#/responses/notFound'
   /matrix/{datasetid}/data.jpg:
@@ -554,30 +554,30 @@ paths:
         -matrix
       parameters:
         - $ref: '#/definitions/range'
-        - name: format_min
+        - name: min
           in: query
           type: number
           format: double
           required: false
-        - name: format_max
+        - name: max
           in: query
           type: number
           format: double
           required: false
-        - name: format_palette
+        - name: palette
           description: 'color palette one of: blue_white_red, white_red'
           in: query
           type: string
           required: false
-        - name: format_w
+        - name: width
           in: query
           type: integer
           required: false
-        - name: format_h
+        - name: height
           in: query
           type: integer
           required: false
-        - name: format_transpose
+        - name: transpose
           in: query
           type: boolean
           required: false
@@ -587,7 +587,7 @@ paths:
         '200':
           description: Successful response
           schema:
-            type: file
+            type: object
         '404':
           $ref: '#/responses/notFound'
   /matrix/{datasetid}/rows:
@@ -624,9 +624,8 @@ paths:
         '200':
           description: Successful response
           schema:
-            type: array
-            items:
-              type: integer
+            type: string
+            format: range
         '404':
           $ref: '#/responses/notFound'
 
@@ -664,9 +663,8 @@ paths:
         '200':
           description: Successful response
           schema:
-            type: array
-            items:
-              type: integer
+            type: string
+            format: range
         '404':
           $ref: '#/responses/notFound'
 
@@ -742,7 +740,7 @@ paths:
         -table
       parameters:
         - $ref: '#/definitions/range'
-        - name: f_pretty_print
+        - name: pretty_print
           in: query
           type: boolean
           required: false
@@ -758,12 +756,12 @@ paths:
       - $ref: '#/parameters/datasetid'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: table_api.get_table
+      operationId: table_api.get_table_data
       tags:
         -table
       parameters:
         - $ref: '#/definitions/range'
-        - name: f_pretty_print
+        - name: pretty_print
           in: query
           type: boolean
           required: false
@@ -779,20 +777,16 @@ paths:
       - $ref: '#/parameters/datasetid'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: table_api.get_table_csv
+      operationId: table_api.get_table_data_csv
       tags:
         -table
       parameters:
         - $ref: '#/definitions/range'
-        - name: f_rows
+        - name: include_rows
           in: query
           type: boolean
           required: false
-        - name: f_cols
-          in: query
-          type: boolean
-          required: false
-        - name: f_delimiter
+        - name: delimiter
           in: query
           type: string
           default: ;
@@ -841,9 +835,8 @@ paths:
         '200':
           description: Successful response
           schema:
-            type: array
-            items:
-              type: integer
+            type: string
+            format: array
         '404':
           $ref: '#/responses/notFound'
 
@@ -906,7 +899,7 @@ paths:
         -table
       parameters:
         # any parameter for view
-        - name: f_pretty_print
+        - name: pretty_print
           in: query
           type: boolean
           required: false
@@ -928,7 +921,7 @@ paths:
         -table
       parameters:
         # any parameter for view
-        - name: f_pretty_print
+        - name: pretty_print
           in: query
           type: boolean
           required: false
@@ -950,15 +943,11 @@ paths:
         -table
       parameters:
         # any parameter for view
-        - name: f_rows
+        - name: include_rows
           in: query
           type: boolean
           required: false
-        - name: f_cols
-          in: query
-          type: boolean
-          required: false
-        - name: f_delimiter
+        - name: delimiter
           in: query
           type: string
           default: ;
@@ -984,7 +973,6 @@ paths:
         -table
       parameters:
         # any parameter for view
-        - $ref: '#/definitions/range'
       responses:
         '200':
           description: Successful response
@@ -1006,7 +994,6 @@ paths:
         -table
       parameters:
         # any parameter for view
-        - $ref: '#/definitions/range'
       responses:
         '200':
           description: Successful response
@@ -1028,7 +1015,6 @@ paths:
         -table
       parameters:
         # any parameter for view
-        - $ref: '#/definitions/range'
       responses:
         '200':
           description: Successful response
@@ -1067,7 +1053,7 @@ paths:
         -vector
       parameters:
         - $ref: '#/definitions/range'
-        - name: f_pretty_print
+        - name: pretty_print
           in: query
           type: boolean
           required: false
@@ -1088,7 +1074,7 @@ paths:
         -vector
       parameters:
         - $ref: '#/definitions/range'
-        - name: f_pretty_print
+        - name: pretty_print
           in: query
           type: boolean
           required: false
@@ -1109,15 +1095,11 @@ paths:
         -vector
       parameters:
         - $ref: '#/definitions/range'
-        - name: f_rows
+        - name: include_rows
           in: query
           type: boolean
           required: false
-        - name: f_cols
-          in: query
-          type: boolean
-          required: false
-        - name: f_delimiter
+        - name: delimiter
           in: query
           type: string
           default: ;
@@ -1166,9 +1148,8 @@ paths:
         '200':
           description: Successful response
           schema:
-            type: array
-            items:
-              type: integer
+            type: string
+            format: range
         '404':
           $ref: '#/responses/notFound'
 
