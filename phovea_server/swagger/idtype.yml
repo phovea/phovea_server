@@ -8,12 +8,11 @@ info:
 produces:
   - application/json
 
-x-module: idtype_api
 # Describe your paths here
 paths:
   /:
     get:
-      x-function: list_idtypes
+      operationId: idtype_api.list_idtypes
       description: list all idtypes
       responses:
         200:
@@ -29,7 +28,7 @@ paths:
     parameters:
       - $ref: '#/parameters/idtype'
     get:
-      x-function: get_map
+      operationId: idtype_api.get_map
       description: returns the uids for the given id names
       parameters:
         - $ref: '#/parameters/idnames'
@@ -46,7 +45,7 @@ paths:
       - $ref: '#/parameters/idtype'
       - $ref: '#/parameters/idname'
     get:
-      x-function: get_map_single
+      operationId: idtype_api.get_map_single
       description: returns the uid for the given id name
       responses:
         200:
@@ -58,7 +57,7 @@ paths:
     parameters:
       - $ref: '#/parameters/idtype'
     get:
-      x-function: get_unmap
+      operationId: idtype_api.get_unmap
       description: returns the id names for the given uids
       parameters:
         - $ref: '#/parameters/idnames'
@@ -75,7 +74,7 @@ paths:
       - $ref: '#/parameters/idtype'
       - $ref: '#/parameters/uid'
     get:
-      x-function: get_unmap_single
+      operationId: idtype_api.get_unmap_single
       description: returns the id name for the given uid
       responses:
         200:
@@ -87,8 +86,8 @@ paths:
     parameters:
       - $ref: '#/parameters/idtype'
     get:
-      x-function: get_maps_to
-      description: returns a list of all mapable types
+      operationId: idtype_api.get_maps_to
+      description: returns a list of all mapable types, i.e. that ar possible target idtypes
       responses:
         200:
           description: Successful response
@@ -102,8 +101,8 @@ paths:
       - $ref: '#/parameters/source'
       - $ref: '#/parameters/target'
     get:
-      x-function: get_convert
-      description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
+      operationId: idtype_api.get_convert
+      description: maps between given source idtype to the target idtype returning the id names of the target idtype
       parameters:
         - $ref: '#/parameters/uids'
         - $ref: '#/parameters/q'
@@ -124,8 +123,8 @@ paths:
       - $ref: '#/parameters/target'
       - $ref: '#/parameters/uid'
     get:
-      x-function: get_convert_single
-      description: maps is between given source idtype to the target idtype returning the id names of the target idtype
+      operationId: idtype_api.get_convert_single
+      description: maps between given source idtype uid to the target idtype returning the id name of the target idtype
       parameters:
         - $ref: '#/parameters/mode'
       responses:
@@ -141,7 +140,7 @@ paths:
       - $ref: '#/parameters/source'
       - $ref: '#/parameters/target'
     get:
-      x-function: get_convert_id
+      operationId: idtype_api.get_convert_id
       description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
       parameters:
         - $ref: '#/parameters/uids'
@@ -164,7 +163,7 @@ paths:
       - $ref: '#/parameters/target'
       - $ref: '#/parameters/idname'
     get:
-      x-function: get_convert_id_single
+      operationId: idtype_api.get_convert_id_single
       description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
       parameters:
         - $ref: '#/parameters/mode'
@@ -180,19 +179,19 @@ parameters:
   source:
     name: source
     in: path
-    description: source id type
+    description: source idtype
     required: true
     type: string
   target:
     name: target
     in: path
-    description: target id type
+    description: target idtype
     required: true
     type: string
   idtype:
     name: idtype
     in: path
-    description: id type
+    description: idtype
     required: true
     type: string
   idname:
@@ -226,7 +225,7 @@ parameters:
   mode:
     name: mode
     in: query
-    description: 'mapping mode: all|single'
+    description: 'in case of multi mapping should all(default) or just the first one returned. options: all|single'
     required: false
     type: string
     default: all

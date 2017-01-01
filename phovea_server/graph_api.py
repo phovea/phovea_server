@@ -4,26 +4,8 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-
-from .util import jsonify
-from . import ns
-
-
-def asrange(r=None):
-  if r is None:
-    return None
-  from .range import parse
-  return parse(r)
-
-
-def _to_desc():
-  if 'desc' in ns.request.values:
-    import json
-    n = json.loads(ns.request.values['desc'])
-  else:
-    n = ns.request.values
-  return n
-
+from .dataset_api_util import dataset_getter
+from .swagger import to_json
 
 def format_json(dataset, range, args):
   d = dataset.asjson(range)
@@ -49,7 +31,7 @@ def _list_items(dataset_getter, name, datasetid):
 
   if ns.request.method == 'DELETE':
     if d.clear():
-      return jsonify(d.to_description(), indent=1)
+      return to_json(d.to_description(), indent=1)
     ns.abort(400)
 
   # post
@@ -85,18 +67,16 @@ def _list_type(dataset_getter, name='node'):
   return partial(_list_items, dataset_getter, name), partial(_handle_item, dataset_getter, name)
 
 
-def add_graph_handler(app, dataset_getter):
-  @app.route('/graph/<datasetid>')
-  def list_graphs(datasetid):
-    d = dataset_getter(datasetid, 'graph')
-    return jsonify(d.to_description())
+def get_graph(datasetid):
+  d = dataset_getter(datasetid, 'graph')
+  return d.to_description()
 
-  @app.route('/graph/<datasetid>/data')
-  def get_graph_data(datasetid):
-    d = dataset_getter(datasetid, 'graph')
-    r = asrange(ns.request.args.get('range', None))
-    formatter = resolve_formatter('graph', ns.request.args.get('format', 'json'))
-    return formatter(d, r, args=ns.request.args)
+
+def get_graph_data(datasetid, range, pretty_print):
+  d = dataset_getter(datasetid, 'graph')
+  if pretty_print:
+    to_json(d.to_description(), indent=' ')
+  return to_json(d.to_description())
 
   list_nodes, handle_node = _list_type(dataset_getter, 'node')
   app.add_url_rule('/graph/<datasetid>/node', 'list_nodes', list_nodes, methods=['GET', 'POST', 'DELETE'])

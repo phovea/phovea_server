@@ -11,6 +11,7 @@ produces:
 paths:
   /:
     get:
+      operationId: dataset_api.list_dataset
       description: list all datasets
       parameters:
         - $ref: '#/parameters/query_limit'
@@ -27,6 +28,7 @@ paths:
             items:
               $ref: 'def/dataset.yml'
     post:
+      operationId: dataset_api.upload_dataset
       description: add a new dataset
       consumes:
         - application/x-www-form-urlencoded
@@ -40,6 +42,7 @@ paths:
             $ref: 'def/dataset.yml'
   /.csv:
     get:
+      operationId: dataset_api.list_dataset_csv
       description: list all datasets as csv file
       parameters:
         - $ref: '#/parameters/query_limit'
@@ -47,6 +50,11 @@ paths:
         - $ref: '#/parameters/query_name'
         - $ref: '#/parameters/query_fqname'
         - $ref: '#/parameters/query_type'
+        - name: delimiter
+          in: query
+          required: false
+          default: ;
+          type: string
       produces:
         - text/csv
       responses:
@@ -57,6 +65,7 @@ paths:
             type: file
   /.tree.json:
     get:
+      operationId: dataset_api.list_dataset_tree
       description: list all datasets as tree
       parameters:
         - $ref: '#/parameters/query_limit'
@@ -73,7 +82,10 @@ paths:
     parameters:
       - $ref: 'def/datasetid.yml'
     get:
+      operationId: dataset_api.get_dataset
       description: get the data of this dataset
+      parameters:
+        - $ref: 'def/range.yml'
       responses:
         200:
           description: Successful response
@@ -83,6 +95,7 @@ paths:
         404:
           $ref: 'def/notFound.yml'
     put:
+      operationId: dataset_api.put_dataset
       description: updates this dataset
       consumes:
         - application/x-www-form-urlencoded
@@ -94,10 +107,13 @@ paths:
           description: Successful response
           schema:
             $ref: 'def/dataset.yml'
-        404:
-          $ref: 'def/notFound.yml'
+        400:
+          $ref: 'def/invalid.yml'
+        500:
+          $ref: 'def/error.yml'
     post:
       description: modifies this dataset
+      operationId: dataset_api.post_dataset
       consumes:
         - application/x-www-form-urlencoded
       parameters:
@@ -108,21 +124,29 @@ paths:
           description: Successful response
           schema:
             $ref: 'def/dataset.yml'
+        400:
+          $ref: 'def/invalid.yml'
         404:
           $ref: 'def/notFound.yml'
+        500:
+          $ref: 'def/error.yml'
     delete:
       description: deletes this dataset
+      operationId: dataset_api.delete_dataset
       responses:
         200:
           description: Successful response
           schema:
             $ref: '#/definitions/dataset_deleted'
+        400:
+          $ref: 'def/invalid.yml'
         404:
           $ref: 'def/notFound.yml'
   /{datasetid}/desc:
     parameters:
       - $ref: 'def/datasetid.yml'
     get:
+      operationId: dataset_api.get_dataset_desc
       description: get the description of this dataset
       responses:
         200:
@@ -152,6 +176,7 @@ parameters:
     required: false
     description: limit the number of returned items
     type: integer
+    default: -1
   query_type:
     name: type
     in: query
@@ -204,3 +229,5 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/datasetnode'
+    required:
+      - name

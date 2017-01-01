@@ -12,7 +12,7 @@ paths:
     parameters:
       - $ref: 'def/datasetid.yml'
     get:
-      description: get the description of this dataset
+      description: get the description of this graph
       responses:
         200:
           description: Successful response
@@ -24,7 +24,7 @@ paths:
     parameters:
       - $ref: 'def/datasetid.yml'
     get:
-      description: get the description of this dataset
+      description: get the data of this graph
       responses:
         200:
           description: Successful response
@@ -124,7 +124,7 @@ paths:
         404:
           $ref: 'def/notFound.yml'
     delete:
-      description: clear all edge
+      description: clear all edges
       responses:
         200:
           $ref: '#/responses/success_desc'
@@ -217,7 +217,7 @@ definitions:
           - id
   graph_edge:
     type: object
-    description: a graph edge
+    description: a graph edge, source and target are the node ids
     allOf:
       - $ref: '#/definitions/attr_container'
       - type: object

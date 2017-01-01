@@ -1,0 +1,4 @@
+description: Internal Server Error
+schema:
+  title: Error
+  type: string

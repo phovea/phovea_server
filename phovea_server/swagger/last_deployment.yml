@@ -6,14 +6,13 @@ info:
   title: Last Deployment API
 
 
-x-module: last_deployment
 # Describe your paths here
 paths:
   # This is a path endpoint. Change it.
   /:
     # This is a HTTP operation
     get:
-      x-function: get_last_deployment
+      operationId: last_deployment.get_last_deployment
       # Describe this verb here. Note: you can use markdown
       description: |
         returns the last deployment timestamp
