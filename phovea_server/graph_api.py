@@ -4,89 +4,108 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-from .dataset_api_util import dataset_getter
-from .swagger import to_json
-
-def format_json(dataset, range, args):
-  d = dataset.asjson(range)
-  if bool(args.get('f_pretty_print', False)):
-    return jsonify(d, indent=' ')
-  return jsonify(d)
+from .dataset_api_util import dataset_getter, to_range, from_json
 
 
-def resolve_formatter(type, format):
-  from .plugin import list as list_plugins
-  for p in list_plugins(type + '-formatter'):
-    if p.format == format:
-      return p.load()
-  formats = ','.join(p.format for p in list_plugins(type + '-formatter'))
-  ns.abort(400, 'unknown format "{0}" possible formats are: {1}'.format(format, formats))
-
-
-def _list_items(dataset_getter, name, datasetid):
-  d = dataset_getter(datasetid, 'graph')
-  if ns.request.method == 'GET':
-    r = asrange(ns.request.args.get('range', None))
-    return jsonify([n.asjson() for n in getattr(d, name + 's')(r[0] if r is not None else None)])
-
-  if ns.request.method == 'DELETE':
-    if d.clear():
-      return to_json(d.to_description(), indent=1)
-    ns.abort(400)
-
-  # post
-  n = _to_desc()
-  if getattr(d, 'add_' + name)(n):
-    return jsonify(d.to_description(), indent=1)
-  # invalid upload
-  ns.abort(400)
-
-
-def _handle_item(dataset_getter, name, datasetid, itemid):
-  d = dataset_getter(datasetid, 'graph')
-  if ns.request.method == 'GET':
-    n = getattr(d, 'get_' + name)(itemid)
-    return jsonify(n.asjson())
-
-  if ns.request.method == 'DELETE':
-    if getattr(d, 'remove_' + name)(itemid):
-      return jsonify(d.to_description(), indent=1)
-    ns.abort(400)
-
-  # put
-  n = _to_desc()
-  n['id'] = itemid
-  if getattr(d, 'update_' + name)(n):
-    return jsonify(d.to_description(), indent=1)
-  # invalid upload
-  ns.abort(400)
-
-
-def _list_type(dataset_getter, name='node'):
-  from functools import partial
-  return partial(_list_items, dataset_getter, name), partial(_handle_item, dataset_getter, name)
+def _get_dataset(datasetid):
+  return dataset_getter(datasetid, 'graph')
 
 
 def get_graph(datasetid):
-  d = dataset_getter(datasetid, 'graph')
+  d = _get_dataset(datasetid)
   return d.to_description()
 
 
-def get_graph_data(datasetid, range, pretty_print):
-  d = dataset_getter(datasetid, 'graph')
-  if pretty_print:
-    to_json(d.to_description(), indent=' ')
-  return to_json(d.to_description())
+def get_graph_data(datasetid):
+  d = _get_dataset(datasetid)
+  return d.asjson()
 
-  list_nodes, handle_node = _list_type(dataset_getter, 'node')
-  app.add_url_rule('/graph/<datasetid>/node', 'list_nodes', list_nodes, methods=['GET', 'POST', 'DELETE'])
-  app.add_url_rule('/graph/<datasetid>/node/<int:itemid>', 'handle_node', handle_node, methods=['GET', 'PUT', 'DELETE'])
 
-  list_edges, handle_edge = _list_type(dataset_getter, 'edge')
-  app.add_url_rule('/graph/<datasetid>/edge', 'list_edges', list_edges, methods=['GET', 'POST', 'DELETE'])
-  app.add_url_rule('/graph/<datasetid>/edge/<int:itemid>', 'handle_edge', handle_edge, methods=['GET', 'PUT', 'DELETE'])
+def list_graph_node(datasetid, range=None):
+  range = to_range(range)
+  d = _get_dataset(datasetid)
+  return [n.asjson() for n in d.nodes(range[0] if range is not None else None)]
 
-  # websocket = ws.Socket(app)
-  # @websocket.route('/ws')
-  # def graph_ws(socket):
-  #  ws.websocket_loop(socket, dict(get_graph=(payload, s)))
+
+def list_graph_edge(datasetid, range=None):
+  range = to_range(range)
+  d = _get_dataset(datasetid)
+  return [n.asjson() for n in d.edges(range[0] if range is not None else None)]
+
+
+def clear_graph_node(datasetid):
+  d = _get_dataset(datasetid)
+  if d.clear():
+    return d.to_description()
+  return 'unknown error', 400
+
+
+def clear_graph_edge(datasetid):
+  d = _get_dataset(datasetid)
+  if d.clear():  # TODO will also clear everything
+    return d.to_description()
+  return 'unknown error', 400
+
+
+def post_graph_node(datasetid, desc):
+  desc = from_json(desc)
+  d = _get_dataset(datasetid)
+  if d.add_node(desc):
+    return d.to_description()
+  return 'cannot add node', 400
+
+
+def post_graph_edge(datasetid, desc):
+  desc = from_json(desc)
+  d = _get_dataset(datasetid)
+  if d.add_edge(desc):
+    return d.to_description()
+  return 'cannot add edge', 400
+
+
+def get_graph_node(datasetid, nodeid):
+  d = _get_dataset(datasetid)
+  n = d.get_node(nodeid)
+  if not n:
+    return 'not found', 404
+  return n.asjson()
+
+
+def get_graph_edge(datasetid, edgeid):
+  d = _get_dataset(datasetid)
+  n = d.get_edge(edgeid)
+  if not n:
+    return 'not found', 404
+  return n.asjson()
+
+
+def delete_graph_node(datasetid, nodeid):
+  d = _get_dataset(datasetid)
+  if d.remove_node(nodeid):
+    return d.to_description()
+  return 'invalid', 400
+
+
+def delete_graph_edge(datasetid, edgeid):
+  d = _get_dataset(datasetid)
+  if d.remove_edge(edgeid):
+    return d.to_description()
+  return 'invalid', 400
+
+
+def put_graph_node(datasetid, nodeid, desc):
+  desc = from_json(desc)
+  desc['id'] = nodeid
+  d = _get_dataset(datasetid)
+  if d.update_node(desc):
+    return d.to_description()
+  return 'invalid', 400
+
+
+def put_graph_edge(datasetid, edgeid, desc):
+  desc = from_json(desc)
+  desc['id'] = edgeid
+  d = _get_dataset(datasetid)
+  if d.update_edge(desc):
+    return d.to_description()
+  return 'invalid', 400
