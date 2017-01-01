@@ -15,7 +15,7 @@ paths:
       operationId: idtype_api.list_idtypes
       description: list all idtypes
       responses:
-        200:
+        '200':
           description: Successful response
           # A schema describing your response object.
           # Use JSON Schema format
@@ -33,7 +33,7 @@ paths:
       parameters:
         - $ref: '#/parameters/idnames'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: ArrayOfUIDs
@@ -48,7 +48,7 @@ paths:
       operationId: idtype_api.get_map_single
       description: returns the uid for the given id name
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: ID name
@@ -62,7 +62,7 @@ paths:
       parameters:
         - $ref: '#/parameters/idnames'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: ArrayOfIDNames
@@ -77,7 +77,7 @@ paths:
       operationId: idtype_api.get_unmap_single
       description: returns the id name for the given uid
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: ID Name
@@ -89,7 +89,7 @@ paths:
       operationId: idtype_api.get_maps_to
       description: returns a list of all mapable types, i.e. that ar possible target idtypes
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: ArrayOfIDTypesIDs
@@ -108,7 +108,7 @@ paths:
         - $ref: '#/parameters/q'
         - $ref: '#/parameters/mode'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: ArrayOfIDNames
@@ -129,7 +129,7 @@ paths:
         - $ref: '#/parameters/mode'
       responses:
         # Response code
-        200:
+        '200':
           description: Successful response
           # Use JSON Schema format
           schema:
@@ -148,7 +148,7 @@ paths:
         - $ref: '#/parameters/mode'
       responses:
         # Response code
-        200:
+        '200':
           description: Successful response
           schema:
             title: ArrayOfUIDs
@@ -168,7 +168,7 @@ paths:
       parameters:
         - $ref: '#/parameters/mode'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: UID

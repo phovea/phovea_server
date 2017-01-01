@@ -13,11 +13,11 @@ paths:
       - $ref: 'def/datasetid.yml'
     get:
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/table_dataset'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /table/{datasetid}/data:
     parameters:
@@ -30,11 +30,11 @@ paths:
           type: boolean
           required: false
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/table_data'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /table/{datasetid}/data.json:
     parameters:
@@ -47,11 +47,11 @@ paths:
           type: boolean
           required: false
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/table_data'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /table/{datasetid}/data.csv:
     parameters:
@@ -75,11 +75,11 @@ paths:
       produces:
         - text/csv
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: file
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /table/{datasetid}/rows:
     parameters:
@@ -88,13 +88,13 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /table/{datasetid}/rowsIds:
@@ -104,13 +104,13 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: integer
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /table/{datasetid}/raw:
@@ -120,7 +120,7 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
@@ -129,7 +129,7 @@ paths:
               items:
                 format: any
                 type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /table/{datasetid}/col/{column}:
@@ -143,14 +143,14 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               format: any
               type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /table/{datasetid}/view/{viewname}:
@@ -165,11 +165,11 @@ paths:
           type: boolean
           required: false
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/table_data'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /table/{datasetid}/view/{viewname}.json:
     parameters:
@@ -183,11 +183,11 @@ paths:
           type: boolean
           required: false
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/table_data'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /table/{datasetid}/view/{viewname}.csv:
     parameters:
@@ -212,11 +212,11 @@ paths:
       produces:
         - text/csv
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: file
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /table/{datasetid}/view/{viewname}/rows:
     parameters:
@@ -227,13 +227,13 @@ paths:
         # any parameter for view
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /table/{datasetid}/view/{viewname}/rowsIds:
@@ -245,13 +245,13 @@ paths:
         # any parameter for view
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: integer
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /table/{datasetid}/view/{viewname}/raw:
@@ -263,7 +263,7 @@ paths:
         # any parameter for view
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
@@ -272,7 +272,7 @@ paths:
               items:
                 format: any
                 type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
 parameters:

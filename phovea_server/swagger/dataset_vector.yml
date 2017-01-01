@@ -13,11 +13,11 @@ paths:
       - $ref: 'def/datasetid.yml'
     get:
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/vector_dataset'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /vector/{datasetid}/data:
     parameters:
@@ -30,11 +30,11 @@ paths:
           type: boolean
           required: false
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/vector_data'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /vector/{datasetid}/data.json:
     parameters:
@@ -47,11 +47,11 @@ paths:
           type: boolean
           required: false
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/vector_data'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /vector/{datasetid}/data.csv:
     parameters:
@@ -75,11 +75,11 @@ paths:
       produces:
         - text/csv
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: file
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /vector/{datasetid}/rows:
     parameters:
@@ -88,13 +88,13 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /vector/{datasetid}/rowsIds:
@@ -104,13 +104,13 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: integer
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /vector/{datasetid}/raw:
@@ -120,14 +120,14 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               format: any
               type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /vector/{datasetid}/hist:
@@ -141,13 +141,13 @@ paths:
           required: false
           type: integer
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: integer
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
 definitions:

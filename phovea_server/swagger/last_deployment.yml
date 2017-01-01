@@ -21,7 +21,7 @@ paths:
         - text/plain
       responses:
         # Response code
-        200:
+        '200':
           description: Successful response
           # A schema describing your response object.
           # Use JSON Schema format

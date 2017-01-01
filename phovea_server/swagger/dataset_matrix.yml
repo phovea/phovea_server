@@ -13,11 +13,11 @@ paths:
       - $ref: 'def/datasetid.yml'
     get:
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/matrix_dataset'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /matrix/{datasetid}/data:
     parameters:
@@ -30,11 +30,11 @@ paths:
           type: boolean
           required: false
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/matrix_data'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /matrix/{datasetid}/data.json:
     parameters:
@@ -47,11 +47,11 @@ paths:
           type: boolean
           required: false
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/matrix_data'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /matrix/{datasetid}/data.csv:
     parameters:
@@ -75,11 +75,11 @@ paths:
       produces:
         - text/csv
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: file
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /matrix/{datasetid}/data.png:
     parameters:
@@ -117,11 +117,11 @@ paths:
       produces:
         - image/png
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: file
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /matrix/{datasetid}/data.jpg:
     parameters:
@@ -159,11 +159,11 @@ paths:
       produces:
         - image/jpeg
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: file
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /matrix/{datasetid}/rows:
     parameters:
@@ -172,13 +172,13 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /matrix/{datasetid}/rowsIds:
@@ -188,13 +188,13 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: integer
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /matrix/{datasetid}/cols:
@@ -204,13 +204,13 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /matrix/{datasetid}/colsIds:
@@ -220,13 +220,13 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: integer
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /matrix/{datasetid}/raw:
@@ -236,7 +236,7 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
@@ -245,7 +245,7 @@ paths:
               items:
                 format: any
                 type: string
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
   /matrix/{datasetid}/hist:
@@ -259,13 +259,13 @@ paths:
           required: false
           type: integer
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               type: integer
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
 definitions:

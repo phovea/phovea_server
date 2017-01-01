@@ -14,11 +14,11 @@ paths:
     get:
       description: get the description of this graph
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/graph_dataset'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /graph/{datasetid}/data:
     parameters:
@@ -26,11 +26,11 @@ paths:
     get:
       description: get the data of this graph
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/graph_data'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /graph/{datasetid}/node:
     parameters:
@@ -38,13 +38,13 @@ paths:
     get:
       description: get all nodes
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               $ref: '#/definitions/graph_node'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
     post:
       description: add a new node
@@ -53,16 +53,16 @@ paths:
       parameters:
         - $ref: 'def/desc.yml'
       responses:
-        200:
+        '200':
           $ref: '#/responses/success_desc'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
     delete:
       description: clear all nodes
       responses:
-        200:
+        '200':
           $ref: '#/responses/success_desc'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /graph/{datasetid}/node/{nodeid}:
     parameters:
@@ -74,11 +74,11 @@ paths:
     get:
       description: get node
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/graph_node'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
     put:
       description: update node
@@ -87,16 +87,16 @@ paths:
       parameters:
         - $ref: 'def/desc.yml'
       responses:
-        200:
+        '200':
           $ref: '#/responses/success_desc'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
     delete:
       description: delete node
       responses:
-        200:
+        '200':
           $ref: '#/responses/success_desc'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /graph/{datasetid}/edge:
     parameters:
@@ -104,13 +104,13 @@ paths:
     get:
       description: get all edges
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             type: array
             items:
               $ref: '#/definitions/graph_node'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
     post:
       description: add a new edge
@@ -119,16 +119,16 @@ paths:
       parameters:
         - $ref: 'def/desc.yml'
       responses:
-        200:
+        '200':
           $ref: '#/responses/success_desc'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
     delete:
       description: clear all edges
       responses:
-        200:
+        '200':
           $ref: '#/responses/success_desc'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /graph/{datasetid}/edge/{edgeid}:
     parameters:
@@ -140,11 +140,11 @@ paths:
     get:
       description: get edge
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/graph_edge'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
     put:
       description: update edge
@@ -153,16 +153,16 @@ paths:
       parameters:
         - $ref: 'def/desc.yml'
       responses:
-        200:
+        '200':
           $ref: '#/responses/success_desc'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
     delete:
       description: delete edge
       responses:
-        200:
+        '200':
           $ref: '#/responses/success_desc'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
 definitions:

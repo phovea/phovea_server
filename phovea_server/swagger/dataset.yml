@@ -20,7 +20,7 @@ paths:
         - $ref: '#/parameters/query_fqname'
         - $ref: '#/parameters/query_type'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: ArrayOfDatsets
@@ -36,7 +36,7 @@ paths:
         - $ref: 'def/desc.yml'
         - $ref: '#/parameters/file'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: 'def/dataset.yml'
@@ -58,7 +58,7 @@ paths:
       produces:
         - text/csv
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: CSV File
@@ -74,7 +74,7 @@ paths:
         - $ref: '#/parameters/query_fqname'
         - $ref: '#/parameters/query_type'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/datasetnode'
@@ -87,12 +87,12 @@ paths:
       parameters:
         - $ref: 'def/range.yml'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             title: dataset object
             type: object
-        404:
+        '404':
           $ref: 'def/notFound.yml'
     put:
       operationId: dataset_api.put_dataset
@@ -103,13 +103,13 @@ paths:
         - $ref: '#/parameters/desc_optional'
         - $ref: '#/parameters/file'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: 'def/dataset.yml'
-        400:
+        '400':
           $ref: 'def/invalid.yml'
-        500:
+        '500':
           $ref: 'def/error.yml'
     post:
       description: modifies this dataset
@@ -120,27 +120,27 @@ paths:
         - $ref: '#/parameters/desc_optional'
         - $ref: '#/parameters/file'
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: 'def/dataset.yml'
-        400:
+        '400':
           $ref: 'def/invalid.yml'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
-        500:
+        '500':
           $ref: 'def/error.yml'
     delete:
       description: deletes this dataset
       operationId: dataset_api.delete_dataset
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: '#/definitions/dataset_deleted'
-        400:
+        '400':
           $ref: 'def/invalid.yml'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
   /{datasetid}/desc:
     parameters:
@@ -149,11 +149,11 @@ paths:
       operationId: dataset_api.get_dataset_desc
       description: get the description of this dataset
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: 'def/dataset.yml'
-        404:
+        '404':
           $ref: 'def/notFound.yml'
 
 parameters:
