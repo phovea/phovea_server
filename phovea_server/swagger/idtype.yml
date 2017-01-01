@@ -115,7 +115,7 @@ paths:
             type: array
             items:
               type: string
-        400:
+        '400':
           description: Invalid arguments
   /{source}/{target}/{uid}:
     parameters:
@@ -155,7 +155,7 @@ paths:
             type: array
             items:
               type: integer
-        400:
+        '400':
           description: Invalid arguments
   /{source}/{target}/map/{idname}:
     parameters:

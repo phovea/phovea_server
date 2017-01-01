@@ -6,7 +6,6 @@
 import gevent.monkey
 import logging.config
 
-
 gevent.monkey.patch_all()  # ensure the standard libraries are patched
 
 
@@ -81,7 +80,22 @@ def _loader(p):
     _init_app(app)
     return app
 
-  return load_app
+  return load_app, True
+
+
+def _swagger_loader(p):
+  _log.info('add swagger application: ' + p.id + ' at namespace: ' + p.namespace)
+
+  def load_app():
+    import connexion
+    _log.info(p.plugin.folder)
+    app = connexion.App(p.name, specification_dir=p.plugin.base_dir)
+    app.add_api(p.swaggerFile, base_path=p.namespace)
+    flask_app = app.app
+    _init_app(flask_app)
+    return flask_app
+
+  return load_app, False
 
 
 def create_application():
@@ -91,12 +105,14 @@ def create_application():
   from werkzeug.contrib.fixers import ProxyFix
 
   # create a path dispatcher
-  _default_app = mainapp.default_app()
-  _init_app(_default_app, True)
-  _applications = {p.namespace: _loader(p) for p in list_plugins('namespace')}
+  default_app = mainapp.default_app()
+  _init_app(default_app, True)
+  applications = {p.namespace: _loader(p) for p in list_plugins('namespace')}
+  swagger = {p.namespace: _swagger_loader(p) for p in list_plugins('swagger')}
+  applications.update(swagger)
 
   # create a dispatcher for all the applications
-  application = dispatcher.PathDispatcher(_default_app, _applications)
+  application = dispatcher.PathDispatcher(default_app, applications)
   return ProxyFix(application)
 
 

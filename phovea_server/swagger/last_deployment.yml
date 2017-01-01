@@ -5,6 +5,8 @@ info:
   version: "0.0.1"
   title: Last Deployment API
 
+produces:
+  - application/json
 
 # Describe your paths here
 paths:
@@ -12,13 +14,11 @@ paths:
   /:
     # This is a HTTP operation
     get:
+      x-swagger-router-controller: phovea_server
       operationId: last_deployment.get_last_deployment
       # Describe this verb here. Note: you can use markdown
       description: |
         returns the last deployment timestamp
-      # Expected responses for this operation:
-      produces:
-        - text/plain
       responses:
         # Response code
         '200':

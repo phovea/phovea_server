@@ -89,6 +89,11 @@ class DirectoryPlugin(object):
     self.repository = pkg.get('repository', {}).get('url')
     self.folder = folder
 
+  @property
+  def base_dir(self):
+    import os.path as p
+    return p.join(self.folder, self.id)
+
   def is_app(self):
     import os.path as p
     f = p.join(self.folder, 'build', 'index.html')
@@ -133,6 +138,11 @@ class DirectoryProductionPlugin(object):
     self.repository = ''
     self.folder = folder
 
+  @property
+  def base_dir(self):
+    import os.path as p
+    return p.join(self.folder)
+
   @staticmethod
   def is_app():
     return False
@@ -175,6 +185,11 @@ class EntryPointPlugin(object):
     f = self.config_file()
     import os.path
     self.folder = os.path.dirname(f) if f else '.'
+
+  @property
+  def base_dir(self):
+    import os.path as p
+    return p.join(self.folder)
 
   @staticmethod
   def is_app():

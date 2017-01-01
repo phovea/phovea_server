@@ -11,10 +11,10 @@ class ApplicationProxy(object):
   """
   helper class for different applications defined by a namespace and a loader function
   """
-  def __init__(self, namespace, loader):
+  def __init__(self, namespace, loader, peek=True):
     self.namespace = namespace
     # number of suburls to pop
-    self.peeks = namespace.count('/')
+    self.peeks = namespace.count('/') if peek else 0
     self.loader = loader
 
   @cached_property
@@ -33,7 +33,7 @@ class PathDispatcher(object):
   def __init__(self, default_app, applications):
     self.default_app = default_app
 
-    self.applications = [ApplicationProxy(key, value) for key, value in applications.items()]
+    self.applications = [ApplicationProxy(key, loader, peek) for key, (loader, peek) in applications.items()]
     # print self.applications
     from threading import Lock
     self.lock = Lock()
