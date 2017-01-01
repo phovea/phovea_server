@@ -12,6 +12,7 @@ produces:
 paths:
   /:
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.list_idtypes
       description: list all idtypes
       responses:
@@ -28,6 +29,7 @@ paths:
     parameters:
       - $ref: '#/parameters/idtype'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.get_map
       description: returns the uids for the given id names
       parameters:
@@ -45,6 +47,7 @@ paths:
       - $ref: '#/parameters/idtype'
       - $ref: '#/parameters/idname'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.get_map_single
       description: returns the uid for the given id name
       responses:
@@ -57,6 +60,7 @@ paths:
     parameters:
       - $ref: '#/parameters/idtype'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.get_unmap
       description: returns the id names for the given uids
       parameters:
@@ -74,6 +78,7 @@ paths:
       - $ref: '#/parameters/idtype'
       - $ref: '#/parameters/uid'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.get_unmap_single
       description: returns the id name for the given uid
       responses:
@@ -86,6 +91,7 @@ paths:
     parameters:
       - $ref: '#/parameters/idtype'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.get_maps_to
       description: returns a list of all mapable types, i.e. that ar possible target idtypes
       responses:
@@ -101,6 +107,7 @@ paths:
       - $ref: '#/parameters/source'
       - $ref: '#/parameters/target'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.get_convert
       description: maps between given source idtype to the target idtype returning the id names of the target idtype
       parameters:
@@ -123,6 +130,7 @@ paths:
       - $ref: '#/parameters/target'
       - $ref: '#/parameters/uid'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.get_convert_single
       description: maps between given source idtype uid to the target idtype returning the id name of the target idtype
       parameters:
@@ -140,6 +148,7 @@ paths:
       - $ref: '#/parameters/source'
       - $ref: '#/parameters/target'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.get_convert_id
       description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
       parameters:
@@ -163,6 +172,7 @@ paths:
       - $ref: '#/parameters/target'
       - $ref: '#/parameters/idname'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: idtype_api.get_convert_id_single
       description: maps is between given ssource idtype to the target idtype returning the id names of the target idtype
       parameters:

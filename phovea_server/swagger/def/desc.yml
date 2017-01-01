@@ -1,6 +1,0 @@
-name: desc
-in: formData
-description: dataset desc
-required: true
-type: string
-format: json

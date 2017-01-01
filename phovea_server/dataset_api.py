@@ -14,7 +14,7 @@ from .dataset import list_idtypes, get_idmanager, iter, get_mappingmanager, get,
 from .dataset_api_util import on_invalid_id, to_query, on_value_error
 
 
-def list_dataset(limit, id, name, fqname, type):
+def list_dataset(limit=-1, id=None, name=None, fqname=None, type=None):
   query = to_query(id=id, name=name, fqname=fqname, type=type)
   data = [d.to_description() for d in iter() if query(d)]
   if 0 < limit < len(data):
@@ -22,7 +22,7 @@ def list_dataset(limit, id, name, fqname, type):
   return data
 
 
-def list_dataset_csv(limit, id, name, fqname, type, delimiter):
+def list_dataset_csv(limit, id=None, name=None, fqname=None, type=None, delimiter=';'):
   data = list_dataset(limit, id, name, fqname, type)
 
   def to_size(size):
@@ -42,7 +42,7 @@ def list_dataset_csv(limit, id, name, fqname, type, delimiter):
   return ''.join(gen())
 
 
-def list_dataset_treejson(limit, id, name, fqname, type):
+def list_dataset_tree(limit=-1, id=None, name=None, fqname=None, type=None):
   data = list_dataset(limit, id, name, fqname, type)
   r = dict(name='/')
   for d in data:
@@ -56,7 +56,7 @@ def list_dataset_treejson(limit, id, name, fqname, type):
   return r
 
 
-def upload_dataset(desc, file):
+def upload_dataset(desc, file=None):
   try:
     # first choose the provider to handle the upload
     r = add(desc, file, desc.get('id', None))
@@ -68,14 +68,14 @@ def upload_dataset(desc, file):
     return on_value_error(e)
 
 
-def get_dataset(datasetid, range):
+def get_dataset(datasetid, range=None):
   d = get(datasetid)
   if d is None:
     return on_invalid_id(datasetid)
   return d.asjson(range)
 
 
-def put_dataset(datasetid, desc, file):
+def put_dataset(datasetid, desc, file=None):
   try:
     old = get(datasetid)
     if old is None:
@@ -90,7 +90,7 @@ def put_dataset(datasetid, desc, file):
     return on_value_error(e)
 
 
-def post_dataset(datasetid, desc, file):
+def post_dataset(datasetid, desc, file=None):
   try:
     old = get(datasetid)
     if old is None:
@@ -117,5 +117,5 @@ def delete_dataset(datasetid):
 def get_dataset_desc(datasetid):
   d = get(datasetid)
   if d is None:
-    return invalid_dataset(datasetid)
+    return on_invalid_id(datasetid)
   return d.to_description()

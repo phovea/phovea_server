@@ -11,6 +11,7 @@ produces:
 paths:
   /:
     get:
+      x-swagger-router-controller: phovea_server
       operationId: dataset_api.list_dataset
       description: list all datasets
       parameters:
@@ -26,22 +27,24 @@ paths:
             title: ArrayOfDatsets
             type: array
             items:
-              $ref: 'def/dataset.yml'
+              $ref: '#/definitions/dataset'
     post:
+      x-swagger-router-controller: phovea_server
       operationId: dataset_api.upload_dataset
       description: add a new dataset
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: 'def/desc.yml'
+        - $ref: '#/parameters/desc'
         - $ref: '#/parameters/file'
       responses:
         '200':
           description: Successful response
           schema:
-            $ref: 'def/dataset.yml'
+            $ref: '#/definitions/dataset'
   /.csv:
     get:
+      x-swagger-router-controller: phovea_server
       operationId: dataset_api.list_dataset_csv
       description: list all datasets as csv file
       parameters:
@@ -62,9 +65,10 @@ paths:
           description: Successful response
           schema:
             title: CSV File
-            type: file
+            type: string
   /.tree.json:
     get:
+      x-swagger-router-controller: phovea_server
       operationId: dataset_api.list_dataset_tree
       description: list all datasets as tree
       parameters:
@@ -80,12 +84,13 @@ paths:
             $ref: '#/definitions/datasetnode'
   /{datasetid}:
     parameters:
-      - $ref: 'def/datasetid.yml'
+      - $ref: '#/parameters/datasetid'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: dataset_api.get_dataset
       description: get the data of this dataset
       parameters:
-        - $ref: 'def/range.yml'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -93,8 +98,9 @@ paths:
             title: dataset object
             type: object
         '404':
-          $ref: 'def/notFound.yml'
+          $ref: '#/responses/notFound'
     put:
+      x-swagger-router-controller: phovea_server
       operationId: dataset_api.put_dataset
       description: updates this dataset
       consumes:
@@ -106,13 +112,14 @@ paths:
         '200':
           description: Successful response
           schema:
-            $ref: 'def/dataset.yml'
+            $ref: '#/definitions/dataset'
         '400':
-          $ref: 'def/invalid.yml'
+          $ref: '#/responses/invalid'
         '500':
-          $ref: 'def/error.yml'
+          $ref: '#/responses/error'
     post:
       description: modifies this dataset
+      x-swagger-router-controller: phovea_server
       operationId: dataset_api.post_dataset
       consumes:
         - application/x-www-form-urlencoded
@@ -123,15 +130,16 @@ paths:
         '200':
           description: Successful response
           schema:
-            $ref: 'def/dataset.yml'
+            $ref: '#/definitions/dataset'
         '400':
-          $ref: 'def/invalid.yml'
+          $ref: '#/responses/invalid'
         '404':
-          $ref: 'def/notFound.yml'
+          $ref: '#/responses/notFound'
         '500':
-          $ref: 'def/error.yml'
+          $ref: '#/responses/error'
     delete:
       description: deletes this dataset
+      x-swagger-router-controller: phovea_server
       operationId: dataset_api.delete_dataset
       responses:
         '200':
@@ -139,24 +147,38 @@ paths:
           schema:
             $ref: '#/definitions/dataset_deleted'
         '400':
-          $ref: 'def/invalid.yml'
+          $ref: '#/responses/invalid'
         '404':
-          $ref: 'def/notFound.yml'
+          $ref: '#/responses/notFound'
   /{datasetid}/desc:
     parameters:
-      - $ref: 'def/datasetid.yml'
+      - $ref: '#/parameters/datasetid'
     get:
+      x-swagger-router-controller: phovea_server
       operationId: dataset_api.get_dataset_desc
       description: get the description of this dataset
       responses:
         '200':
           description: Successful response
           schema:
-            $ref: 'def/dataset.yml'
+            $ref: '#/definitions/dataset'
         '404':
-          $ref: 'def/notFound.yml'
+          $ref: '#/responses/notFound'
 
 parameters:
+  datasetid:
+    name: datasetid
+    in: path
+    description: dataset id
+    required: true
+    type: string
+  desc:
+    name: desc
+    in: formData
+    description: dataset desc
+    required: true
+    type: string
+    format: json
   desc_optional:
     name: desc
     in: formData
@@ -164,6 +186,13 @@ parameters:
     required: false
     type: string
     format: json
+  range:
+    name: range
+    in: query
+    description: range to subset
+    required: false
+    type: string
+    format: range
   file:
     name: file
     in: formData
@@ -207,6 +236,27 @@ parameters:
     format: regex
 
 definitions:
+  dataset:
+    type: object
+    description: a dataset definition
+    required:
+      - id
+      - name
+      - fqname
+      - type
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      fqname:
+        type: string
+      type:
+        type: string
+      creator:
+        type: string
+      ts:
+        type: number
   dataset_deleted:
     type: object
     description: status info
@@ -224,10 +274,27 @@ definitions:
       name:
         type: string
       data:
-        $ref: 'def/dataset.yml'
+        $ref: '#/definitions/dataset'
       children:
         type: array
         items:
           $ref: '#/definitions/datasetnode'
     required:
       - name
+
+responses:
+  error:
+    description: Internal Server Error
+    schema:
+      title: Error
+      type: string
+  invalid:
+    description: Invalid Request
+    schema:
+      title: Error
+      type: string
+  notFound:
+    description: Not Found
+    schema:
+      title: Error
+      type: string

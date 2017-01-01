@@ -1,4 +1,0 @@
-description: Invalid Request
-schema:
-  title: Error
-  type: string

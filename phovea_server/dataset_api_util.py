@@ -26,8 +26,8 @@ def on_invalid_type(datasetid, dataset_type):
   return 'the given dataset "' + str(datasetid) + '" is not a ' + dataset_type, 400
 
 def dataset_getter(datasetid, dataset_type):
-  if isinstance(datasetid, int) and dataset_id < 0:
-    return [d for d in list_datasets() if d.type == dataset_type]
+  if isinstance(datasetid, int) and datasetid < 0:
+    return [d for d in datasetid() if d.type == dataset_type]
   t = get(datasetid)
   if t is None:
     abort(*on_invalid_id(datasetid))
@@ -36,7 +36,7 @@ def dataset_getter(datasetid, dataset_type):
   return t
 
 def to_query(**query):
-  act_query = {k: v for k, v in query.iteritems()}
+  act_query = {k: v for k, v in query.iteritems() if v is not None}
   if len(act_query) == 0:  # no query
     return lambda x: True
   import re

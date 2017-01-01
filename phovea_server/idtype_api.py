@@ -47,7 +47,7 @@ def get_convert_single(source, target, uid, mode):
   return _do_mapping_single(source, target, uid, mode, False)
 
 
-def get_convert_single_id(source, target, uid, mode):
+def get_convert_id_single(source, target, uid, mode):
   return _do_mapping_single(source, target, uid, mode, True)
 
 

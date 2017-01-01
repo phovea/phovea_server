@@ -17,13 +17,13 @@ def phovea(registry):
       'namespace': '/api/last_deployment',
       'swaggerFile': 'swagger/last_deployment.yml'
   })
-  registry.append('namespace', 'caleydo-dataset', 'phovea_server.dataset_api', {
+  registry.append('swagger', 'caleydo-dataset', '', {
       'namespace': '/api/dataset',
-      'factory': 'create_dataset'
+      'swaggerFile': 'swagger/dataset.yml'
   })
-  registry.append('namespace', 'caleydo-idtype', 'phovea_server.dataset_api', {
+  registry.append('swagger', 'caleydo-idtype', '', {
       'namespace': '/api/idtype',
-      'factory': 'create_idtype'
+      'swaggerFile': 'swagger/idtype.yml'
   })
   registry.append('dataset-provider', 'dataset-csv', 'phovea_server.dataset_csv')
   registry.append('json-encoder', 'numpy', 'phovea_server.json_encoder')
