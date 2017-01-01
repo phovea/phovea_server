@@ -4,7 +4,7 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-from .dataset_api_util import dataset_getter, to_range, on_invalid_id
+from .dataset_api_util import dataset_getter, to_range
 from .swagger import to_json, abort
 import range as ranges
 

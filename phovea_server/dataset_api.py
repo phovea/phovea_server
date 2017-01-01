@@ -8,6 +8,7 @@ from .swagger import to_json
 from .dataset import iter, get, add, remove
 from .dataset_api_util import on_invalid_id, to_query, on_value_error, to_range, from_json
 
+
 def list_dataset(limit=-1, id=None, name=None, fqname=None, type=None):
   query = to_query(id=id, name=name, fqname=fqname, type=type)
   data = [d.to_description() for d in iter() if query(d)]
@@ -30,8 +31,7 @@ def list_dataset_csv(limit, id=None, name=None, fqname=None, type=None, delimite
     yield delimiter.join(['ID', 'Name', 'FQName', 'Type', 'Size', 'Entry'])
     for d in data:
       yield '\n'
-      yield delimiter.join(
-        [str(d['id']), d['name'], d['fqname'], d['type'], to_size(d.get('size', None)), to_json(d)])
+      yield delimiter.join([str(d['id']), d['name'], d['fqname'], d['type'], to_size(d.get('size', None)), to_json(d)])
 
   return ''.join(gen())
 

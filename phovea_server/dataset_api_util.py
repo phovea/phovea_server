@@ -11,17 +11,21 @@ from .dataset import get
 
 _log = logging.getLogger(__name__)
 
+
 def on_value_error(error):
   _log.error('ValueError: (' + str(error.message) + ')')
   _log.error(error)
   return '<strong>{2} - {0}</strong><pre>{1}</pre>'.format('ValueError', error.message, 500), 500
 
+
 def on_invalid_id(datasetid):
-  _log.info('requested invalid datasetid: '+str(datasetid))
+  _log.info('requested invalid datasetid: ' + str(datasetid))
   return 'invalid dataset id "' + str(datasetid) + '"', 404
+
 
 def on_invalid_type(datasetid, dataset_type):
   return 'the given dataset "' + str(datasetid) + '" is not a ' + dataset_type, 400
+
 
 def dataset_getter(datasetid, dataset_type):
   if isinstance(datasetid, int) and datasetid < 0:
@@ -32,6 +36,7 @@ def dataset_getter(datasetid, dataset_type):
   if t.type != dataset_type:
     abort(*on_invalid_type(datasetid, dataset_type))
   return t
+
 
 def to_query(**query):
   act_query = {k: v for k, v in query.iteritems() if v is not None}
@@ -44,11 +49,13 @@ def to_query(**query):
 
   return filter_elem
 
+
 def to_range(r):
   if r is None or r == '':
     return None
   import range as ranges
   return ranges.parse(r)
+
 
 def from_json(s):
   if s is None or s == '':

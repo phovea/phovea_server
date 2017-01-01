@@ -237,6 +237,8 @@ paths:
       tags:
         -graph
       description: get all nodes
+      parameters:
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -255,7 +257,7 @@ paths:
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: 'def/desc.yml'
+        - $ref: '#/parameters/desc'
       responses:
         '200':
           $ref: '#/responses/success_graph_desc'
