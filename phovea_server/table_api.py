@@ -4,7 +4,7 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-from .dataset_api_util import dataset_getter, to_range
+from .dataset_api_util import dataset_getter, to_range, from_json
 from .swagger import to_json, abort
 import range as ranges
 
@@ -25,6 +25,9 @@ def get_table_data(datasetid, range=None, pretty_print=False):
   if pretty_print:
     return to_json(d, indent=' ', allow_nan=False)
   return to_json(d, allow_nan=False)
+
+
+get_table_data_json = get_table_data
 
 
 def to_csv(dataset, param, range, include_rows=False, delimiter=';'):
@@ -110,30 +113,38 @@ def _find_view(datasetid, viewname):
   abort('view not found', 404)
 
 
-def get_table_view(datasetid, viewname, pretty_print, **kwargs):
+def get_table_view(datasetid, viewname, pretty_print, args=None):
   view = _find_view(datasetid, viewname)
-  d = view.asjson(kwargs)
+  args = from_json(args)
+  d = view.asjson(args)
   if pretty_print:
     return to_json(d, indent=' ', allow_nan=False)
   return to_json(d, allow_nan=False)
 
 
-def get_table_view_data_csv(datasetid, viewname, include_rows=False, delimiter=';', **kwargs):
+get_table_view_data_json = get_table_view
+
+
+def get_table_view_data_csv(datasetid, viewname, include_rows=False, delimiter=';', args=None):
   view = _find_view(datasetid, viewname)
-  return to_csv(view, kwargs, None, include_rows, delimiter)
+  args = from_json(args)
+  return to_csv(view, args, None, include_rows, delimiter)
 
 
-def get_table_view_rows(datasetid, viewname, **kwargs):
+def get_table_view_rows(datasetid, viewname, args=None):
   view = _find_view(datasetid, viewname)
-  return view.rows(kwargs)
+  args = from_json(args)
+  return view.rows(args)
 
 
-def get_table_view_row_ids(datasetid, viewname, **kwargs):
+def get_table_view_row_ids(datasetid, viewname, args=None):
   view = _find_view(datasetid, viewname)
-  ids = view.rowids(kwargs)
+  args = from_json(args)
+  ids = view.rowids(args)
   str(ranges.from_list(list(ids)))
 
 
-def get_table_view_raw(datasetid, viewname, **kwargs):
+def get_table_view_raw(datasetid, viewname, args=None):
   view = _find_view(datasetid, viewname)
-  return list(view.aslist(kwargs))
+  args = from_json(args)
+  return list(view.aslist(args))

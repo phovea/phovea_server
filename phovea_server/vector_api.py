@@ -27,6 +27,9 @@ def get_vector_data(datasetid, range=None, pretty_print=False):
   return to_json(d, allow_nan=False)
 
 
+get_vector_data_json = get_vector_data
+
+
 def get_vector_data_csv(datasetid, range=None, include_rows=False, delimiter=';'):
   range = to_range(range)
   dataset = _get_dataset(datasetid)

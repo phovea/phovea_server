@@ -203,7 +203,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.get_graph
       tags:
-        -graph
+        - graph
       description: get the description of this graph
       responses:
         '200':
@@ -219,7 +219,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.get_graph_data
       tags:
-        -graph
+        - graph
       description: get the data of this graph
       responses:
         '200':
@@ -235,7 +235,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.list_graph_node
       tags:
-        -graph
+        - graph
       description: get all nodes
       parameters:
         - $ref: '#/parameters/range'
@@ -252,7 +252,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.post_graph_node
       tags:
-        -graph
+        - graph
       description: add a new node
       consumes:
         - application/x-www-form-urlencoded
@@ -267,7 +267,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.clear_graph_node
       tags:
-        -graph
+        - graph
       description: clear all nodes
       responses:
         '200':
@@ -285,7 +285,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.get_graph_node
       tags:
-        -graph
+        - graph
       description: get node
       responses:
         '200':
@@ -298,12 +298,12 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.put_graph_node
       tags:
-        -graph
+        - graph
       description: update node
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: 'def/desc.yml'
+        - $ref: '#/parameters/desc'
       responses:
         '200':
           $ref: '#/responses/success_graph_desc'
@@ -313,7 +313,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.delete_graph_node
       tags:
-        -graph
+        - graph
       description: delete node
       responses:
         '200':
@@ -327,7 +327,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.list_graph_edge
       tags:
-        -graph
+        - graph
       description: get all edges
       responses:
         '200':
@@ -342,12 +342,12 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.post_graph_edge
       tags:
-        -graph
+        - graph
       description: add a new edge
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: 'def/desc.yml'
+        - $ref: '#/parameters/desc'
       responses:
         '200':
           $ref: '#/responses/success_graph_desc'
@@ -357,7 +357,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.clear_graph_edge
       tags:
-        -graph
+        - graph
       description: clear all edges
       responses:
         '200':
@@ -375,7 +375,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.get_graph_edge
       tags:
-        -graph
+        - graph
       description: get edge
       responses:
         '200':
@@ -388,12 +388,12 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.put_graph_edge
       tags:
-        -graph
+        - graph
       description: update edge
       consumes:
         - application/x-www-form-urlencoded
       parameters:
-        - $ref: 'def/desc.yml'
+        - $ref: '#/parameters/desc'
       responses:
         '200':
           $ref: '#/responses/success_graph_desc'
@@ -403,7 +403,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: graph_api.delete_graph_edge
       tags:
-        -graph
+        - graph
       description: delete edge
       responses:
         '200':
@@ -415,9 +415,9 @@ paths:
       - $ref: '#/parameters/datasetid'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: matrix_api.list_matrix
+      operationId: matrix_api.get_matrix
       tags:
-        -matrix
+        - matrix
       responses:
         '200':
           description: Successful response
@@ -432,9 +432,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: matrix_api.get_matrix_data
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: pretty_print
           in: query
           type: boolean
@@ -451,11 +451,11 @@ paths:
       - $ref: '#/parameters/datasetid'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: matrix_api.get_matrix_data
+      operationId: matrix_api.get_matrix_data_json
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: pretty_print
           in: query
           type: boolean
@@ -472,11 +472,11 @@ paths:
       - $ref: '#/parameters/datasetid'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: matrix_api.get_matrix_csv
+      operationId: matrix_api.get_matrix_data_csv
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: include_rows
           in: query
           type: boolean
@@ -507,9 +507,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: matrix_api.get_matrix_data_png
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: min
           in: query
           type: number
@@ -553,9 +553,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: matrix_api.get_matrix_data_jpg
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: min
           in: query
           type: number
@@ -599,9 +599,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: matrix_api.get_matrix_rows
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -619,9 +619,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: matrix_api.get_matrix_row_ids
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -638,9 +638,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: matrix_api.get_matrix_cols
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -658,9 +658,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: matrix_api.get_matrix_col_ids
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -677,9 +677,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: matrix_api.get_matrix_raw
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -700,9 +700,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: matrix_api.get_matrix_hist
       tags:
-        -matrix
+        - matrix
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: bins
           in: query
           required: false
@@ -724,7 +724,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table
       tags:
-        -table
+        - table
       responses:
         '200':
           description: Successful response
@@ -739,9 +739,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_data
       tags:
-        -table
+        - table
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: pretty_print
           in: query
           type: boolean
@@ -758,11 +758,11 @@ paths:
       - $ref: '#/parameters/datasetid'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: table_api.get_table_data
+      operationId: table_api.get_table_data_json
       tags:
-        -table
+        - table
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: pretty_print
           in: query
           type: boolean
@@ -781,9 +781,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_data_csv
       tags:
-        -table
+        - table
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: include_rows
           in: query
           type: boolean
@@ -810,9 +810,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_rows
       tags:
-        -table
+        - table
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -830,9 +830,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_row_ids
       tags:
-        -table
+        - table
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -849,9 +849,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_raw
       tags:
-        -table
+        - table
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -876,9 +876,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_column
       tags:
-        -table
+        - table
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -898,9 +898,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_view
       tags:
-        -table
+        - table
       parameters:
-        # any parameter for view
+        - $ref: '#/parameters/viewargs'
         - name: pretty_print
           in: query
           type: boolean
@@ -918,11 +918,11 @@ paths:
       - $ref: '#/parameters/viewname'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: table_api.get_table_view
+      operationId: table_api.get_table_view_data_json
       tags:
-        -table
+        - table
       parameters:
-        # any parameter for view
+        - $ref: '#/parameters/viewargs'
         - name: pretty_print
           in: query
           type: boolean
@@ -940,11 +940,11 @@ paths:
       - $ref: '#/parameters/viewname'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: table_api.get_table_view_csv
+      operationId: table_api.get_table_view_data_csv
       tags:
-        -table
+        - table
       parameters:
-        # any parameter for view
+        - $ref: '#/parameters/viewargs'
         - name: include_rows
           in: query
           type: boolean
@@ -972,9 +972,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_view_rows
       tags:
-        -table
+        - table
       parameters:
-        # any parameter for view
+        - $ref: '#/parameters/viewargs'
       responses:
         '200':
           description: Successful response
@@ -993,9 +993,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_view_row_ids
       tags:
-        -table
+        - table
       parameters:
-        # any parameter for view
+        - $ref: '#/parameters/viewargs'
       responses:
         '200':
           description: Successful response
@@ -1014,9 +1014,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: table_api.get_table_view_raw
       tags:
-        -table
+        - table
       parameters:
-        # any parameter for view
+        - $ref: '#/parameters/viewargs'
       responses:
         '200':
           description: Successful response
@@ -1025,8 +1025,8 @@ paths:
             items:
               type: array
               items:
-                format: any
                 type: string
+                format: any
         '404':
           $ref: '#/responses/notFound'
 
@@ -1037,7 +1037,7 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: vector_api.get_vector
       tags:
-        -vector
+        - vector
       responses:
         '200':
           description: Successful response
@@ -1052,9 +1052,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: vector_api.get_vector_data
       tags:
-        -vector
+        - vector
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: pretty_print
           in: query
           type: boolean
@@ -1071,11 +1071,11 @@ paths:
       - $ref: '#/parameters/datasetid'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: vector_api.get_vector_data
+      operationId: vector_api.get_vector_data_json
       tags:
-        -vector
+        - vector
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: pretty_print
           in: query
           type: boolean
@@ -1092,11 +1092,11 @@ paths:
       - $ref: '#/parameters/datasetid'
     get:
       x-swagger-router-controller: phovea_server
-      operationId: vector_api.get_vector_csv
+      operationId: vector_api.get_vector_data_csv
       tags:
-        -vector
+        - vector
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: include_rows
           in: query
           type: boolean
@@ -1123,9 +1123,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: vector_api.get_vector_rows
       tags:
-        -vector
+        - vector
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -1143,9 +1143,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: vector_api.get_vector_row_ids
       tags:
-        -vector
+        - vector
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -1162,9 +1162,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: vector_api.get_vector_raw
       tags:
-        -vector
+        - vector
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
       responses:
         '200':
           description: Successful response
@@ -1183,9 +1183,9 @@ paths:
       x-swagger-router-controller: phovea_server
       operationId: vector_api.get_vector_hist
       tags:
-        -vector
+        - vector
       parameters:
-        - $ref: '#/definitions/range'
+        - $ref: '#/parameters/range'
         - name: bins
           in: query
           required: false
@@ -1199,12 +1199,19 @@ paths:
               type: integer
         '404':
           $ref: '#/responses/notFound'
+
 parameters:
   viewname:
     name: viewname
     in: path
     required: true
     type: string
+  viewargs:
+    name: args
+    in: query
+    required: false
+    type: string
+    format: json
   datasetid:
     name: datasetid
     in: path
@@ -1531,6 +1538,7 @@ definitions:
       - data
       - rows
       - rowIds
+
 responses:
   success_graph_desc:
     description: Successful response

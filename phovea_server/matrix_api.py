@@ -28,6 +28,9 @@ def get_matrix_data(datasetid, range=None, pretty_print=False):
   return to_json(d, allow_nan=False)
 
 
+get_matrix_data_json = get_matrix_data
+
+
 def get_matrix_data_csv(datasetid, range=None, include_rows=False, include_cols=False, delimiter=';'):
   range = to_range(range)
   dataset = _get_dataset(datasetid)
