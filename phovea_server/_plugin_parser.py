@@ -9,8 +9,11 @@ from past.builtins import basestring
 from builtins import object
 from ._utils import replace_variables
 from .config import view
+import logging
+
 
 cc = view('phovea_server')
+_log = logging.getLogger(__name__)
 
 
 def is_disabled_plugin(p):
@@ -20,6 +23,10 @@ def is_disabled_plugin(p):
     return isinstance(disable, basestring) and re.match(disable, p.id)
 
   return any(map(check, cc.disable['plugins']))
+
+
+def is_development_mode():
+  return cc.env.startswith('dev')
 
 
 def is_disabled_extension(extension, extension_type, p):
@@ -116,6 +123,45 @@ class DirectoryPlugin(object):
     regfile(p.join(self.folder, self.id, '__init__.py'))
 
 
+class DirectoryProductionPlugin(object):
+  def __init__(self, folder):
+    import os.path as p
+    self.id = p.basename(folder)
+    self.name = self.id
+    self.title = self.id
+    self.description = ''
+    self.homepage = ''
+    self.version = ''
+    self.extensions = []
+    self.repository = ''
+    self.folder = folder
+
+  @staticmethod
+  def is_app():
+    return False
+
+  def config_file(self):
+    import os.path as p
+    f = p.join(self.folder, 'config.json')
+    return f if p.exists(f) else None
+
+  def register(self, reg):
+    import os.path as p
+    import sys
+
+    def regfile(f):
+      if not p.exists(f):
+        return
+      # append path ../__init__.py
+      sys.path.append(p.abspath(p.dirname(p.dirname(f))))
+      import importlib
+      m = importlib.import_module(self.id)
+      if hasattr(m, 'phovea'):
+        m.phovea(reg)
+
+    regfile(p.join(self.folder, '__init__.py'))
+
+
 class EntryPointPlugin(object):
   def __init__(self, entry_point, config_entry_point):
     self.id = entry_point.name
@@ -133,7 +179,8 @@ class EntryPointPlugin(object):
     import os.path
     self.folder = os.path.dirname(f) if f else '.'
 
-  def is_app(self):
+  @staticmethod
+  def is_app():
     return False
 
   def config_file(self):
@@ -162,17 +209,56 @@ class RegHelper(object):
     self._items.append(desc)
 
 
+def _find_entry_point_plugins():
+  import pkg_resources as p
+  configs = {ep.name: ep for ep in p.iter_entry_points(group='phovea.config')}
+  return [EntryPointPlugin(ep, configs.get(ep.name)) for ep in p.iter_entry_points(group='phovea.registry')]
+
+
+def _find_development_neighbor_plugins():
+  import os.path as p
+  import glob
+  import itertools
+  prefix = ['./', '../', '../../']
+  suffix = ['', 'p/', 'public/']
+  files = []
+  for pre, s in itertools.product(prefix, suffix):
+    files.extend((p.abspath(pi) for pi in glob.glob(pre + s + '*/package.json')))
+  # files contains all plugins
+  return [DirectoryPlugin(pi) for pi in files]
+
+
+def _find_production_neighbor_plugins():
+  import os.path as p
+  import glob
+  base_dir = p.dirname(p.dirname(__file__))
+  # all dirs having both __init__.py and config.json contained
+  dirs = [p.dirname(p.abspath(pi)) for pi in glob.glob(base_dir + '/*/__init__.py')]
+  dirs = [d for d in dirs if p.exists(p.join(d, 'config.json'))]
+  # files contains all plugins
+  return [DirectoryProductionPlugin(d) for d in dirs]
+
+
 class PluginMetaData(object):
   def __init__(self):
     self.plugins = []
 
-    entrypoints = self.find_entry_point_plugins()
+    entrypoints = _find_entry_point_plugins()
     self.plugins.extend(p for p in entrypoints if not is_disabled_plugin(p))
+    entrypoint_ids = frozenset([p.id for p in self.plugins])
 
-    neigbhors = self.find_neighbor_plugins()
-    self.plugins.extend(p for p in neigbhors if not is_disabled_plugin(p))
+    if is_development_mode():
+      _log.info('looking for development neighbors')
+      neigbhors = _find_development_neighbor_plugins()
+    else:
+      _log.info('looking for production neighbors')
+      neigbhors = _find_production_neighbor_plugins()
+
+    self.plugins.extend(p for p in neigbhors if not is_disabled_plugin(p) and p.id not in entrypoint_ids)
 
     self.plugins.sort(key=lambda p: p.id)
+
+    _log.info('discovered %d plugins: %s', len(self.plugins), [d.id for d in self.plugins])
 
     self.server_extensions = []
     for p in self.plugins:
@@ -181,23 +267,6 @@ class PluginMetaData(object):
       ext = [r for r in reg if not is_disabled_extension(r, 'python', p)]
       p.extensions = ext
       self.server_extensions.extend(ext)
-
-  def find_entry_point_plugins(self):
-    import pkg_resources as p
-    configs = {ep.name: ep for ep in p.iter_entry_points(group='phovea.config')}
-    return [EntryPointPlugin(ep, configs.get(ep.name)) for ep in p.iter_entry_points(group='phovea.registry')]
-
-  def find_neighbor_plugins(self):
-    import os.path as p
-    import glob
-    import itertools
-    prefix = ['./', '../', '../../']
-    suffix = ['', 'p/', 'public/']
-    files = []
-    for pre, s in itertools.product(prefix, suffix):
-      files.extend((p.abspath(pi) for pi in glob.glob(pre + s + '*/package.json')))
-    # files contains all plugins
-    return [DirectoryPlugin(pi) for pi in files]
 
 
 def parse():

@@ -5,11 +5,12 @@ env:
   - TOXENV=py34
 
 install:
-  - sudo apt-get install -y cython
-  - sudo apt-get install -y `cat debian_packages.txt | tr '\r' ' ' | tr '\n' ' '`
+  - (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get install -y))
   - pip install -r requirements_dev.txt
   - pip install -r requirements.txt
 
+addons:
+  firefox: 49.0.1
 script: npm run dist
 
 deploy:

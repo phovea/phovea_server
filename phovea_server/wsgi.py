@@ -6,5 +6,4 @@
 from __future__ import print_function
 from . import launch
 
-if __name__ == '__main__':
-  launch.run()
+application = launch.create_embedded()

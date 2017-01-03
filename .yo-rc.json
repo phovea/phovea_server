@@ -2,6 +2,7 @@
   "generator-phovea": {
     "type": "service",
     "name": "phovea_server",
+    "serviceName": "api",
     "author": "The Caleydo Team",
     "githubAccount": "phovea",
     "modules": [],
@@ -205,14 +206,7 @@
         "matplotlib>=1.3.1",
         "json-cfg==0.4.1",
         "future==0.16.0"
-      ],
-      "debianPackages": [
-        "python-numpy",
-        "python-scipy",
-        "python-matplotlib",
-        "python-pandas"
-      ],
-      "redhatPackages": []
+      ]
     },
     "today": "Thu, 03 Nov 2016 14:43:16 GMT"
   }

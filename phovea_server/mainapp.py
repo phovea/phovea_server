@@ -10,32 +10,35 @@ from . import ns
 import os
 import re
 
-app = ns.Namespace(__name__)
 black_list = re.compile(r'(.*\.(py|pyc|gitignore|gitattributes)|(\w+)/((config|package)\.json|_deploy/.*))')
+public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'public'))
 
 
-def is_on_black_list(path):
+def _is_on_black_list(path):
   # print 'check',path,black_list.match(path) is not None
   return black_list.match(path) is not None
 
 
-@app.route('/')
-def index():
-  return generate_index()
-
-
-@app.route('/<path:path>')
-def deliver(path):
+def _deliver_production(path):
   # print path
   if path.endswith('/'):
     path += 'index.html'
-  if is_on_black_list(path):
+  if _is_on_black_list(path):
+    return 'This page does not exist', 404
+  # serve public
+  return ns.send_from_directory(public_dir, path)
+
+
+def _deliver(path):
+  # print path
+  if path.endswith('/'):
+    path += 'index.html'
+  if _is_on_black_list(path):
     return 'This page does not exist', 404
 
   # serve public
-  d = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'public'))
-  if os.path.exists(ns.safe_join(d, path)):
-    return ns.send_from_directory(d, path)
+  if os.path.exists(ns.safe_join(public_dir, path)):
+    return ns.send_from_directory(public_dir, path)
 
   # check all plugins
   elems = path.split('/')
@@ -54,8 +57,7 @@ def deliver(path):
   return 'This page does not exist', 404
 
 
-@app.route('/index.html')
-def generate_index():
+def _generate_index():
   text = [
       """
       <!DOCTYPE html><html><head lang="en">
@@ -98,4 +100,13 @@ def generate_index():
 
 
 def default_app():
+  from .config import view
+  app = ns.Namespace(__name__)
+  cc = view('phovea_server')
+  if cc.env.startswith('dev'):
+    app.add_url_rule('/', 'index', _generate_index)
+    app.add_url_rule('/index.html', 'index', _generate_index)
+    app.add_url_rule('/<path:path>', 'deliver', _deliver)
+  else:
+    app.add_url_rule('/<path:path>', 'deliver', _deliver_production)
   return app

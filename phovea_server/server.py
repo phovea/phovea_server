@@ -3,11 +3,10 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
-
-
 from __future__ import absolute_import
 import gevent.monkey
 import logging.config
+
 
 gevent.monkey.patch_all()  # ensure the standard libraries are patched
 
@@ -16,6 +15,7 @@ gevent.monkey.patch_all()  # ensure the standard libraries are patched
 def _get_config():
   from . import config
   return config.view('phovea_server')
+
 
 # append the plugin directories as primary lookup path
 cc = _get_config()
@@ -85,7 +85,7 @@ def _loader(p):
   return load_app
 
 
-def _create_application():
+def create_application():
   from . import dispatcher
   from . import mainapp
   from .plugin import list as list_plugins
@@ -100,24 +100,19 @@ def _create_application():
   application = dispatcher.PathDispatcher(_default_app, _applications)
   return ProxyFix(application)
 
-# the public wsgi application
-application = _create_application()
 
-
-def run():
-  import argparse
-  from geventwebsocket.handler import WebSocketHandler
-  from gevent.pywsgi import WSGIServer
-
-  parser = argparse.ArgumentParser(description='Caleydo Web Server')
+def create(parser):
   parser.add_argument('--port', '-p', type=int, default=cc.getint('port'),
                       help='server port')
   parser.add_argument('--address', '-a', default=cc.get('address'),
                       help='server address')
-  parser.add_argument('--use_reloader', action='store_true', help='whether to automatically reload the server')
-  args = parser.parse_args()
-  http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
-  http_server.serve_forever()
 
-  # from werkzeug.serving import run_simple
-  # run_simple(args.address, args.port, application, use_reloader=args.use_reloader or phovea_server.config.getboolean('use_reloader','phovea_server'))
+  def _launcher(args):
+    from geventwebsocket.handler import WebSocketHandler
+    from gevent.pywsgi import WSGIServer
+    application = create_application()
+    http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
+
+    return http_server.serve_forever
+
+  return _launcher

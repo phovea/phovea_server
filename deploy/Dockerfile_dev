@@ -1,0 +1,31 @@
+FROM python:2.7
+
+MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
+WORKDIR /phovea
+
+# install node
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+RUN apt-get install -y nodejs
+
+# install openssh-server for python debugging
+RUN apt-get install -y openssh-server \
+  && mkdir -p /var/run/sshd
+# Fix up SSH, probably should rip this out in real deploy situations.
+RUN echo 'root:docker' | chpasswd
+RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+# Expose SSH on 22, but this gets mapped to some other address.
+EXPOSE 22
+
+# install dependencies last step such that everything before can be cached
+COPY requirements*.txt docker_packages.txt ./
+RUN (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs apt-get install -y)) && pip install --no-cache-dir -r requirements.txt && (pip install --no-cache-dir -r requirements_dev.txt)
+
+ENV PHOVEA_ENV=dev
+ENV PHOVEA_SERVICE=api
+#start ssh and service
+CMD python phovea_server --use_reloader --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
+EXPOSE 80

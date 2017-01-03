@@ -91,6 +91,7 @@ def phovea(registry):
       'format': 'json',
       'factory': 'parse_json'
   })
+  registry.append('command', 'api', 'phovea_server.server', {'isDefault': True})
 
 
 def phovea_config():
