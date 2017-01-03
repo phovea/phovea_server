@@ -1,10 +1,10 @@
 {
-  "env": "development",
+  "env": "production",
   "debug": false,
-  "nocache": true,
+  "nocache": false,
   "error_stack_trace": false,
 
-  "port": 9000,
+  "port": 80,
   "address": "0.0.0.0",
 
   "dir": "./",
@@ -32,7 +32,6 @@
     "handlers": {
       "console": {
         "class": "logging.StreamHandler",
-        "level": "INFO",
         "formatter": "simple",
         "stream": "ext://sys.stdout"
       },
@@ -40,7 +39,7 @@
         "class": "phovea_server.TimedRotatingFileHandler",
         "level": "DEBUG",
         "formatter": "line",
-        "filename": "logs/phovea.log",
+        "filename": "/var/log/phovea/phovea.log",
         "when": "midnight",
         "backupCount": 7
       }
@@ -55,10 +54,9 @@
       }
     },
     "root": {
-      "level": "DEBUG",
+      "level": "INFO",
       "handlers": [
-        "console",
-        "file"
+        "console"
       ]
     }
   }

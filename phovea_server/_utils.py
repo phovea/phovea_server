@@ -25,6 +25,7 @@ def extend(target, w):
 
 def replace_variables_f(s, lookup):
   import re
+  s = str(s)
   if re.match(r'^\$\{([^}]+)\}$', s):  # full string is a pattern
     s = s[2:len(s) - 1]
     v = lookup(s)
@@ -38,7 +39,7 @@ def replace_variables_f(s, lookup):
     if v is None:
       _log.error('cant resolve ' + m.group(1))
       return '$unresolved$'
-    return v
+    return str(v)
 
   return re.sub(r'\$\{([^}]+)\}', match, s)
 

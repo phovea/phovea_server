@@ -3,10 +3,9 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
-
-
 import gevent.monkey
 import logging.config
+
 
 gevent.monkey.patch_all()  # ensure the standard libraries are patched
 
@@ -15,6 +14,7 @@ gevent.monkey.patch_all()  # ensure the standard libraries are patched
 def _get_config():
   from . import config
   return config.view('phovea_server')
+
 
 # append the plugin directories as primary lookup path
 cc = _get_config()
@@ -84,22 +84,6 @@ def _loader(p):
   return load_app
 
 
-def enable_dev_mode():
-  _log.info('enabling development mode')
-  cc.set('env', 'development')
-  cc.set('debug', True)
-  cc.set('error_stack_trace', True)
-  cc.set('nocache', True)
-
-
-def enable_prod_mode():
-  _log.info('enabling production mode')
-  cc.set('env', 'production')
-  cc.set('debug', False)
-  cc.set('error_stack_trace', False)
-  cc.set('nocache', False)
-
-
 def create_application():
   import dispatcher
   import mainapp
@@ -116,44 +100,18 @@ def create_application():
   return ProxyFix(application)
 
 
-def _config_files():
-  """
-  list all known config files
-  :return:
-  """
-  from .plugin import plugins
-  return [p for p in (p.config_file() for p in plugins()) if p is not None]
-
-
-def run():
-  import argparse
-  from geventwebsocket.handler import WebSocketHandler
-  from gevent.pywsgi import WSGIServer
-
-  parser = argparse.ArgumentParser(description='Caleydo Web Server')
+def create(parser):
   parser.add_argument('--port', '-p', type=int, default=cc.getint('port'),
                       help='server port')
   parser.add_argument('--address', '-a', default=cc.get('address'),
                       help='server address')
-  parser.add_argument('--use_reloader', action='store_true', help='whether to automatically reload the server')
-  parser.add_argument('--env', default=cc.get('env'), help='environment mode (dev or prod)')
-  args = parser.parse_args()
 
-  if args.env.startswith('dev'):
-    enable_dev_mode()
-  else:
-    enable_prod_mode()
+  def _launcher(args):
+    from geventwebsocket.handler import WebSocketHandler
+    from gevent.pywsgi import WSGIServer
+    application = create_application()
+    http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
 
-  application = create_application()
-  http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
+    return http_server.serve_forever
 
-  if args.use_reloader:
-    _log.info('start using reloader...')
-    from werkzeug._reloader import run_with_reloader
-    run_with_reloader(http_server.serve_forever, extra_files=_config_files())
-  else:
-    _log.info('start serving...')
-    http_server.serve_forever()
-
-  # from werkzeug.serving import run_simple
-  # run_simple(args.address, args.port, application, use_reloader=args.use_reloader or phovea_server.config.getboolean('use_reloader','phovea_server'))
+  return _launcher
