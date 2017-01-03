@@ -5,6 +5,7 @@
 ###############################################################################
 
 
+from builtins import object
 import logging
 
 _log = logging.getLogger(__name__)
@@ -159,8 +160,8 @@ class Registry(object):
     if plugin_type is None:
       return self
     if not hasattr(plugin_type, '__call__'):  # not a callable
-      return filter(lambda x: x.type == plugin_type, self)
-    return filter(plugin_type, self)
+      return [x for x in self if x.type == plugin_type]
+    return [x for x in self if plugin_type(x)]
 
   def lookup(self, singleton_id):
     if singleton_id in self.singletons:

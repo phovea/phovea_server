@@ -3,6 +3,7 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
+from __future__ import absolute_import
 import gevent.monkey
 import logging.config
 
@@ -85,8 +86,8 @@ def _loader(p):
 
 
 def create_application():
-  import dispatcher
-  import mainapp
+  from . import dispatcher
+  from . import mainapp
   from .plugin import list as list_plugins
   from werkzeug.contrib.fixers import ProxyFix
 

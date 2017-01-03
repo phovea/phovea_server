@@ -5,6 +5,7 @@
 ###############################################################################
 
 
+from past.builtins import basestring
 import logging
 
 _log = logging.getLogger(__name__)

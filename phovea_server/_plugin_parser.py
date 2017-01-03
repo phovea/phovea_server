@@ -4,6 +4,9 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
+from builtins import map
+from past.builtins import basestring
+from builtins import object
 from ._utils import replace_variables
 from .config import view
 import logging

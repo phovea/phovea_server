@@ -5,6 +5,7 @@
 ###############################################################################
 
 
+from builtins import next
 from . import ns
 import os
 import re

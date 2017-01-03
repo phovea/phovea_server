@@ -5,6 +5,7 @@
 ###############################################################################
 
 
+from builtins import str
 from . import ns, plugin, range
 from .util import jsonify, to_json
 import logging
@@ -63,13 +64,13 @@ def _list_format_csv(data):
 
 def _to_query(query):
   keys = ['name', 'id', 'fqname', 'type']
-  act_query = {k: v for k, v in query.iteritems() if k in keys}
+  act_query = {k: v for k, v in query.items() if k in keys}
   if len(act_query) == 0:  # no query
     return lambda x: True
   import re
 
   def filter_elem(elem):
-    return all((re.match(v, getattr(elem, k, '')) for k, v in act_query.iteritems()))
+    return all((re.match(v, getattr(elem, k, '')) for k, v in act_query.items()))
 
   return filter_elem
 

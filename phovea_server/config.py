@@ -5,9 +5,11 @@
 ###############################################################################
 
 
+from __future__ import absolute_import
+from builtins import object
 import os
 import jsoncfg
-from _utils import replace_nested_variables, extend
+from ._utils import replace_nested_variables, extend
 import logging
 
 

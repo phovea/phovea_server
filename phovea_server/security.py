@@ -5,6 +5,8 @@
 ###############################################################################
 
 
+from builtins import str
+from builtins import object
 from . import plugin as p
 import sys
 
@@ -17,7 +19,7 @@ class User(object):
 
   def get_id(self):
     try:
-      return unicode(self.id)  # python 2
+      return str(self.id)  # python 2
     except NameError:
       return str(self.id)  # python 3
 
