@@ -34,14 +34,6 @@
         "class": "logging.StreamHandler",
         "formatter": "simple",
         "stream": "ext://sys.stdout"
-      },
-      "file": {
-        "class": "phovea_server.TimedRotatingFileHandler",
-        "level": "DEBUG",
-        "formatter": "line",
-        "filename": "/var/log/phovea/phovea.log",
-        "when": "midnight",
-        "backupCount": 7
       }
     },
     "loggers": {
