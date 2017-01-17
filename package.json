@@ -6,11 +6,12 @@
     "test": "test ! -d tests || python setup.py test",
     "prebuild": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test",
     "build": "python -c \"from distutils.dir_util import mkpath ; mkpath('./build/source')\" && (tar -c ./phovea_server --exclude '*.pyc' | tar -xC build/source)",
-    "predist": "npm run build",
+    "predist": "npm run build && npm run docs",
     "dist": "python setup.py bdist_egg",
     "predocker": "npm run build",
     "docker": "docker build -t phovea_server -f deploy/Dockerfile .",
-    "docker:dev": "docker build -t phovea_server -f deploy/Dockerfile_dev ."
+    "docker:dev": "docker build -t phovea_server -f deploy/Dockerfile_dev .",
+    "docs": "echo todo creating docs..."
   },
   "files": [
     "phovea_server",
