@@ -2,7 +2,7 @@ FROM python:2.7
 
 MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
 WORKDIR /phovea
-RUN printf "from phovea_server import launch\nlaunch.run()\n" > ./launch.py
+RUN printf "from phovea_server import launch\nlaunch.run()\n" > /phovea/launch.py
 
 RUN apt-get update
 
