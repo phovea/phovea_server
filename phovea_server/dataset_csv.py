@@ -440,7 +440,7 @@ class CSVVector(CSVEntry):
 
 def to_files(plugins):
   for plugin in plugins:
-    index = os.path.join(plugins.folder + '/data/' if not hasattr(plugins, 'inplace') else plugins.folder, 'index.json')
+    index = os.path.join(plugin.folder + '/data/' if not hasattr(plugin, 'inplace') else plugin.folder, 'index.json')
     if not os.path.isfile(index):
       continue
     with open(index, 'r') as f:
