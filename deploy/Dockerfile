@@ -2,6 +2,7 @@ FROM python:2.7
 
 MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
 WORKDIR /phovea
+RUN printf "from phovea_server import launch\nlaunch.run()\n" > ./launch.py
 
 RUN apt-get update
 
@@ -13,5 +14,5 @@ COPY ./build/source ./
 
 ENV PHOVEA_ENV=production
 ENV PHOVEA_SERVICE=api
-CMD python phovea_server --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
+CMD python launch.py --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
 EXPOSE 80
