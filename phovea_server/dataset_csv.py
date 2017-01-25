@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-from builtins import str,object
+from builtins import str, object
 import json
 import csv
 import os
@@ -32,7 +32,7 @@ class CSVEntry(ADataSetEntry):
     self._desc = desc
     desc['fqname'] = self.fqname
     desc['id'] = self.id
-    folder = project.folder + '/data/' if not hasAttr(project, 'inplace') else project.folder
+    folder = project.folder + '/data/' if not hasattr(project, 'inplace') else project.folder
     self._path = os.path.join(folder, self._desc['path'])
     del self._desc['path']
     self._project = project
