@@ -9,7 +9,7 @@ RUN apt-get update
 COPY requirements*.txt docker_packages.txt ./
 RUN (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs apt-get install -y)) && pip install --no-cache-dir -r requirements.txt
 
-COPY ./build/source ./phovea/
+COPY ./build/source ./
 
 ENV PHOVEA_ENV=production
 ENV PHOVEA_SERVICE=api
