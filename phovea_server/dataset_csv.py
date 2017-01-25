@@ -461,7 +461,7 @@ class DataPlugin(object):
     # add a magic plugin for the static data dir
     self.inplace = True  # avoid adding the data suffix
     self.folder = folder
-    self.id = folder
+    self.id = os.path.basename(folder)
 
   def save(self, f):
     import werkzeug.utils
