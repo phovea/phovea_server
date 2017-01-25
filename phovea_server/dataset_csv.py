@@ -5,13 +5,13 @@
 ###############################################################################
 
 
-from builtins import str
-from builtins import object
+from builtins import str,object
 import json
 import csv
 import os
 import numpy as np
 from .dataset_def import ADataSetEntry, ADataSetProvider
+from .config import view
 
 
 def assign_ids(ids, idtype):
@@ -32,8 +32,8 @@ class CSVEntry(ADataSetEntry):
     self._desc = desc
     desc['fqname'] = self.fqname
     desc['id'] = self.id
-    self._path = os.path.join(project.folder + '/data/' if not hasAttr(project, 'inplace') else project.folder,
-                              self._desc['path'])
+    folder = project.folder + '/data/' if not hasAttr(project, 'inplace') else project.folder
+    self._path = os.path.join(folder, self._desc['path'])
     del self._desc['path']
     self._project = project
 
@@ -132,9 +132,9 @@ class CSVStratification(CSVEntry):
 
     rows = np.array([di[0] for di in data[1:]])
     return {
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.idtype),
-      'groups': clusters
+        'rows': rows,
+        'rowIds': assign_ids(rows, self.idtype),
+        'groups': clusters
     }
 
   def rows(self, range=None):
@@ -206,11 +206,11 @@ class CSVMatrix(CSVEntry):
     else:
       dd = np.array([x[1:] for x in data[1:]])
     return {
-      'cols': cols,
-      'colIds': assign_ids(cols, self.coltype),
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.rowtype),
-      'data': dd
+        'cols': cols,
+        'colIds': assign_ids(cols, self.coltype),
+        'rows': rows,
+        'rowIds': assign_ids(rows, self.rowtype),
+        'data': dd
     }
 
   def rows(self, range=None):
@@ -348,9 +348,9 @@ class CSVTable(CSVEntry):
     df = pd.DataFrame(objs)
     df.index = rows
     return {
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.idtype),
-      'df': df
+        'rows': rows,
+        'rowIds': assign_ids(rows, self.idtype),
+        'df': df
     }
 
   def rows(self, range=None):
@@ -399,9 +399,9 @@ class CSVVector(CSVEntry):
   def _process(self, data):
     rows = np.array([x[0] for x in data[1:]])
     return {
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.idtype),
-      'data': np.array([x[1] for x in data[1:]])
+        'rows': rows,
+        'rowIds': assign_ids(rows, self.idtype),
+        'data': np.array([x[1] for x in data[1:]])
     }
 
   def rows(self, range=None):
@@ -440,7 +440,7 @@ class CSVVector(CSVEntry):
 
 def to_files(plugins):
   for plugin in plugins:
-    index = os.path.join(plugins.folder + '/data/' if not hasAttr(plugins, 'inplace') else plugins.folder, 'index.json')
+    index = os.path.join(plugins.folder + '/data/' if not hasattr(plugins, 'inplace') else plugins.folder, 'index.json')
     if not os.path.isfile(index):
       continue
     with open(index, 'r') as f:
@@ -459,7 +459,6 @@ def to_files(plugins):
 class DataPlugin(object):
   def __init__(self, folder):
     # add a magic plugin for the static data dir
-    from .config import view
     self.inplace = True  # avoid adding the data suffix
     self.folder = folder
     self.id = folder
