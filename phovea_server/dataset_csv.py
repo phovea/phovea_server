@@ -32,7 +32,8 @@ class CSVEntry(ADataSetEntry):
     self._desc = desc
     desc['fqname'] = self.fqname
     desc['id'] = self.id
-    self._path = os.path.join(project.folder + '/data/', self._desc['path'])
+    self._path = os.path.join(project.folder + '/data/' if not hasAttr(project, 'inplace') else project.folder,
+                              self._desc['path'])
     del self._desc['path']
     self._project = project
 
@@ -131,9 +132,9 @@ class CSVStratification(CSVEntry):
 
     rows = np.array([di[0] for di in data[1:]])
     return {
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.idtype),
-        'groups': clusters
+      'rows': rows,
+      'rowIds': assign_ids(rows, self.idtype),
+      'groups': clusters
     }
 
   def rows(self, range=None):
@@ -205,11 +206,11 @@ class CSVMatrix(CSVEntry):
     else:
       dd = np.array([x[1:] for x in data[1:]])
     return {
-        'cols': cols,
-        'colIds': assign_ids(cols, self.coltype),
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.rowtype),
-        'data': dd
+      'cols': cols,
+      'colIds': assign_ids(cols, self.coltype),
+      'rows': rows,
+      'rowIds': assign_ids(rows, self.rowtype),
+      'data': dd
     }
 
   def rows(self, range=None):
@@ -347,9 +348,9 @@ class CSVTable(CSVEntry):
     df = pd.DataFrame(objs)
     df.index = rows
     return {
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.idtype),
-        'df': df
+      'rows': rows,
+      'rowIds': assign_ids(rows, self.idtype),
+      'df': df
     }
 
   def rows(self, range=None):
@@ -398,9 +399,9 @@ class CSVVector(CSVEntry):
   def _process(self, data):
     rows = np.array([x[0] for x in data[1:]])
     return {
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.idtype),
-        'data': np.array([x[1] for x in data[1:]])
+      'rows': rows,
+      'rowIds': assign_ids(rows, self.idtype),
+      'data': np.array([x[1] for x in data[1:]])
     }
 
   def rows(self, range=None):
@@ -439,7 +440,7 @@ class CSVVector(CSVEntry):
 
 def to_files(plugins):
   for plugin in plugins:
-    index = os.path.join(plugin.folder, 'data/index.json')
+    index = os.path.join(plugins.folder + '/data/' if not hasAttr(plugins, 'inplace') else plugins.folder, 'index.json')
     if not os.path.isfile(index):
       continue
     with open(index, 'r') as f:
@@ -456,28 +457,27 @@ def to_files(plugins):
 
 
 class DataPlugin(object):
-  def __init__(self):
+  def __init__(self, folder):
     # add a magic plugin for the static data dir
     from .config import view
-    cc = view('phovea_server')
-    self.folder = cc.dataDir
-    self.id = 'data'
+    self.inplace = True  # avoid adding the data suffix
+    self.folder = folder
+    self.id = folder
 
   def save(self, f):
     import werkzeug.utils
     from .util import random_id
-    dir_ = os.path.join(self.folder, 'data')
-    if not os.path.exists(dir_):
-      os.makedirs(dir_)
+    if not os.path.exists(self.folder):
+      os.makedirs(self.folder)
     filename = os.path.basename(f.filename)
     filename = werkzeug.utils.secure_filename(filename + random_id(3) + '.csv')
-    path = os.path.join(dir_, filename)
+    path = os.path.join(self.folder, filename)
     f.save(path)
     return path
 
   def append(self, desc, path):
     desc['path'] = os.path.basename(path)
-    index = os.path.join(self.folder, 'data/index.json')
+    index = os.path.join(self.folder, 'index.json')
     old = []
     if os.path.isfile(index):
       with open(index, 'r') as f:
@@ -487,7 +487,8 @@ class DataPlugin(object):
       json.dump(old, f, indent=1)
 
 
-dataPlugin = DataPlugin()
+cc = view('phovea_server')
+dataPlugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
 
 
 class StaticFileProvider(ADataSetProvider):
@@ -496,6 +497,10 @@ class StaticFileProvider(ADataSetProvider):
     self.files = list(to_files(plugins))
 
     self.files.extend(to_files([dataPlugin]))
+    import glob
+    extras = [DataPlugin(f) for f in (os.path.dirname(f) for f in glob.glob(cc.dataDir + '/*/index.json')) if
+              os.path.basename(f) != 'data']
+    self.files.extend(to_files(extras))
 
   def __len__(self):
     return len(self.files)
