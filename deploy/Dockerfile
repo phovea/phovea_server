@@ -2,6 +2,7 @@ FROM python:2.7
 
 MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
 WORKDIR /phovea
+RUN printf "from phovea_server import launch\nlaunch.run()\n" > /phovea/launch.py
 
 RUN apt-get update
 
@@ -9,9 +10,9 @@ RUN apt-get update
 COPY requirements*.txt docker_packages.txt ./
 RUN (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs apt-get install -y)) && pip install --no-cache-dir -r requirements.txt
 
-COPY ./build/source ./phovea/
+COPY ./build/source ./
 
 ENV PHOVEA_ENV=production
 ENV PHOVEA_SERVICE=api
-CMD python phovea_server --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
+CMD python launch.py --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
 EXPOSE 80
