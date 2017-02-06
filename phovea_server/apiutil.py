@@ -6,7 +6,7 @@
 
 
 from flask import Flask
-from flask_restplus import Api, apidoc, Resource # no-qa
+from flask_restplus import Api, apidoc, Resource  # noqa
 
 
 def create_api(name, **kwargs):
