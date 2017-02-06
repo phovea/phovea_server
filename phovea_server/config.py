@@ -116,8 +116,9 @@ def _init_config():
   from . import phovea_config
   f = phovea_config()
   _merge_config(f, 'phovea_server')
-  global_ = os.path.abspath('config.json')
+  global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
   if os.path.exists(global_) and global_ != f:
+    print('configuration file: ' + global_)
     with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))
 
@@ -137,6 +138,7 @@ def merge_plugin_configs(plugins):
       _merge_config(f, plugin.id)
 
   # override with more important settings
-  if os.path.exists('config.json'):
-    with codecs.open('config.json', 'r', 'utf-8') as fi:
+  global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
+  if os.path.exists(global_):
+    with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))

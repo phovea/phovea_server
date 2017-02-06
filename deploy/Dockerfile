@@ -14,5 +14,6 @@ COPY ./build/source ./
 
 ENV PHOVEA_ENV=production
 ENV PHOVEA_SERVICE=api
+ENV PHOVEA_CONFIG_PATH=config.json
 CMD python launch.py --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
 EXPOSE 80
