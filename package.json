@@ -11,7 +11,7 @@
     "predocker": "npm run build",
     "docker": "docker build -t phovea_server -f deploy/Dockerfile .",
     "docker:dev": "docker build -t phovea_server -f deploy/Dockerfile_dev .",
-    "docs": "echo todo creating docs..."
+    "docs": "sphinx-apidoc -o docs -f ./phovea_server && sphinx-build ./docs build/docs"
   },
   "files": [
     "phovea_server",
