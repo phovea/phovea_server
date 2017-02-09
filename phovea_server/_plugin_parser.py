@@ -149,15 +149,28 @@ class DirectoryPlugin(object):
 class DirectoryProductionPlugin(object):
   def __init__(self, folder):
     import os.path as p
-    self.id = p.basename(folder)
-    self.name = self.id
-    self.title = self.id
-    self.description = ''
-    self.homepage = ''
-    self.version = ''
-    self.extensions = []
-    self.repository = ''
+    import json
     self.folder = folder
+    self.extensions = []
+    if p.exists(p.join(folder, 'buildInfo.json')):
+      with open(p.join(folder, 'buildInfo.json')) as f:
+        pkg = json.load(f)
+      self.id = pkg['name']
+      self.name = self.id
+      desc = pkg.get('description', '').split('\n')
+      self.title = desc.pop(0) if len(desc) > 1 else self.name
+      self.description = '\n'.join(desc)
+      self.homepage = pkg.get('homepage')
+      self.version = pkg['version']
+      self.repository = pkg.get('repository', {}).get('url')
+    else:
+      self.id = p.basename(folder)
+      self.name = self.id
+      self.title = self.id
+      self.description = ''
+      self.homepage = ''
+      self.version = ''
+      self.repository = ''
 
   @staticmethod
   def is_app():
@@ -191,6 +204,8 @@ class DirectoryProductionPlugin(object):
 
 class EntryPointPlugin(object):
   def __init__(self, entry_point, config_entry_point):
+    import os.path as p
+    import json
     self.id = entry_point.name
     self.name = self.id
     self.title = self.name
@@ -205,6 +220,16 @@ class EntryPointPlugin(object):
     f = self.config_file()
     import os.path
     self.folder = os.path.dirname(f) if f else '.'
+
+    if p.exists(p.join(self.folder, 'buildInfo.json')):
+      with open(p.join(self.folder, 'buildInfo.json')) as f:
+        pkg = json.load(f)
+      desc = pkg.get('description', '').split('\n')
+      self.title = desc.pop(0) if len(desc) > 1 else self.name
+      self.description = '\n'.join(desc)
+      self.homepage = pkg.get('homepage')
+      self.version = pkg['version']
+      self.repository = pkg.get('repository', {}).get('url')
 
   @staticmethod
   def is_app():

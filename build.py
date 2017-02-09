@@ -44,7 +44,8 @@ shutil.rmtree('build/source', ignore_errors=True)
 shutil.copytree(name, 'build/source', symlinks=False, ignore=shutil.ignore_patterns('*.pyc'))
 
 # create buildInfo.json
-build_info = dict(name=name, version=version, resolved=resolved)
+build_info = dict(name=name, version=version, resolved=resolved, description=pkg['description'],
+                  homepage=pkg.get('homepage'), repository=pkg.get('repository', {}).get('url'))
 
 # TODO create build Info
 
