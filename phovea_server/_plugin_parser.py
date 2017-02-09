@@ -162,7 +162,7 @@ class DirectoryProductionPlugin(object):
       self.description = '\n'.join(desc)
       self.homepage = pkg.get('homepage')
       self.version = pkg['version']
-      self.repository = pkg.get('repository', {}).get('url')
+      self.repository = pkg.get('repository', '')
     else:
       self.id = p.basename(folder)
       self.name = self.id
@@ -229,7 +229,7 @@ class EntryPointPlugin(object):
       self.description = '\n'.join(desc)
       self.homepage = pkg.get('homepage')
       self.version = pkg['version']
-      self.repository = pkg.get('repository', {}).get('url')
+      self.repository = pkg.get('repository', '')
 
   @staticmethod
   def is_app():
