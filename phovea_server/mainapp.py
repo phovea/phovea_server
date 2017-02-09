@@ -103,7 +103,6 @@ def _build_info():
   from .config import view
   from codecs import open
   from .plugin import metadata
-  cc = view('phovea_server')
 
   dependencies = []
   plugins = []
@@ -115,11 +114,12 @@ def _build_info():
       dependencies.extend([l.strip() for l in f.readlines()])
 
   for p in metadata().plugins:
-    desc = dict(name=p.name, version=p.version, resolved=p.resolved)
     if p.id == 'phovea_server':
-      for k, v in desc.items():
-        build_info[k] = v
+      build_info['name'] = p.name
+      build_info['version'] = p.version
+      build_info['resolved'] = p.resolved
     else:
+      desc = dict(name=p.name, version=p.version, resolved=p.resolved)
       plugins.append(desc)
 
   return ns.jsonify(build_info)
