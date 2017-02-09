@@ -58,18 +58,17 @@ def _deliver(path):
 
 
 def _generate_index():
-  text = [
-      """
-      <!DOCTYPE html><html><head lang="en">
-      <meta charset="UTF-8"> <title>Caleydo Web Apps</title>
-      <link href="//fonts.googleapis.com/css?family=Yantramanav:400,300" rel="stylesheet" type="text/css">
-      <link href="assets/main.css" rel="stylesheet" type="text/css"></head>
-      <body><div class="container"> <header>
-      <h1><img src="assets/caleydo_text_right.svg" alt="Caleydo" width="200" height="40"> Web Apps</h1> </header>
-      <main> <nav id="apps"> <input type="search" id="search" class="search" placeholder="Search App" autocomplete="off"/>
-      <div class="keyboard-navigation-hint"> <span>Jump to an app:</span> <span><b>&#8593;</b><b>&#8595;</b> to navigate</span> <span><b>&#8629;</b> to select</span> </div>
-      <ul class="list">
-      """]
+  text = ["""
+    <!DOCTYPE html><html><head lang="en">
+    <meta charset="UTF-8"> <title>Caleydo Web Apps</title>
+    <link href="//fonts.googleapis.com/css?family=Yantramanav:400,300" rel="stylesheet" type="text/css">
+    <link href="assets/main.css" rel="stylesheet" type="text/css"></head>
+    <body><div class="container"> <header>
+    <h1><img src="assets/caleydo_text_right.svg" alt="Caleydo" width="200" height="40"> Web Apps</h1> </header>
+    <main> <nav id="apps"> <input type="search" id="search" class="search" placeholder="Search App" autocomplete="off"/>
+    <div class="keyboard-navigation-hint"> <span>Jump to an app:</span> <span><b>&#8593;</b><b>&#8595;</b> to navigate</span> <span><b>&#8629;</b> to select</span> </div>
+    <ul class="list">
+    """]
 
   # filter list and get title for apps
   from .plugin import plugins
@@ -77,8 +76,9 @@ def _generate_index():
 
   for app in apps:
     text.append('<li>')
-    text.append(
-        '<a class="appinfo" href="/' + app.id + '/"><span class="title">' + app.title + '</span><span class="name">' + app.name + '</span><span class="description">' + app.description + '</span></a>')
+    text.append('<a class="appinfo" href="/' + app.id + '/"><span class="title">' +
+                app.title + '</span><span class="name">' + app.name + '</span><span class="description">' +
+                app.description + '</span></a>')
     text.append('<div class="links">')
     if app.homepage and app.homepage != '':
       text.append('<a href="' + app.homepage + '" target="_blank" class="homepage"><span>Visit homepage</span></a>')
@@ -89,14 +89,38 @@ def _generate_index():
     text.append('</div>')
     text.append('</li>')
 
-  text.append(
-      """</ul> </nav> </main> <footer>
-        <img src="assets/caleydo_c.svg" alt="Caleydo" width="20" height="20">
-        <a href="http://caleydo.org">caleydo.org</a> </footer></div>
-        <script src="assets/list.min.js"></script><script src="assets/main.js"></script>
-        </body></html>
-      """)
+  text.append("""</ul> </nav> </main> <footer>
+      <img src="assets/caleydo_c.svg" alt="Caleydo" width="20" height="20">
+      <a href="http://caleydo.org">caleydo.org</a> </footer></div>
+      <script src="assets/list.min.js"></script><script src="assets/main.js"></script>
+      </body></html>
+    """)
   return '\n'.join(text)
+
+
+def _build_info():
+  from codecs import open
+  from .plugin import metadata
+
+  dependencies = []
+  plugins = []
+  build_info = dict(plugins=plugins, dependencies=dependencies)
+
+  requirements = 'requirements.txt'
+  if os.path.exists(requirements):
+    with open(requirements, 'r', encoding='utf-8') as f:
+      dependencies.extend([l.strip() for l in f.readlines()])
+
+  for p in metadata().plugins:
+    if p.id == 'phovea_server':
+      build_info['name'] = p.name
+      build_info['version'] = p.version
+      build_info['resolved'] = p.resolved
+    else:
+      desc = dict(name=p.name, version=p.version, resolved=p.resolved)
+      plugins.append(desc)
+
+  return ns.jsonify(build_info)
 
 
 def default_app():
@@ -109,4 +133,5 @@ def default_app():
     app.add_url_rule('/<path:path>', 'deliver', _deliver)
   else:
     app.add_url_rule('/<path:path>', 'deliver', _deliver_production)
+  app.add_url_rule('/api/buildInfo.json', 'build_info', _build_info)
   return app
