@@ -58,8 +58,7 @@ def _deliver(path):
 
 
 def _generate_index():
-  text = [
-    """
+  text = ["""
     <!DOCTYPE html><html><head lang="en">
     <meta charset="UTF-8"> <title>Caleydo Web Apps</title>
     <link href="//fonts.googleapis.com/css?family=Yantramanav:400,300" rel="stylesheet" type="text/css">
@@ -77,8 +76,9 @@ def _generate_index():
 
   for app in apps:
     text.append('<li>')
-    text.append(
-      '<a class="appinfo" href="/' + app.id + '/"><span class="title">' + app.title + '</span><span class="name">' + app.name + '</span><span class="description">' + app.description + '</span></a>')
+    text.append('<a class="appinfo" href="/' + app.id + '/"><span class="title">' +
+                app.title + '</span><span class="name">' + app.name + '</span><span class="description">' +
+                app.description + '</span></a>')
     text.append('<div class="links">')
     if app.homepage and app.homepage != '':
       text.append('<a href="' + app.homepage + '" target="_blank" class="homepage"><span>Visit homepage</span></a>')
@@ -89,8 +89,7 @@ def _generate_index():
     text.append('</div>')
     text.append('</li>')
 
-  text.append(
-    """</ul> </nav> </main> <footer>
+  text.append("""</ul> </nav> </main> <footer>
       <img src="assets/caleydo_c.svg" alt="Caleydo" width="20" height="20">
       <a href="http://caleydo.org">caleydo.org</a> </footer></div>
       <script src="assets/list.min.js"></script><script src="assets/main.js"></script>
@@ -100,7 +99,6 @@ def _generate_index():
 
 
 def _build_info():
-  from .config import view
   from codecs import open
   from .plugin import metadata
 

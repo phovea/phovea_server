@@ -1,5 +1,3 @@
-import fnmatch
-import os
 import shutil
 from codecs import open
 import json
