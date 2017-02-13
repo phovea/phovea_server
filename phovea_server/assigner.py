@@ -10,6 +10,7 @@ from builtins import map
 from builtins import str
 from builtins import range
 from builtins import object
+from itertools import islice
 import logging
 
 _log = logging.getLogger(__name__)
@@ -19,6 +20,7 @@ class MemoryIDAssigner(object):
   """
   assigns ids to object in memory only, i.e. not persisted
   """
+
   def __init__(self):
     self._idsmapping = {}
 
@@ -32,6 +34,7 @@ class MemoryIDAssigner(object):
         if v == id:
           return k
       return None
+
     return list(map(lookup, uids))
 
   def load(self, idtype, mapping):
@@ -44,6 +47,14 @@ class MemoryIDAssigner(object):
     del self._idsmapping[idtype]
     # assuming incremental ids
     self._idsmapping[idtype] = {id: uid for id, uid in mapping}
+
+  def search(self, idtype, query, max_results=None):
+    if not idtype in self._idsmapping:
+      return []
+    mappings = self._idsmapping[idtype]
+    query = query.lower()
+
+    return list(islice((dict(id=v, name=k) for k, v in mappings.items() if query in k.lower()), max_results))
 
   def __call__(self, ids, idtype):
     """
@@ -62,6 +73,7 @@ class MemoryIDAssigner(object):
         i = len(cache)
         cache[id] = i
       return i
+
     return [add(id) for id in ids]
 
 
@@ -69,6 +81,7 @@ class DBIDAssigner(object):
   """
   assigns ids to object using a dbm database
   """
+
   def __init__(self):
     import anydbm
     import phovea_server.config
@@ -92,6 +105,7 @@ class DBIDAssigner(object):
     def lookup(id):
       key = self.to_backward_key(idtype, id)
       return self._db.get(key, None)
+
     return list(map(lookup, uids))
 
   def load(self, idtype, mapping):
@@ -115,6 +129,12 @@ class DBIDAssigner(object):
       max_uid = uid if max_uid is None else max(uid, max_uid)
       self._db[key] = str(uid)
       self._db[self.to_backward_key(idtype, uid)] = str(id).encode('ascii', 'ignore')
+
+  def search(self, idtype, query, max_results=None):
+    from fnmatch import fnmatch
+    pattern = idtype + '2id.*' + query + '*'
+
+    return list(islice((dict(id=v, name=k) for k, v in self._db.items() if fnmatch(k, pattern)), max_results))
 
   def __call__(self, ids, idtype):
     """
@@ -143,6 +163,7 @@ class SqliteIDAssigner(object):
   """
   assigns ids to object using a sqlite database
   """
+
   def __init__(self):
     import sqlite3
     import phovea_server.config
@@ -151,7 +172,8 @@ class SqliteIDAssigner(object):
     if not os.path.exists(base_dir):
       os.makedirs(base_dir)
     self._db = sqlite3.connect(base_dir + '/mapping.sqlite3')
-    self._db.execute('create table if not exists mapping(idtype text, name text, id int, primary key(idtype,name), unique (idtype,id))')
+    self._db.execute(
+      'CREATE TABLE IF NOT EXISTS mapping(idtype TEXT, name TEXT, id INT, PRIMARY KEY(idtype,name), UNIQUE (idtype,id))')
     self._cache = {}
 
   def unmap(self, uids, idtype):
@@ -162,6 +184,7 @@ class SqliteIDAssigner(object):
         if v == id:
           return k
       return None
+
     return list(map(lookup, uids))
 
   def get_cache(self, idtype):
@@ -171,7 +194,7 @@ class SqliteIDAssigner(object):
     if existing is None:
       existing = dict()
       self._cache[idtype] = existing
-      for row in self._db.execute('select name, id from mapping where idtype=?', (idtype,)):
+      for row in self._db.execute('SELECT name, id FROM mapping WHERE idtype=?', (idtype,)):
         existing[row[0]] = row[1]
 
     return existing
@@ -186,7 +209,7 @@ class SqliteIDAssigner(object):
     idtype = ascii(idtype)
     # delete cache
     del self._cache[idtype]
-    self._db.execute('delete from mapping where idtype=?', (idtype,))
+    self._db.execute('DELETE FROM mapping WHERE idtype=?', (idtype,))
 
     self._db.executemany('insert or ignore into mapping values ("' + idtype + '",?,?)', mapping)
     self._db.commit()
@@ -220,7 +243,12 @@ class SqliteIDAssigner(object):
 
     return r
 
-# TODO implement a Redis based id assigner
+  def search(self, idtype, query, max_results=None):
+    mappings = self.get_cache(idtype)
+    query = query.lower()
+    return list(islice((dict(id=v, name=k) for k, v in mappings.items() if query in k.lower()), max_results))
+
+
 # TODO implement a real id mappper
 
 _assigner = SqliteIDAssigner()
