@@ -220,6 +220,7 @@ def _maps_to(idtype):
   target_id_types = mapper.maps_to(idtype)
   return jsonify(target_id_types)
 
+
 @app_idtype.route('/<idtype>/search')
 def _search_ids(idtype):
   query = ns.request.args.get('q', None)
@@ -228,6 +229,7 @@ def _search_ids(idtype):
   if hasattr(manager, 'search'):
     return jsonify(manager.search(idtype, query, max_results))
   return jsonify([])
+
 
 @app_idtype.route('/<idtype>/<to_idtype>')
 def _mapping_to(idtype, to_idtype):

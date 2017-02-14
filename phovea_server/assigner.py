@@ -49,7 +49,7 @@ class MemoryIDAssigner(object):
     self._idsmapping[idtype] = {id: uid for id, uid in mapping}
 
   def search(self, idtype, query, max_results=None):
-    if not idtype in self._idsmapping:
+    if idtype not in self._idsmapping:
       return []
     mappings = self._idsmapping[idtype]
     query = query.lower()
@@ -172,8 +172,7 @@ class SqliteIDAssigner(object):
     if not os.path.exists(base_dir):
       os.makedirs(base_dir)
     self._db = sqlite3.connect(base_dir + '/mapping.sqlite3')
-    self._db.execute(
-      'CREATE TABLE IF NOT EXISTS mapping(idtype TEXT, name TEXT, id INT, PRIMARY KEY(idtype,name), UNIQUE (idtype,id))')
+    self._db.execute('CREATE TABLE IF NOT EXISTS mapping(idtype TEXT, name TEXT, id INT, PRIMARY KEY(idtype,name), UNIQUE (idtype,id))')
     self._cache = {}
 
   def unmap(self, uids, idtype):
