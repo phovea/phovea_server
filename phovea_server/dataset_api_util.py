@@ -8,6 +8,7 @@
 from .swagger import abort
 import logging
 from .dataset import get
+from .range import parse
 
 _log = logging.getLogger(__name__)
 
@@ -53,8 +54,7 @@ def to_query(**query):
 def to_range(r):
   if r is None or r == '':
     return None
-  import range as ranges
-  return ranges.parse(r)
+  return parse(r)
 
 
 def from_json(s):

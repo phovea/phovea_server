@@ -612,7 +612,7 @@ paths:
         '404':
           $ref: '#/responses/notFound'
 
-  /matrix/{datasetid}/rowsIds:
+  /matrix/{datasetid}/rowIds:
     parameters:
       - $ref: '#/parameters/datasetid'
     get:
@@ -651,7 +651,7 @@ paths:
         '404':
           $ref: '#/responses/notFound'
 
-  /matrix/{datasetid}/colsIds:
+  /matrix/{datasetid}/colIds:
     parameters:
       - $ref: '#/parameters/datasetid'
     get:
@@ -823,7 +823,7 @@ paths:
         '404':
           $ref: '#/responses/notFound'
 
-  /table/{datasetid}/rowsIds:
+  /table/{datasetid}/rowIds:
     parameters:
       - $ref: '#/parameters/datasetid'
     get:
@@ -985,7 +985,7 @@ paths:
         '404':
           $ref: '#/responses/notFound'
 
-  /table/{datasetid}/view/{viewname}/rowsIds:
+  /table/{datasetid}/view/{viewname}/rowIds:
     parameters:
       - $ref: '#/parameters/datasetid'
       - $ref: '#/parameters/viewname'
@@ -1136,7 +1136,7 @@ paths:
         '404':
           $ref: '#/responses/notFound'
 
-  /vector/{datasetid}/rowsIds:
+  /vector/{datasetid}/rowIds:
     parameters:
       - $ref: '#/parameters/datasetid'
     get:

@@ -6,7 +6,7 @@
 
 
 import logging
-from .dataset import get_idmanager, get_mappingmanager
+from .dataset import get_idmanager, get_mappingmanager, list_idtypes
 
 _log = logging.getLogger(__name__)
 
