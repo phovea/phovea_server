@@ -87,6 +87,37 @@ paths:
           schema:
             title: ID Name
             type: string
+  /{idtype}/search:
+    parameters:
+      - $ref: '#/parameters/idtype'
+      - name: q
+        in: query
+        description: the substring to look for
+        required: true
+        type: string
+      - name: limit
+        in: query
+        description: limit the number of results
+        default: 10
+        required: false
+        type: integer
+    get:
+      x-swagger-router-controller: phovea_server
+      operationId: idtype_api.get_search
+      description: returns a list of all found names with their id
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            title: ArrayOfIDAndNames
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
   /{idtype}/:
     parameters:
       - $ref: '#/parameters/idtype'

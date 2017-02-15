@@ -84,3 +84,10 @@ def _perform_mapping(source, target, names, first_only, to_ids):
     else:
       mapped_list = [m(entry, target) for entry in mapped_list]
   return mapped_list
+
+
+def get_search(idtype, q, limit=10):
+  manager = get_idmanager()
+  if hasattr(manager, 'search'):
+    return manager.search(idtype, q, limit)
+  return []
