@@ -5,8 +5,13 @@
 ###############################################################################
 
 
+from __future__ import division
+from builtins import str
+from builtins import range as number_range
+from past.builtins import basestring
+from builtins import object
 import itertools
-import math
+from functools import reduce
 
 all_f = all
 
@@ -112,7 +117,7 @@ class RangeElem(object):
     s = abs(self.step)
     if d <= 0:
       return 0
-    return math.floor(d / s)
+    return (d // s)
 
   def reverse(self):
     t = self.start if self.start < 0 else self.start + 1
@@ -128,7 +133,7 @@ class RangeElem(object):
     return self.iter()
 
   def iter(self, size=0):
-    return iter(xrange(fix(self.start, size), fix(self.end, size), self.step))
+    return iter(number_range(fix(self.start, size), fix(self.end, size), self.step))
 
   def contains(self, value, size=0):
     f = fix(self.start, size)
@@ -216,7 +221,7 @@ class Range1D(object):
         if abs(deltas[start]) == 1:
           r.append(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]))
         else:
-          for i in xrange(start, act):
+          for i in number_range(start, act):
             r.append(RangeElem.single(indices[i]))
       start = act
       act += 1
@@ -287,7 +292,7 @@ class Range1D(object):
     if ntimes == 1:
       return self
     r = []
-    for i in xrange(ntimes):
+    for i in number_range(ntimes):
       r.extend(self._elems)
     return Range1D(r)
 
@@ -304,7 +309,7 @@ class Range1D(object):
     s = sub.iter(len(l))
     r = []
     while s.hasNext():
-      i = s.next()
+      i = next(s)
       if 0 <= i < len(l):  # check for out of range
         r.append(l[i])
 
@@ -540,7 +545,7 @@ class Range(object):
   def __getitem__(self, item):
     if len(self.dims) > item:
       return self.dims[item]
-    for i in xrange(len(self.dims), item + 1):
+    for i in number_range(len(self.dims), item + 1):
       self.dims.append(Range1D.all())
     return self.dims[item]
 

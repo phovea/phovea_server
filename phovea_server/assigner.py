@@ -5,6 +5,11 @@
 ###############################################################################
 
 
+from builtins import ascii
+from builtins import map
+from builtins import str
+from builtins import range
+from builtins import object
 import logging
 
 _log = logging.getLogger(__name__)
@@ -27,7 +32,7 @@ class MemoryIDAssigner(object):
         if v == id:
           return k
       return None
-    return map(lookup, uids)
+    return list(map(lookup, uids))
 
   def load(self, idtype, mapping):
     """
@@ -47,7 +52,7 @@ class MemoryIDAssigner(object):
     if idtype not in self._idsmapping:
       self._idsmapping[idtype] = {id: i for i, id in enumerate(ids)}
       # 1 to 1 mapping
-      return range(len(ids))
+      return list(range(len(ids)))
 
     cache = self._idsmapping[idtype]
 
@@ -58,10 +63,6 @@ class MemoryIDAssigner(object):
         cache[id] = i
       return i
     return [add(id) for id in ids]
-
-
-def ascii(s):
-  return s.encode('ascii', 'ignore')
 
 
 class DBIDAssigner(object):
@@ -91,7 +92,7 @@ class DBIDAssigner(object):
     def lookup(id):
       key = self.to_backward_key(idtype, id)
       return self._db.get(key, None)
-    return map(lookup, uids)
+    return list(map(lookup, uids))
 
   def load(self, idtype, mapping):
     """
@@ -161,7 +162,7 @@ class SqliteIDAssigner(object):
         if v == id:
           return k
       return None
-    return map(lookup, uids)
+    return list(map(lookup, uids))
 
   def get_cache(self, idtype):
     existing = self._cache.get(idtype, None)

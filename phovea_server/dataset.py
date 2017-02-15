@@ -5,6 +5,7 @@
 ###############################################################################
 
 
+from past.builtins import basestring
 import phovea_server.plugin
 import phovea_server.range
 import phovea_server.util
@@ -98,7 +99,7 @@ def list_idtypes():
   for d in list_datasets():
     for idtype in d.to_idtype_descriptions():
       tmp[idtype['id']] = idtype
-  return tmp.values()
+  return list(tmp.values())
 
 
 def get_idmanager():
