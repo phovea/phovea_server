@@ -328,8 +328,9 @@ class CSVColumn(object):
     return self.asnumpy(range).tolist()
 
   def asnumpy(self, range=None):
+    import pandas as pd
     p = self._table.aspandas(range)[self.name]
-    if hasattr(p, '__len__'):
+    if isinstance(p, pd.DataFrame):
       return p.values
     return np.array([p])
 
