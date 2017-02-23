@@ -330,7 +330,7 @@ class CSVColumn(object):
   def asnumpy(self, range=None):
     import pandas as pd
     p = self._table.aspandas(range)[self.name]
-    if isinstance(p, pd.DataFrame):
+    if isinstance(p, pd.Series):
       return p.values
     return np.array([p])
 
