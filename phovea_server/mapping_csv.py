@@ -10,6 +10,9 @@ import json
 import os
 from .config import view
 from codecs import open
+import logging
+
+_log = logging.getLogger(__name__)
 
 
 def merge(idtype, species):
@@ -26,6 +29,7 @@ class FileMapper(object):
     self._desc = desc
     self.from_idtype = merge(desc['from'], desc.get('fromSpecies'))
     self.to_idtype = merge(desc['to'], desc.get('toSpecies'))
+    _log.info('loading csv mapping table from %s to %s', self.from_idtype, self.to_idtype)
     pass
 
   def _load(self):
@@ -65,14 +69,12 @@ class DataPlugin(object):
     self.id = os.path.basename(folder)
 
 
-cc = view('phovea_server')
-dataPlugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
-
-
 class StaticFileProvider(object):
   def __init__(self, plugins):
     self.files = list(to_files(plugins))
 
+    cc = view('phovea_server')
+    dataPlugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
     self.files.extend(to_files([dataPlugin]))
     import glob
     extras = [DataPlugin(f) for f in (os.path.dirname(f) for f in glob.glob(cc.dataDir + '/*/mapping.json')) if

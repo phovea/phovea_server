@@ -132,9 +132,9 @@ class CSVStratification(CSVEntry):
 
     rows = np.array([di[0] for di in data[1:]])
     return {
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.idtype),
-        'groups': clusters
+      'rows': rows,
+      'rowIds': assign_ids(rows, self.idtype),
+      'groups': clusters
     }
 
   def rows(self, range=None):
@@ -206,11 +206,11 @@ class CSVMatrix(CSVEntry):
     else:
       dd = np.array([x[1:] for x in data[1:]])
     return {
-        'cols': cols,
-        'colIds': assign_ids(cols, self.coltype),
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.rowtype),
-        'data': dd
+      'cols': cols,
+      'colIds': assign_ids(cols, self.coltype),
+      'rows': rows,
+      'rowIds': assign_ids(rows, self.rowtype),
+      'data': dd
     }
 
   def rows(self, range=None):
@@ -352,9 +352,9 @@ class CSVTable(CSVEntry):
     df = pd.DataFrame(objs)
     df.index = rows
     return {
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.idtype),
-        'df': df
+      'rows': rows,
+      'rowIds': assign_ids(rows, self.idtype),
+      'df': df
     }
 
   def rows(self, range=None):
@@ -403,9 +403,9 @@ class CSVVector(CSVEntry):
   def _process(self, data):
     rows = np.array([x[0] for x in data[1:]])
     return {
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.idtype),
-        'data': np.array([x[1] for x in data[1:]])
+      'rows': rows,
+      'rowIds': assign_ids(rows, self.idtype),
+      'data': np.array([x[1] for x in data[1:]])
     }
 
   def rows(self, range=None):
@@ -490,15 +490,13 @@ class DataPlugin(object):
       json.dump(old, f, indent=1)
 
 
-cc = view('phovea_server')
-dataPlugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
-
-
 class StaticFileProvider(ADataSetProvider):
   def __init__(self, plugins):
 
     self.files = list(to_files(plugins))
 
+    cc = view('phovea_server')
+    dataPlugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
     self.files.extend(to_files([dataPlugin]))
     import glob
     extras = [DataPlugin(f) for f in (os.path.dirname(f) for f in glob.glob(cc.dataDir + '/*/index.json')) if
