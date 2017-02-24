@@ -7,6 +7,7 @@
 
 from builtins import object, set
 from .plugin import list as list_plugin
+from itertools import izip
 import logging
 
 _log = logging.getLogger(__name__)
@@ -19,10 +20,13 @@ class MappingManager(object):
   def __init__(self):
     self.mappers = {}
     for plugin in list_plugin('mapping_provider'):
+      _log.info('loading mapping provider: %s', plugin.id)
       provider = plugin.load().factory()
       for (from_idtype, to_idtype, mapper) in provider:
         from_mappings = self.mappers.get(from_idtype, {})
+        self.mappers[from_idtype] = from_mappings
         to_mappings = from_mappings.get(to_idtype, [])
+        from_mappings[to_idtype] = to_mappings
         to_mappings.append(mapper)
 
   def can_map(self, from_idtype, to_idtype):
@@ -45,14 +49,15 @@ class MappingManager(object):
       return to_mappings[0](ids)
 
     # two way to preserve the order of the results
-    r = []
-    rset = set()
+    r = [[] for _ in ids]
+    rset = [set() for _ in ids]
     for mapper in to_mappings:
-      ri = mapper(ids)
-      for mapped in ri:
-        if mapped not in rset:
-          r.append(mapped)
-          rset.add(mapped)
+      mapped_ids = mapper(ids)
+      for mapped_id, rlist, rhash in izip(mapped_ids, r, rset):
+        for id in mapped_id:
+          if id not in rhash:
+            rlist.append(id)
+            rhash.add(id)
     return r
 
 

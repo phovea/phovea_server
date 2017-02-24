@@ -77,7 +77,8 @@ def phovea(registry):
   registry.append('json-encoder', 'numpy', 'phovea_server.json_encoder')
 
   registry.append('manager', 'idmanager', 'phovea_server.assigner', dict(singleton=True))
-  registry.append('manager', 'mappingmanager', 'phovea_data_redis.mapper', dict(singleton=True))
+  registry.append('manager', 'mappingmanager', 'phovea_server.mapper', dict(singleton=True))
+  registry.append('mapping_provider', 'csv', 'phovea_server.mapping_csv')
 
   registry.append('dataset-specific-handler', 'handler-graph', 'phovea_server.graph_api', {
       'datatype': 'graph',

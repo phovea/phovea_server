@@ -34,6 +34,8 @@ class FileMapper(object):
 
   def _load(self):
     import csv
+
+    _log.info('loading real mapping file from %s to %s', self.from_idtype, self.to_idtype)
     with open(self._path, 'r', 'utf-8') as csvfile:
       reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ',').encode('ascii', 'ignore'), quotechar='"')
       self._map = dict()
