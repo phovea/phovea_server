@@ -27,6 +27,22 @@ def fix_id(fqname):
   return fix_id(fqname)
 
 
+def basic_description(data, type, path):
+  import datetime
+  from .security import current_username
+  desc = dict(type=type,
+              name=data.get('name', 'Uploaded File'),
+              description=data.get('description', ''),
+              creator=current_username,
+              ts=datetime.datetime.utcnow(),
+              path=os.path.basename(path))
+  if 'group' in data:
+    desc['group']= data['group']
+  if 'permissions' in data:
+    desc['permissions'] = data['permissions']
+
+  return desc
+
 class CSVEntryMixin(object):
   def __init__(self, desc, project):
     self._desc = desc
@@ -158,10 +174,9 @@ class CSVStratification(AStratification, CSVEntryMixin):
 
   @staticmethod
   def parse(data, path, project, id=None):
-    desc = dict(type='stratification',
-                name=data.get('name', 'Uploaded File'),
-                path=os.path.basename(path),
-                idtype=data.get('idtype', data.get('rowtype', 'unknown')))
+    desc = basic_description(data, 'stratification', path)
+    desc['idtype'] = data.get('idtype', data.get('rowtype', 'unknown'))
+
     for k, v in data.items():
       if k not in desc:
         desc[k] = v
@@ -266,12 +281,11 @@ class CSVMatrix(AMatrix, CSVEntryMixin):
 
   @staticmethod
   def parse(data, path, project, id=None):
-    desc = dict(type='matrix',
-                name=data.get('name', 'Uploaded File'),
-                path=os.path.basename(path),
-                rowtype=data.get('rowtype', 'unknown'),
-                coltype=data.get('coltype', 'unknown'),
-                value=dict(type=data.get('value_type', 'real')))
+    desc = basic_description(data, 'matrix', path)
+    desc['rowtype'] = data.get('rowtype', 'unknown')
+    desc['coltype'] = data.get('coltype', 'unknown')
+    desc['value'] = dict(type=data.get('value_type', 'real'))
+
     for k, v in data.items():
       if k not in desc:
         desc[k] = v
@@ -467,11 +481,8 @@ class StaticFileProvider(ADataSetProvider):
 
     self.files.extend(to_files([dataPlugin]))
 
-  def __len__(self):
-    return len(self.files)
-
   def __iter__(self):
-    return iter(self.files)
+    return iter((f for f in self.files if f.can_read()))
 
   def upload(self, data, files, id=None):
     if 'csv' != data.get('_provider', 'csv'):
