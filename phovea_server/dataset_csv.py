@@ -36,11 +36,12 @@ def basic_description(data, type, path):
               ts=datetime.datetime.utcnow(),
               path=os.path.basename(path))
   if 'group' in data:
-    desc['group']= data['group']
+    desc['group'] = data['group']
   if 'permissions' in data:
     desc['permissions'] = data['permissions']
 
   return desc
+
 
 class CSVEntryMixin(object):
   def __init__(self, desc, project):
@@ -148,11 +149,10 @@ class CSVStratification(CSVEntryMixin, AStratification):
     clusters = [dict(name=k, range=clusters.get(k, []), color=colors.get(k, 'gray')) for k in groups]
 
     rows = np.array([di[0] for di in data[1:]])
-    return {
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.idtype),
-        'groups': clusters
-    }
+    return {'rows': rows,
+            'rowIds': assign_ids(rows, self.idtype),
+            'groups': clusters
+            }
 
   def rows(self, range=None):
     n = self.load()['rows']
@@ -224,13 +224,12 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
       dd = np.array(vs)
     else:
       dd = np.array([x[1:] for x in data[1:]])
-    return {
-        'cols': cols,
-        'colIds': assign_ids(cols, self.coltype),
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.rowtype),
-        'data': dd
-    }
+    return {'cols': cols,
+            'colIds': assign_ids(cols, self.coltype),
+            'rows': rows,
+            'rowIds': assign_ids(rows, self.rowtype),
+            'data': dd
+            }
 
   def rows(self, range=None):
     n = self.load()['rows']
@@ -355,11 +354,10 @@ class CSVTable(CSVEntryMixin, ATable):
     objs = {c.name: [x[i + 1] for x in data[1:]] for i, c in enumerate(self.columns)}
     df = pd.DataFrame(objs)
     df.index = rows
-    return {
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.idtype),
-        'df': df
-    }
+    return {'rows': rows,
+            'rowIds': assign_ids(rows, self.idtype),
+            'df': df
+            }
 
   def rows(self, range=None):
     n = self.load()['rows']
@@ -396,11 +394,10 @@ class CSVVector(CSVEntryMixin, AVector):
 
   def _process(self, data):
     rows = np.array([x[0] for x in data[1:]])
-    return {
-        'rows': rows,
-        'rowIds': assign_ids(rows, self.idtype),
-        'data': np.array([x[1] for x in data[1:]])
-    }
+    return {'rows': rows,
+            'rowIds': assign_ids(rows, self.idtype),
+            'data': np.array([x[1] for x in data[1:]])
+            }
 
   def rows(self, range=None):
     n = self.load()['rows']

@@ -59,6 +59,7 @@ class User(object):
     # We set it back to its default implementation
     __hash__ = object.__hash__
 
+
 ANONYMOUS_USER = User(ANONYMOUS)
 
 
@@ -179,13 +180,15 @@ PERMISSION_EXECUTE = 1
 
 
 def to_number(p_set):
-  return (PERMISSION_READ if PERMISSION_READ in p_set else 0) + (PERMISSION_WRITE if PERMISSION_WRITE in p_set else 0) + (
-    PERMISSION_EXECUTE if PERMISSION_EXECUTE in p_set else 0)
+  return (PERMISSION_READ if PERMISSION_READ in p_set else 0) + \
+         (PERMISSION_WRITE if PERMISSION_WRITE in p_set else 0) + \
+         (PERMISSION_EXECUTE if PERMISSION_EXECUTE in p_set else 0)
 
 
 def to_string(p_set):
-  return ('r' if PERMISSION_READ in p_set else '-') + ('w' if PERMISSION_WRITE in p_set else '-') + (
-    'x' if PERMISSION_EXECUTE in p_set else '-')
+  return ('r' if PERMISSION_READ in p_set else '-') + \
+         ('w' if PERMISSION_WRITE in p_set else '-') + \
+         ('x' if PERMISSION_EXECUTE in p_set else '-')
 
 
 def _from_number(p):

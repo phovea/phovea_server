@@ -40,7 +40,7 @@ class AGraph(ADataSetEntry):
   __metaclass__ = abc.ABCMeta
 
   def __init__(self, name, project, id=None, attrs=None):
-    super(Graph, self).__init__(name, project, 'graph', id)
+    super(AGraph, self).__init__(name, project, 'graph', id)
     self.attrs = {} if attrs is None else attrs
 
   @abc.abstractmethod
@@ -60,7 +60,7 @@ class AGraph(ADataSetEntry):
     return len(self.edges())
 
   def to_description(self):
-    r = super(Graph, self).to_description()
+    r = super(AGraph, self).to_description()
     r['size'] = [self.nnodes, self.nedges]
     r['attrs'] = self.attrs
     return r
