@@ -18,10 +18,7 @@ class User(object):
     self.roles = ['anonymous']
 
   def get_id(self):
-    try:
-      return str(self.id)  # python 2
-    except NameError:
-      return str(self.id)  # python 3
+    return str(self.id)
 
   @property
   def is_authenticated(self):
@@ -39,17 +36,17 @@ class User(object):
     return role in self.roles
 
   def __eq__(self, other):
-    '''
+    """
     Checks the equality of two `UserMixin` objects using `get_id`.
-    '''
+    """
     if isinstance(other, User):
       return self.get_id() == other.get_id()
     return NotImplemented
 
   def __ne__(self, other):
-    '''
+    """
     Checks the inequality of two `UserMixin` objects using `get_id`.
-    '''
+    """
     equal = self.__eq__(other)
     if equal is NotImplemented:
       return NotImplemented
