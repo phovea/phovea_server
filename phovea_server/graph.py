@@ -7,6 +7,7 @@
 
 from builtins import object
 from .dataset_def import ADataSetEntry
+import abc
 
 
 class GraphNode(object):
@@ -36,23 +37,27 @@ class GraphEdge(object):
 
 
 class Graph(ADataSetEntry):
+  __metaclass__ = abc.ABCMeta
+
   def __init__(self, name, project, id=None, attrs=None):
     super(Graph, self).__init__(name, project, 'graph', id)
     self.attrs = {} if attrs is None else attrs
 
+  @abc.abstractmethod
   def nodes(self, range=None):
     return []
 
   @property
   def nnodes(self):
-    return 0
+    return len(self.nodes())
 
+  @abc.abstractmethod
   def edges(self, range=None):
     return []
 
   @property
   def nedges(self):
-    return 0
+    return len(self.edges())
 
   def to_description(self):
     r = super(Graph, self).to_description()
@@ -74,7 +79,7 @@ class Graph(ADataSetEntry):
     return False
 
   def get_node(self, id):
-    return None
+    return next((n for n in self.nodes() if n.id == id), None)
 
   def remove_node(self, id):
     return False
@@ -83,7 +88,7 @@ class Graph(ADataSetEntry):
     return False
 
   def get_edge(self, id):
-    return None
+    return next((n for n in self.edges() if n.id == id), None)
 
   def update_edge(self, data):
     return False

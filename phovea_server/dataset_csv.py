@@ -11,7 +11,8 @@ import json
 import csv
 import os
 import numpy as np
-from .dataset_def import ADataSetEntry, ADataSetProvider
+from .dataset_def import ADataSetProvider, AColumn, AMatrix, AStratification, ATable, AVector
+from .security import current_user
 
 
 def assign_ids(ids, idtype):
@@ -26,12 +27,9 @@ def fix_id(fqname):
   return fix_id(fqname)
 
 
-class CSVEntry(ADataSetEntry):
+class CSVEntryMixin(object):
   def __init__(self, desc, project):
-    super(CSVEntry, self).__init__(desc['name'], project.id, desc['type'], desc.get('id', None))
     self._desc = desc
-    desc['fqname'] = self.fqname
-    desc['id'] = self.id
     self._path = os.path.join(project.folder + '/data/', self._desc['path'])
     del self._desc['path']
     self._project = project
@@ -88,9 +86,13 @@ def cmp_string(a, b):
   return -1 if a < b else +1
 
 
-class CSVStratification(CSVEntry):
+class CSVStratification(AStratification, CSVEntryMixin):
   def __init__(self, desc, project):
-    super(CSVStratification, self).__init__(desc, project)
+    AStratification.__init__(self, desc['name'], project.id, desc['type'], desc.get('id', None))
+    CSVEntryMixin.__init__(self, desc, project)
+    desc['fqname'] = self.fqname
+    desc['id'] = self.id
+
     self.idtype = desc['idtype']
     for i, g in enumerate(desc['groups']):
       if 'color' not in g:
@@ -183,9 +185,12 @@ class CSVStratification(CSVEntry):
     return CSVStratification(desc, project)
 
 
-class CSVMatrix(CSVEntry):
+class CSVMatrix(AMatrix, CSVEntryMixin):
   def __init__(self, desc, project):
-    super(CSVMatrix, self).__init__(desc, project)
+    AMatrix.__init__(self, desc['name'], project.id, desc['type'], desc.get('id', None))
+    CSVEntryMixin.__init__(self, desc, project)
+    desc['fqname'] = self.fqname
+    desc['id'] = self.id
     self.rowtype = desc['rowtype']
     self.coltype = desc['coltype']
     self.value = desc['value']['type']
@@ -236,9 +241,6 @@ class CSVMatrix(CSVEntry):
       return n
     return n[range.asslice()]
 
-  def aslist(self, range=None):
-    return self.asnumpy(range)
-
   def asnumpy(self, range=None):
     n = self.load()['data']
     if range is None:
@@ -261,16 +263,6 @@ class CSVMatrix(CSVEntry):
       else:
         d = d.reshape((1, d.shape[0]))
     return d
-
-  def asjson(self, range=None):
-    arr = self.asnumpy(range)
-    rows = self.rows(None if range is None else range[0])
-    cols = self.cols(None if range is None else range[1])
-    rowids = self.rowids(None if range is None else range[0])
-    colids = self.colids(None if range is None else range[1])
-
-    r = dict(data=arr, rows=rows, cols=cols, rowIds=rowids, colIds=colids)
-    return r
 
   @staticmethod
   def parse(data, path, project, id=None):
@@ -316,15 +308,11 @@ class CSVMatrix(CSVEntry):
     return CSVMatrix(desc, project)
 
 
-class CSVColumn(object):
+class CSVColumn(AColumn):
   def __init__(self, desc, table):
+    super(CSVColumn, self).__init__(desc['name'], desc['value']['type'])
     self._desc = desc
     self._table = table
-    self.name = desc['name']
-    self.type = desc['value']['type']
-
-  def aslist(self, range=None):
-    return self.asnumpy(range).tolist()
 
   def asnumpy(self, range=None):
     return self._table.aspandas(range)[self.name].values
@@ -333,9 +321,12 @@ class CSVColumn(object):
     return self._desc
 
 
-class CSVTable(CSVEntry):
+class CSVTable(ATable, CSVEntryMixin):
   def __init__(self, desc, project):
-    super(CSVTable, self).__init__(desc, project)
+    ATable.__init__(self, desc['name'], project.id, desc['type'], desc.get('id', None))
+    CSVEntryMixin.__init__(self, desc, project)
+    desc['fqname'] = self.fqname
+    desc['id'] = self.id
     self.idtype = desc['idtype']
     self.columns = [CSVColumn(d, self) for d in desc['columns']]
     self.shape = desc['size']
@@ -364,32 +355,22 @@ class CSVTable(CSVEntry):
       return n
     return n[range.asslice()]
 
-  def aslist(self, range=None):
-    return self.aspandas(range).to_dict('records')
-
   def aspandas(self, range=None):
     n = self.load()['df']
     if range is None:
       return n
     return n.iloc[range.asslice()]
 
-  def asjson(self, range=None):
-    arr = self.aslist(range)
-    rows = self.rows(None if range is None else range[0])
-    rowids = self.rowids(None if range is None else range[0])
-    r = dict(data=arr, rows=rows, rowIds=rowids)
-
-    return r
-
   @staticmethod
   def parse(data, path, id=None):
     pass
 
 
-class CSVVector(CSVEntry):
+class CSVVector(AVector, CSVEntryMixin):
   def __init__(self, desc, project):
-    super(CSVVector, self).__init__(desc, project)
-
+    AVector.__init__(self, desc['name'], project.id, desc['type'], desc.get('id', None))
+    CSVEntryMixin.__init__(self, desc, project)
+    desc['fqname'] = self.fqname
     self.idtype = desc['idtype']
     self.value = desc['value']['type']
     self.range = desc['value']['range']
@@ -415,22 +396,11 @@ class CSVVector(CSVEntry):
       return n
     return n[range.asslice()]
 
-  def aslist(self, range=None):
-    return self.asnumpy(range)
-
   def asnumpy(self, range=None):
     n = self.load()['data']
     if range is None:
       return n
     return n[range[0].asslice()]
-
-  def asjson(self, range=None):
-    arr = self.asnumpy(range)
-    rows = self.rows(None if range is None else range[0])
-    rowids = self.rowids(None if range is None else range[0])
-    r = dict(data=arr, rows=rows, rowIds=rowids)
-
-    return r
 
   @staticmethod
   def parse(data, path, project, id=None):
