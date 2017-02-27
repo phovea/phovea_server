@@ -36,7 +36,7 @@ class GraphEdge(object):
                 attrs=self.attrs)
 
 
-class Graph(ADataSetEntry):
+class AGraph(ADataSetEntry):
   __metaclass__ = abc.ABCMeta
 
   def __init__(self, name, project, id=None, attrs=None):
