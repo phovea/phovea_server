@@ -32,7 +32,7 @@ class User(object):
 
   @property
   def is_anonymous(self):
-    return self.name == 'anonymous'
+    return self.name == ANONYMOUS
 
   def has_role(self, role):
     return role in self.roles
@@ -58,6 +58,8 @@ class User(object):
     # Python 3 implicitly set __hash__ to None if we override __eq__
     # We set it back to its default implementation
     __hash__ = object.__hash__
+
+ANONYMOUS_USER = User(ANONYMOUS)
 
 
 class SecurityManager(object):
@@ -140,7 +142,10 @@ def current_username():
 
 
 def current_user():
-  return manager().current_user
+  user = manager().current_user
+  if user.is_anonymous:
+    return ANONYMOUS_USER
+  return user
 
 
 def login_required(f):
@@ -169,13 +174,13 @@ def add_login_routes(app):
 
 
 PERMISSION_READ = 4
-PERMISSION_WRITE = 4
-PERMISSION_EXECUTE = 4
+PERMISSION_WRITE = 2
+PERMISSION_EXECUTE = 1
 
 
 def to_number(p_set):
-  return (4 if PERMISSION_READ in p_set else 0) + (2 if PERMISSION_WRITE in p_set else 0) + (
-    1 if PERMISSION_EXECUTE in p_set else 0)
+  return (PERMISSION_READ if PERMISSION_READ in p_set else 0) + (PERMISSION_WRITE if PERMISSION_WRITE in p_set else 0) + (
+    PERMISSION_EXECUTE if PERMISSION_EXECUTE in p_set else 0)
 
 
 def to_string(p_set):
@@ -196,7 +201,7 @@ def _from_number(p):
   return r
 
 
-DEFAULT_PERMISSION = 700
+DEFAULT_PERMISSION = 744
 
 
 def _decode(permission=DEFAULT_PERMISSION):
