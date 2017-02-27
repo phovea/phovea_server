@@ -5,14 +5,14 @@
 ###############################################################################
 
 
-from builtins import str
-from builtins import object
+from builtins import str, object
 import json
 import csv
 import os
 import numpy as np
 from .dataset_def import ADataSetProvider, AColumn, AMatrix, AStratification, ATable, AVector
 from .security import current_user
+from .config import view
 
 
 def assign_ids(ids, idtype):
@@ -46,7 +46,8 @@ def basic_description(data, type, path):
 class CSVEntryMixin(object):
   def __init__(self, desc, project):
     self._desc = desc
-    self._path = os.path.join(project.folder + '/data/', self._desc['path'])
+    folder = project.folder + '/data/' if not hasattr(project, 'inplace') else project.folder
+    self._path = os.path.join(folder, self._desc['path'])
     del self._desc['path']
     self._project = project
 
@@ -329,7 +330,11 @@ class CSVColumn(AColumn):
     self._table = table
 
   def asnumpy(self, range=None):
-    return self._table.aspandas(range)[self.name].values
+    import pandas as pd
+    p = self._table.aspandas(range)[self.name]
+    if isinstance(p, pd.Series):
+      return p.values
+    return np.array([p])
 
   def dump(self):
     return self._desc
@@ -423,7 +428,7 @@ class CSVVector(AVector, CSVEntryMixin):
 
 def to_files(plugins):
   for plugin in plugins:
-    index = os.path.join(plugin.folder, 'data/index.json')
+    index = os.path.join(plugin.folder + '/data/' if not hasattr(plugin, 'inplace') else plugin.folder, 'index.json')
     if not os.path.isfile(index):
       continue
     with open(index, 'r') as f:
@@ -440,28 +445,26 @@ def to_files(plugins):
 
 
 class DataPlugin(object):
-  def __init__(self):
+  def __init__(self, folder):
     # add a magic plugin for the static data dir
-    from .config import view
-    cc = view('phovea_server')
-    self.folder = cc.dataDir
-    self.id = 'data'
+    self.inplace = True  # avoid adding the data suffix
+    self.folder = folder
+    self.id = os.path.basename(folder)
 
   def save(self, f):
     import werkzeug.utils
     from .util import random_id
-    dir_ = os.path.join(self.folder, 'data')
-    if not os.path.exists(dir_):
-      os.makedirs(dir_)
+    if not os.path.exists(self.folder):
+      os.makedirs(self.folder)
     filename = os.path.basename(f.filename)
     filename = werkzeug.utils.secure_filename(filename + random_id(3) + '.csv')
-    path = os.path.join(dir_, filename)
+    path = os.path.join(self.folder, filename)
     f.save(path)
     return path
 
   def append(self, desc, path):
     desc['path'] = os.path.basename(path)
-    index = os.path.join(self.folder, 'data/index.json')
+    index = os.path.join(self.folder, 'index.json')
     old = []
     if os.path.isfile(index):
       with open(index, 'r') as f:
@@ -471,7 +474,8 @@ class DataPlugin(object):
       json.dump(old, f, indent=1)
 
 
-dataPlugin = DataPlugin()
+cc = view('phovea_server')
+dataPlugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
 
 
 class StaticFileProvider(ADataSetProvider):
@@ -480,6 +484,10 @@ class StaticFileProvider(ADataSetProvider):
     self.files = list(to_files(plugins))
 
     self.files.extend(to_files([dataPlugin]))
+    import glob
+    extras = [DataPlugin(f) for f in (os.path.dirname(f) for f in glob.glob(cc.dataDir + '/*/index.json')) if
+              os.path.basename(f) != 'data']
+    self.files.extend(to_files(extras))
 
   def __iter__(self):
     return iter((f for f in self.files if f.can_read()))

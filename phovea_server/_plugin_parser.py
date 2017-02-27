@@ -11,7 +11,6 @@ from ._utils import replace_variables
 from .config import view
 import logging
 
-
 cc = view('phovea_server')
 _log = logging.getLogger(__name__)
 
@@ -73,6 +72,26 @@ def _extend(target, w):
   return target
 
 
+def _git_head(cwd):
+  import subprocess
+  try:
+    output = subprocess.check_output(['git', 'rev-parse', '--verify', 'HEAD'], cwd=cwd)
+    return output.strip()
+  except subprocess.CalledProcessError:
+    return 'error'
+
+
+def _resolve_plugin(p):
+  import os.path
+  if os.path.isdir(os.path.join(p.folder, '.git')) and p.repository:
+    repo = p.repository
+    if repo.endswith('.git'):
+      repo = repo[0:-4]
+    return repo + '/commit/' + _git_head(p.folder)
+  # not a git repo
+  return p.version
+
+
 class DirectoryPlugin(object):
   def __init__(self, package_file):
     import json
@@ -122,19 +141,36 @@ class DirectoryPlugin(object):
     regfile(p.join(self.folder, '__init__.py'))
     regfile(p.join(self.folder, self.id, '__init__.py'))
 
+  @property
+  def resolved(self):
+    return _resolve_plugin(self)
+
 
 class DirectoryProductionPlugin(object):
   def __init__(self, folder):
     import os.path as p
-    self.id = p.basename(folder)
-    self.name = self.id
-    self.title = self.id
-    self.description = ''
-    self.homepage = ''
-    self.version = ''
-    self.extensions = []
-    self.repository = ''
+    import json
     self.folder = folder
+    self.extensions = []
+    if p.exists(p.join(folder, 'buildInfo.json')):
+      with open(p.join(folder, 'buildInfo.json')) as f:
+        pkg = json.load(f)
+      self.id = pkg['name']
+      self.name = self.id
+      desc = pkg.get('description', '').split('\n')
+      self.title = desc.pop(0) if len(desc) > 1 else self.name
+      self.description = '\n'.join(desc)
+      self.homepage = pkg.get('homepage')
+      self.version = pkg['version']
+      self.repository = pkg.get('repository', '')
+    else:
+      self.id = p.basename(folder)
+      self.name = self.id
+      self.title = self.id
+      self.description = ''
+      self.homepage = ''
+      self.version = ''
+      self.repository = ''
 
   @staticmethod
   def is_app():
@@ -161,9 +197,15 @@ class DirectoryProductionPlugin(object):
 
     regfile(p.join(self.folder, '__init__.py'))
 
+  @property
+  def resolved(self):
+    return self.version
+
 
 class EntryPointPlugin(object):
   def __init__(self, entry_point, config_entry_point):
+    import os.path as p
+    import json
     self.id = entry_point.name
     self.name = self.id
     self.title = self.name
@@ -179,6 +221,16 @@ class EntryPointPlugin(object):
     import os.path
     self.folder = os.path.dirname(f) if f else '.'
 
+    if p.exists(p.join(self.folder, 'buildInfo.json')):
+      with open(p.join(self.folder, 'buildInfo.json')) as f:
+        pkg = json.load(f)
+      desc = pkg.get('description', '').split('\n')
+      self.title = desc.pop(0) if len(desc) > 1 else self.name
+      self.description = '\n'.join(desc)
+      self.homepage = pkg.get('homepage')
+      self.version = pkg['version']
+      self.repository = pkg.get('repository', '')
+
   @staticmethod
   def is_app():
     return False
@@ -190,6 +242,10 @@ class EntryPointPlugin(object):
 
   def register(self, reg):
     self._loader(reg)
+
+  @property
+  def resolved(self):
+    return self.version
 
 
 class RegHelper(object):

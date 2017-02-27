@@ -2,16 +2,16 @@ FROM python:2.7
 
 MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
 WORKDIR /phovea
-
-RUN apt-get update
+RUN printf "from phovea_server import launch\nlaunch.run()\n" > /phovea/launch.py
 
 # install dependencies last step such that everything before can be cached
 COPY requirements*.txt docker_packages.txt ./
-RUN (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs apt-get install -y)) && pip install --no-cache-dir -r requirements.txt
+RUN (!(test -s docker_packages.txt) || (apt-get update && (cat docker_packages.txt | xargs apt-get install -y))) && pip install --no-cache-dir -r requirements.txt
 
-COPY ./build/source ./phovea/
+COPY ./build/source ./
 
 ENV PHOVEA_ENV=production
 ENV PHOVEA_SERVICE=api
-CMD python phovea_server --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
+ENV PHOVEA_CONFIG_PATH=config.json
+CMD python launch.py --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
 EXPOSE 80

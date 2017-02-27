@@ -9,6 +9,7 @@ from __future__ import absolute_import
 from builtins import object
 import os
 import jsoncfg
+import codecs
 from ._utils import replace_nested_variables, extend
 import logging
 
@@ -105,7 +106,9 @@ class CaleydoConfigSection(object):
 
 
 def _merge_config(config_file, plugin_id):
-  c = jsoncfg.load(config_file)
+  _log.info(plugin_id)
+  with codecs.open(config_file, 'r', 'utf-8') as fi:
+    c = jsoncfg.loads(fi.read())
   extend(_c, {plugin_id: c})
 
 
@@ -113,9 +116,11 @@ def _init_config():
   from . import phovea_config
   f = phovea_config()
   _merge_config(f, 'phovea_server')
-  global_ = os.path.abspath('config.json')
+  global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
   if os.path.exists(global_) and global_ != f:
-    extend(_c, jsoncfg.load(global_))
+    print('configuration file: ' + global_)
+    with codecs.open(global_, 'r', 'utf-8') as fi:
+      extend(_c, jsoncfg.loads(fi.read()))
 
 # create an initial config guess
 _init_config()
@@ -133,5 +138,7 @@ def merge_plugin_configs(plugins):
       _merge_config(f, plugin.id)
 
   # override with more important settings
-  if os.path.exists('config.json'):
-    extend(_c, jsoncfg.load('config.json'))
+  global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
+  if os.path.exists(global_):
+    with codecs.open(global_, 'r', 'utf-8') as fi:
+      extend(_c, jsoncfg.loads(fi.read()))
