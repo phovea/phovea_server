@@ -11,7 +11,6 @@ import csv
 import os
 import numpy as np
 from .dataset_def import ADataSetProvider, AColumn, AMatrix, AStratification, ATable, AVector
-from .security import current_user
 from .config import view
 
 
@@ -103,7 +102,7 @@ def cmp_string(a, b):
   return -1 if a < b else +1
 
 
-class CSVStratification(AStratification, CSVEntryMixin):
+class CSVStratification(CSVEntryMixin, AStratification):
   def __init__(self, desc, project):
     AStratification.__init__(self, desc['name'], project.id, desc['type'], desc.get('id', None))
     CSVEntryMixin.__init__(self, desc, project)
@@ -201,7 +200,7 @@ class CSVStratification(AStratification, CSVEntryMixin):
     return CSVStratification(desc, project)
 
 
-class CSVMatrix(AMatrix, CSVEntryMixin):
+class CSVMatrix(CSVEntryMixin, AMatrix):
   def __init__(self, desc, project):
     AMatrix.__init__(self, desc['name'], project.id, desc['type'], desc.get('id', None))
     CSVEntryMixin.__init__(self, desc, project)
@@ -340,7 +339,7 @@ class CSVColumn(AColumn):
     return self._desc
 
 
-class CSVTable(ATable, CSVEntryMixin):
+class CSVTable(CSVEntryMixin, ATable):
   def __init__(self, desc, project):
     ATable.__init__(self, desc['name'], project.id, desc['type'], desc.get('id', None))
     CSVEntryMixin.__init__(self, desc, project)
@@ -385,7 +384,7 @@ class CSVTable(ATable, CSVEntryMixin):
     pass
 
 
-class CSVVector(AVector, CSVEntryMixin):
+class CSVVector(CSVEntryMixin, AVector):
   def __init__(self, desc, project):
     AVector.__init__(self, desc['name'], project.id, desc['type'], desc.get('id', None))
     CSVEntryMixin.__init__(self, desc, project)

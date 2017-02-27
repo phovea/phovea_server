@@ -141,22 +141,10 @@ class AMatrix(ADataSetEntry):
 
   def __init__(self, name, project, type, id=None):
     super(AMatrix, self).__init__(name, project, type, id)
-
-  @abc.abstractproperty
-  def rowtype(self):
-    return 'Custom'
-
-  @abc.abstractproperty
-  def coltype(self):
-    return 'Custom'
-
-  @abc.abstractproperty
-  def value(self):
-    return 'string'
-
-  @abc.abstractproperty
-  def shape(self):
-    return [0, 0]
+    self.rowtype = 'Custom'
+    self.coltype = 'Custom'
+    self.shape = [0, 0]
+    self.value = 'string'
 
   @abc.abstractmethod
   def rows(self, range=None):
@@ -174,7 +162,6 @@ class AMatrix(ADataSetEntry):
   def colids(self, range=None):
     return []
 
-  @abc.abstractmethod
   def aslist(self, range=None):
     return self.asnumpy(range).tolist()
 
@@ -202,18 +189,9 @@ class AVector(ADataSetEntry):
 
   def __init__(self, name, project, type, id=None):
     super(AVector, self).__init__(name, project, type, id)
-
-  @abc.abstractproperty
-  def idtype(self):
-    return 'Custom'
-
-  @abc.abstractproperty
-  def value(self):
-    return 'string'
-
-  @abc.abstractproperty
-  def shape(self):
-    return [0, 0]
+    self.idtype = 'Custom'
+    self.value = 'string'
+    self.shape = [0]
 
   @abc.abstractmethod
   def rows(self, range=None):
@@ -223,7 +201,6 @@ class AVector(ADataSetEntry):
   def rowids(self, range=None):
     return []
 
-  @abc.abstractmethod
   def aslist(self, range=None):
     return self.asnumpy(range).tolist()
 
@@ -268,18 +245,9 @@ class ATable(ADataSetEntry):
 
   def __init__(self, name, project, type, id=None):
     super(ATable, self).__init__(name, project, type, id)
-
-  @abc.abstractproperty
-  def idtype(self):
-    return 'Custom'
-
-  @abc.abstractproperty
-  def shape(self):
-    return [0, 0]
-
-  @abc.abstractproperty
-  def columns(self):
-    return []
+    self.idtype = 'Custom'
+    self.shape = [0, 0]
+    self.columns = []
 
   @abc.abstractmethod
   def rows(self, range=None):
@@ -289,7 +257,6 @@ class ATable(ADataSetEntry):
   def rowids(self, range=None):
     return []
 
-  @abc.abstractmethod
   def aslist(self, range=None):
     return self.aspandas(range).to_dict('records')
 
