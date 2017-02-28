@@ -241,8 +241,8 @@ def _stats_of(data):
               moment3=scipy.stats.moment(data, 3),
               moment4=scipy.stats.moment(data, 4),
               kurtosis=scipy.stats.kurtosis(data),
-              skewness=scipy.stats.skew(data)
-             )
+              skewness=scipy.stats.skew(data))
+
 
 def add_vector_handler(app, dataset_getter):
   _add_handler(app, dataset_getter, 'vector')
