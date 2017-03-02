@@ -376,7 +376,7 @@ class CSVTable(CSVEntry):
     n = self.load()['df']
     if range is None:
       return n
-    return n.iloc[range.asslice()]
+    return n.iloc[range.asslice(no_ellipsis=True)]
 
   def asjson(self, range=None):
     arr = self.aslist(range)
