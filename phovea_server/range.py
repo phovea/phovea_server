@@ -277,7 +277,7 @@ class Range1D(object):
 
   def asslice(self, no_ellipsis=False):
     if self.isall:
-      return slice(0,-1) if no_ellipsis else Ellipsis
+      return slice(0, -1) if no_ellipsis else Ellipsis
     if self.isnone:
       return []
     if len(self._elems) == 1:
