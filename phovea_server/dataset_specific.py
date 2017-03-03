@@ -223,6 +223,27 @@ def add_table_handler(app, dataset_getter):
   app.add_url_rule('/table/<dataset_id>/view/<view_name>/rowIds', 'view_rowids_table', view_rowids_table)
 
 
+def _stats_of(data):
+  import numpy as np
+  import scipy.stats
+  return dict(median=np.nanmedian(data),
+              q1=np.nanpercentile(data, 25),
+              q3=np.nanpercentile(data, 75),
+              min=np.nanmin(data),
+              max=np.nanmax(data),
+              sum=np.nansum(data),
+              mean=np.nanmean(data),
+              var=np.nanvar(data),
+              sd=np.nanstd(data),
+              n=len(data),
+              nans=np.count_nonzero(np.isnan(data)),
+              moment2=scipy.stats.moment(data, 2),
+              moment3=scipy.stats.moment(data, 3),
+              moment4=scipy.stats.moment(data, 4),
+              kurtosis=scipy.stats.kurtosis(data),
+              skewness=scipy.stats.skew(data))
+
+
 def add_vector_handler(app, dataset_getter):
   _add_handler(app, dataset_getter, 'vector')
 
@@ -234,7 +255,14 @@ def add_vector_handler(app, dataset_getter):
     hist, bin_edges = np.histogram(data, bins=int(ns.request.args.get('bins', np.sqrt(len(data)))), range=d.range)
     return jsonify(hist)
 
+  def stats_vector(dataset_id):
+    d = dataset_getter(dataset_id, 'vector')
+    r = asrange(ns.request.args.get('range', None))
+    data = d.asnumpy(r)
+    return jsonify(_stats_of(data))
+
   app.add_url_rule('/vector/<dataset_id>/hist', 'hist_vector', hist_vector)
+  app.add_url_rule('/vector/<dataset_id>/stats', 'stats_vector', stats_vector)
 
 
 def add_matrix_handler(app, dataset_getter):
@@ -269,4 +297,11 @@ def add_matrix_handler(app, dataset_getter):
     hist, bin_edges = np.histogram(data, bins=int(ns.request.args.get('bins', np.sqrt(len(data)))), range=d.range)
     return jsonify(hist)
 
+  def stats_matrix(dataset_id):
+    d = dataset_getter(dataset_id, 'matrix')
+    r = asrange(ns.request.args.get('range', None))
+    data = d.asnumpy(r)
+    return jsonify(_stats_of(data.flat))
+
   app.add_url_rule('/matrix/<dataset_id>/hist', 'hist_matrix', hist_matrix)
+  app.add_url_rule('/matrix/<dataset_id>/stats', 'stats_matrix', stats_matrix)
