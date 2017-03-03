@@ -76,8 +76,8 @@ class StaticFileProvider(object):
     self.files = list(to_files(plugins))
 
     cc = view('phovea_server')
-    dataPlugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
-    self.files.extend(to_files([dataPlugin]))
+    data_plugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
+    self.files.extend(to_files([data_plugin]))
     import glob
     extras = [DataPlugin(f) for f in (os.path.dirname(f) for f in glob.glob(cc.dataDir + '/*/mapping.json')) if
               os.path.basename(f) != 'data']

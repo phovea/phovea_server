@@ -131,11 +131,10 @@ class CSVStratification(CSVEntry):
     clusters = [dict(name=k, range=clusters.get(k, []), color=colors.get(k, 'gray')) for k in groups]
 
     rows = np.array([di[0] for di in data[1:]])
-    return {
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.idtype),
-      'groups': clusters
-    }
+    return {'rows': rows,
+            'rowIds': assign_ids(rows, self.idtype),
+            'groups': clusters
+            }
 
   def rows(self, range=None):
     n = self.load()['rows']
@@ -205,13 +204,12 @@ class CSVMatrix(CSVEntry):
       dd = np.array(vs)
     else:
       dd = np.array([x[1:] for x in data[1:]])
-    return {
-      'cols': cols,
-      'colIds': assign_ids(cols, self.coltype),
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.rowtype),
-      'data': dd
-    }
+    return {'cols': cols,
+            'colIds': assign_ids(cols, self.coltype),
+            'rows': rows,
+            'rowIds': assign_ids(rows, self.rowtype),
+            'data': dd
+            }
 
   def rows(self, range=None):
     n = self.load()['rows']
@@ -351,11 +349,10 @@ class CSVTable(CSVEntry):
     objs = {c.name: [x[i + 1] for x in data[1:]] for i, c in enumerate(self.columns)}
     df = pd.DataFrame(objs)
     df.index = rows
-    return {
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.idtype),
-      'df': df
-    }
+    return {'rows': rows,
+            'rowIds': assign_ids(rows, self.idtype),
+            'df': df
+            }
 
   def rows(self, range=None):
     n = self.load()['rows']
@@ -402,11 +399,10 @@ class CSVVector(CSVEntry):
 
   def _process(self, data):
     rows = np.array([x[0] for x in data[1:]])
-    return {
-      'rows': rows,
-      'rowIds': assign_ids(rows, self.idtype),
-      'data': np.array([x[1] for x in data[1:]])
-    }
+    return {'rows': rows,
+            'rowIds': assign_ids(rows, self.idtype),
+            'data': np.array([x[1] for x in data[1:]])
+            }
 
   def rows(self, range=None):
     n = self.load()['rows']
@@ -496,8 +492,8 @@ class StaticFileProvider(ADataSetProvider):
     self.files = list(to_files(plugins))
 
     cc = view('phovea_server')
-    dataPlugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
-    self.files.extend(to_files([dataPlugin]))
+    self.data_plugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
+    self.files.extend(to_files([self.data_plugin]))
     import glob
     extras = [DataPlugin(f) for f in (os.path.dirname(f) for f in glob.glob(cc.dataDir + '/*/index.json')) if
               os.path.basename(f) != 'data']
@@ -518,10 +514,10 @@ class StaticFileProvider(ADataSetProvider):
     if type not in parsers:
       return None  # unknown type
     f = files[list(files.keys())[0]]
-    path = dataPlugin.save(f)
-    r = parsers[type](data, path, dataPlugin, id)
+    path = self.data_plugin.save(f)
+    r = parsers[type](data, path, self.data_plugin, id)
     if r:
-      dataPlugin.append(r._desc, path)
+      self.data_plugin.append(r._desc, path)
       self.files.append(r)
     else:
       os.remove(path)  # delete file again

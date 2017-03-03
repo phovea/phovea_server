@@ -12,6 +12,7 @@ import logging
 
 _log = logging.getLogger(__name__)
 
+
 class MappingManager(object):
   """
   assigns ids to object using a redis database
