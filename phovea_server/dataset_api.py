@@ -63,7 +63,7 @@ def _list_format_csv(data):
 
 
 def _to_query(query):
-  keys = ['name', 'id', 'fqname', 'type']
+  keys = ['name', 'id', 'fqname', 'type', 'idtype', 'coltype', 'rowtype']
   act_query = {k: v for k, v in query.items() if k in keys}
   if len(act_query) == 0:  # no query
     return lambda x: True
