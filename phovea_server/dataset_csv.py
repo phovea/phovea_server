@@ -350,6 +350,8 @@ class CSVTable(CSVEntry):
     import pandas as pd
     objs = {c.name: [x[i + 1] for x in data[1:]] for i, c in enumerate(self.columns)}
     df = pd.DataFrame(objs)
+    # ensure right column order
+    df = df[[c.name for c in self.columns]]
     df.index = rows
     return {
         'rows': rows,
