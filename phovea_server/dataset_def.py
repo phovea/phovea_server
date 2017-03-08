@@ -114,10 +114,7 @@ class AStratification(ADataSetEntry):
 
   def __init__(self, name, project, type, id=None):
     super(AStratification, self).__init__(name, project, type, id)
-
-  @abc.abstractproperty
-  def idtype(self):
-    return 'Custom'
+    self.idtype = 'Custom'
 
   @abc.abstractmethod
   def rows(self, range=None):
