@@ -45,7 +45,8 @@ class CSVEntry(ADataSetEntry):
 
     data = []
     with open(self._path, 'r') as csvfile:
-      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ',').encode('ascii', 'ignore'), quotechar='|')
+      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ',').encode('ascii', 'ignore'),
+                          quotechar=str(self._desc.get('quotechar', '|')).encode('ascii', 'ignore'))
       data.extend(reader)
 
     # print data
@@ -174,7 +175,8 @@ class CSVStratification(CSVEntry):
       clusters = set()
       count = 0
       with open(path, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii', 'ignore'), quotechar='|')
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii', 'ignore'),
+                            quotechar=str(desc.get('quotechar', '|')).encode('ascii', 'ignore'))
         for row in reader:
           count += 1
           clusters.add(row[1])
@@ -300,7 +302,8 @@ class CSVMatrix(CSVEntry):
       min_v = None
       max_v = None
       with open(path, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii', 'ignore'), quotechar='|')
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii', 'ignore'),
+                            quotechar=str(desc.get('quotechar', '|')).encode('ascii', 'ignore'))
         for row in reader:
           if cols is None:
             cols = len(row) - 1
