@@ -475,16 +475,14 @@ class DataPlugin(object):
       json.dump(old, f, indent=1)
 
 
-cc = view('phovea_server')
-dataPlugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
-
-
 class StaticFileProvider(ADataSetProvider):
   def __init__(self, plugins):
 
     self.files = list(to_files(plugins))
 
-    self.files.extend(to_files([dataPlugin]))
+    cc = view('phovea_server')
+    self.data_plugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
+    self.files.extend(to_files([self.data_plugin]))
     import glob
     extras = [DataPlugin(f) for f in (os.path.dirname(f) for f in glob.glob(cc.dataDir + '/*/index.json')) if
               os.path.basename(f) != 'data']
@@ -502,10 +500,10 @@ class StaticFileProvider(ADataSetProvider):
     if type not in parsers:
       return None  # unknown type
     f = files[list(files.keys())[0]]
-    path = dataPlugin.save(f)
-    r = parsers[type](data, path, dataPlugin, id)
+    path = self.data_plugin.save(f)
+    r = parsers[type](data, path, self.data_plugin, id)
     if r:
-      dataPlugin.append(r._desc, path)
+      self.data_plugin.append(r._desc, path)
       self.files.append(r)
     else:
       os.remove(path)  # delete file again
