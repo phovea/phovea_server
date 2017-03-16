@@ -25,6 +25,10 @@ class SingleRangeElem(object):
     self.start = val
 
   @property
+  def end(self):
+    return self.start + 1
+
+  @property
   def step(self):
     return 1
 
@@ -120,6 +124,8 @@ class RangeElem(object):
     if self.step == 1:
       return max(t - f, 0)
     elif self.step == -1:
+      if self.end == -1:
+        return max(f - -1, 0)
       return max(f - t, 0)
     d = t - f + 1 if self.step > 0 else f - t + 1
     s = abs(self.step)

@@ -76,3 +76,30 @@ class TestRangeElem:
     assert elem.end == -1, 'end'
     assert elem.step == 1, 'step'
     assert elem.size(10) == 10, 'size'
+
+  def test_none(self):
+    elem = RangeElem.none()
+    assert not elem.isall, '!isAll'
+    assert not elem.issingle, '!isSingle'
+    assert not elem.isunbound, '!isUnbound'
+    assert elem.start == 0, 'start'
+    assert elem.end == 0, 'end'
+    assert elem.step == 1, 'step'
+    assert elem.size() == 0, 'size'
+
+  def test_single(self):
+    elem = RangeElem.single(5)
+    assert not elem.isall, '!isAll'
+    assert elem.issingle, 'isSingle'
+    assert not elem.isunbound, '!isUnbound'
+    assert elem.start == 5, 'start'
+    assert elem.end == 6, 'end'
+    assert elem.step == 1, 'step'
+    assert elem.size() == 1, 'size'
+
+  def test_size(self):
+    assert RangeElem(0, 5).size() == 5, 'default 0:5'
+    assert RangeElem(4, -1, -1).size() == 5, 'default 4:-1:-1'
+    assert RangeElem(0, 5, 2).size() == 3, 'default 0:5:2'
+    assert RangeElem(0).size(5) == 5, 'default 0:-1 (5)'
+    assert RangeElem(-1, 4, -1).size(10) == 6, 'default -1:4:-1 (10)'
