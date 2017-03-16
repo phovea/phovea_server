@@ -17,7 +17,7 @@ all_f = all
 
 
 def fix(v, size=0):
-  return v if v > 0 else (size + 1 + v)
+  return v if v >= 0 else (size + 1 + v)
 
 
 class SingleRangeElem(object):
@@ -38,6 +38,10 @@ class SingleRangeElem(object):
   @property
   def issingle(self):
     return True
+
+  @property
+  def isunbound(self):
+    return False
 
   def __len__(self):
     return 1
@@ -84,6 +88,10 @@ class RangeElem(object):
   @property
   def issingle(self):
     return (self.start + self.step) == self.end
+
+  @property
+  def isunbound(self):
+    return self.start < 0 or self.end < 0
 
   @staticmethod
   def all():
