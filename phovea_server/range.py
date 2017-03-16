@@ -75,6 +75,17 @@ class SingleRangeElem(object):
   def __str__(self):
     return str(self.start)
 
+  def __eq__(self, other):
+    if isinstance(other, self.__class__):
+      return self.start == other.start
+    return False
+
+  def copy(self):
+    return self.__copy__()
+
+  def __copy__(self):
+    return SingleRangeElem(self.start)
+
 
 class RangeElem(object):
   def __init__(self, start, end=-1, step=1):
@@ -169,6 +180,17 @@ class RangeElem(object):
     if self.step != 1:
       r = r + ':' + str(self.step)
     return r
+
+  def __eq__(self, other):
+    if isinstance(other, self.__class__):
+      return self.start == other.start and self.end == other.end and self.step == other.step
+    return False
+
+  def copy(self):
+    return self.__copy__()
+
+  def __copy__(self):
+    return RangeElem(self.start, self.end, self.step)
 
   @staticmethod
   def parse(code):

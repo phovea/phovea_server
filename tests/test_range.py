@@ -1,4 +1,4 @@
-from phovea_server.range import fix, RangeElem
+from phovea_server.range import fix, RangeElem, SingleRangeElem
 from numpy import NaN, isnan
 
 __author__ = 'Samuel Gratzl'
@@ -29,6 +29,46 @@ class TestFix:
 
   def test_fix_m13(self):
     assert fix(-13, 10) == -2
+
+
+class TestSingleRangeElem:
+  VALUE = 5
+  v = SingleRangeElem(VALUE)
+
+  def test_attributes(self):
+    v = self.v
+    assert v.start == self.VALUE, 'from'
+    assert v.end == self.VALUE + 1, 'to'
+    assert v.step == 1, 'step'
+    assert not v.isall, '!isAll'
+    assert v.issingle, 'isSingle'
+    assert not v.isunbound, '!isUnbound'
+    assert str(v) == str(self.VALUE), 'toString'
+
+  def test_size(self):
+    v = self.v
+    assert v.size() == 1, 'size'
+    assert v.size(100) == 1, 'size(5)'
+
+  def test_clone_and_reverse(self):
+    v = self.v
+    assert v.copy() == v, 'clone'
+    assert v.reverse() == v, 'reverse'
+
+  def test_iter(self):
+    v = self.v
+    assert list(v) == [self.VALUE], 'default'
+    assert list(v.iter(100)) == [self.VALUE], 'dedicated size'
+
+  def test_contains(self):
+    v = self.v
+    assert self.VALUE in v, 'contains value'
+    assert (self.VALUE - 5) not in v, '!contains value'
+
+  def test_invert(self):
+    v = self.v
+    assert v.invert(0) == self.VALUE, 'invert 0'
+    assert v.invert(2) == 2 + self.VALUE, 'invert 2'
 
 
 class TestRangeElem:
