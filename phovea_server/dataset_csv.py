@@ -337,6 +337,13 @@ class CSVColumn(AColumn):
       return p.values
     return np.array([p])
 
+  def process(self, index, data):
+    is_number = self.type == 'real' or self.type == 'int'
+    if is_number:
+      return [np.NaN if d[index] == 'NA' or d[index] == '' else d[index] for d in data]
+    else:
+      return [d[index] for d in data]
+
   def dump(self):
     return self._desc
 
@@ -354,10 +361,8 @@ class CSVTable(CSVEntryMixin, ATable):
   def _process(self, data):
     rows = np.array([x[0] for x in data[1:]])
     import pandas as pd
-    objs = {c.name: [x[i + 1] for x in data[1:]] for i, c in enumerate(self.columns)}
-    df = pd.DataFrame(objs)
-    # ensure right column order
-    df = df[[c.name for c in self.columns]]
+    objs = {c.name: c.process(i + 1, data[1:]) for i, c in enumerate(self.columns)}
+    df = pd.DataFrame(objs, columns=[c.name for c in self.columns])
     df.index = rows
     return {'rows': rows,
             'rowIds': assign_ids(rows, self.idtype),
@@ -398,10 +403,16 @@ class CSVVector(CSVEntryMixin, AVector):
     self.shape = desc['size']
 
   def _process(self, data):
+    is_number = self.value == 'real' or self.value == 'int'
+
+    if is_number:
+      data = [np.NaN if x[1] == 'NA' or x[1] == '' else x[1] for x in data[1:]]
+    else:
+      data = [x[1] for x in data[1:]]
     rows = np.array([x[0] for x in data[1:]])
     return {'rows': rows,
             'rowIds': assign_ids(rows, self.idtype),
-            'data': np.array([x[1] for x in data[1:]])
+            'data': np.array(data)
             }
 
   def rows(self, range=None):
