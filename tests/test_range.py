@@ -1,5 +1,6 @@
 from phovea_server.range import fix, RangeElem, SingleRangeElem
 from numpy import NaN, isnan
+import pytest
 
 __author__ = 'Samuel Gratzl'
 
@@ -143,3 +144,47 @@ class TestRangeElem:
     assert RangeElem(0, 5, 2).size() == 3, 'default 0:5:2'
     assert RangeElem(0).size(5) == 5, 'default 0:-1 (5)'
     assert RangeElem(-1, 4, -1).size(10) == 6, 'default -1:4:-1 (10)'
+
+  def test_iter(self):
+    assert list(RangeElem(0, 5)) == [0, 1, 2, 3, 4], 'default 0:5'
+    assert list(RangeElem(4, -1, -1)) == [4, 3, 2, 1, 0], 'default 4:-1:-1'
+    assert list(RangeElem(0, 5, 2)) == [0, 2, 4], 'default 0:5:2'
+    assert list(RangeElem(0).iter(5)) == [0, 1, 2, 3, 4], 'default 0:-1 (5)'
+    assert list(RangeElem(-2, -1, -1).iter(5)) == [4, 3, 2, 1, 0], 'default 0:-1 (5)'
+    assert list(RangeElem(-1, 4, -1).iter(10)) == [10, 9, 8, 7, 6, 5], 'default -1:4:-1 (10)'
+
+  def test_reverse(self):
+    assert RangeElem(0).reverse() == RangeElem(-2, -1, -1), '0:-1'
+    assert RangeElem(0, 5).reverse() == RangeElem(4, -1, -1), '0:5'
+    assert RangeElem(2, 5).reverse() == RangeElem(4, 1, -1), '2:5'
+    assert RangeElem(5, 2, -1).reverse() == RangeElem(1, 4), '5:2:-1'
+
+  def test_invert(self):
+    assert RangeElem(0).invert(5) == 5, '0:-1'
+    assert RangeElem(0, 10).invert(5) == 5, '0:10'
+    assert RangeElem(5, 20).invert(5) == 10, '5:20'
+    assert RangeElem(20, -1, -1).invert(5) == 15, '20:-1:-1'
+
+  def test_contains(self):
+    assert RangeElem(0).contains(5), '0:-1 5'
+    assert not RangeElem(0, 5).contains(10), '0:5 10'
+    assert not RangeElem(0, 5).contains(5), '0:5 5'
+    assert not RangeElem(0, 5).contains(-1), '0:5 -1'
+    assert RangeElem(0, 10, 2).contains(2), '0:10:2 2'
+    assert not RangeElem(0, 10, 2).contains(3), '0:10:2 3'
+    assert RangeElem(10, -1, -1).contains(3), '10:-1:-1 3'
+    assert RangeElem(10, -1, -2).contains(2), '10:-1:-2 2'
+
+  def test_parse(self):
+    assert RangeElem.parse('') == RangeElem.all(), '""'
+    assert RangeElem.parse('::') == RangeElem.all(), '":"'
+    assert RangeElem.parse('::') == RangeElem.all(), '"::"'
+    assert RangeElem.parse('2') == RangeElem.single(2), '"2"'
+    assert RangeElem.parse('2:5') == RangeElem(2, 5), '"2:5"'
+    assert RangeElem.parse(':5') == RangeElem(0, 5), '":5"'
+    assert RangeElem.parse('2:5:2') == RangeElem(2, 5, 2), '"2:5:2"'
+    assert RangeElem.parse('::2') == RangeElem(0, -1, 2), '"::2"'
+    with pytest.raises(Exception):
+      RangeElem.parse('a')
+    with pytest.raises(Exception):
+      RangeElem.parse('0:a')

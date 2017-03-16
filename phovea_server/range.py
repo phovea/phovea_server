@@ -145,9 +145,14 @@ class RangeElem(object):
     return (d // s)
 
   def reverse(self):
-    t = self.start if self.start < 0 else self.start + 1
-    f = self.end if self.end < 0 else self.end - 1
-    return RangeElem(f, t, - self.step)
+    if self.start > 0:
+      t = self.start - 1
+      f = self.end - 1
+      return RangeElem(f, t, - self.step)
+    else:  # step < 0
+      t = self.start - 1
+      f = self.end - 1
+      return RangeElem(f, t, - self.step)
 
   def invert(self, index, size=0):
     if self.isall:
@@ -158,15 +163,24 @@ class RangeElem(object):
     return self.iter()
 
   def iter(self, size=0):
+    if self.step < 0 and self.end == -1:
+      # keep negative to have 0 included
+      return iter(number_range(fix(self.start, size), -1, self.step))
     return iter(number_range(fix(self.start, size), fix(self.end, size), self.step))
 
   def contains(self, value, size=0):
+    if self.isall:
+      return True
     f = fix(self.start, size)
     t = fix(self.end, size)
     if self.step == -1:
+      if self.end == -1:
+        return 0 <= value <= f
       return (value <= f) and (value > t)
-    else:
+    elif self.step == 1:
       return (value >= f) and (value < t)
+    else:
+      return value in list(self)
 
   def __in__(self, value):
     return self.contains(value)
@@ -196,12 +210,24 @@ class RangeElem(object):
   def parse(code):
     if len(code) == 0:
       return RangeElem.all()
+
+    def parse_elem(v, default_value=None):
+      v = v.strip()
+      if len(v) == 0 and default_value is not None:
+        return default_value
+      try:
+        return int(v)
+      except ValueError:
+        raise Exception('parse error: "' + v + '" is not a valid integer')
+
     parts = code.split(':')
     if len(parts) == 1:
-      return RangeElem.single(int(parts[0]))
+      return RangeElem.single(parse_elem(parts[0]))
     elif len(parts) == 2:
-      return RangeElem(int(parts[0]), int(parts[1]))
-    return RangeElem(int(parts[0]), int(parts[1]), int(parts[2]))
+      return RangeElem(parse_elem(parts[0], 0), parse_elem(parts[1], -1))
+    elif len(parts) == 3:
+      return RangeElem(parse_elem(parts[0], 0), parse_elem(parts[1], -1), parse_elem(parts[2], 1))
+    raise Exception('parse error: "' + code + '" is not a valid range specifier')
 
 
 class Range1D(object):
