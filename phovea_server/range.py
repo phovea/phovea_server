@@ -12,6 +12,7 @@ from past.builtins import basestring
 from builtins import object
 import itertools
 from functools import reduce
+from numpy import NaN, isnan
 
 all_f = all
 
@@ -129,7 +130,7 @@ class RangeElem(object):
   def __len__(self):
     return self.size()
 
-  def size(self, size=0):
+  def size(self, size=NaN):
     t = fix(self.end, size)
     f = fix(self.start, size)
     if self.step == 1:
@@ -168,7 +169,7 @@ class RangeElem(object):
       return iter(number_range(fix(self.start, size), -1, self.step))
     return iter(number_range(fix(self.start, size), fix(self.end, size), self.step))
 
-  def contains(self, value, size=0):
+  def contains(self, value, size=NaN):
     if self.isall:
       return True
     f = fix(self.start, size)
@@ -180,7 +181,7 @@ class RangeElem(object):
     elif self.step == 1:
       return (value >= f) and (value < t)
     else:
-      return value in list(self)
+      return value in list(self.iter(size))
 
   def __in__(self, value):
     return self.contains(value)
@@ -240,12 +241,17 @@ class Range1D(object):
       self._elems = []
 
   def __len__(self):
-    return reduce(lambda s, x: s + len(x), self._elems, 0)
+    return self.size()
 
   def copy(self):
     return Range1D(self._elems[:])
 
-  def size(self, size=0):
+  def __copy__(self):
+    return self.copy()
+
+  def size(self, size=NaN):
+    if isnan(size) and self.isunbound:
+      return NaN
     return reduce(lambda s, x: s + x.size(size), self._elems, 0)
 
   @staticmethod
@@ -253,11 +259,15 @@ class Range1D(object):
     return Range1D([RangeElem.all()])
 
   @staticmethod
+  def single(item):
+    return Range1D([RangeElem.single(item)])
+
+  @staticmethod
   def none():
     return Range1D()
 
   @staticmethod
-  def start(indices):
+  def from_list(indices):
     return Range1D(Range1D._compress(indices))
 
   @staticmethod
@@ -279,8 +289,8 @@ class Range1D(object):
         r.append(RangeElem.single(indices[start]))
       else:
         # +1 since end is excluded
-        # fix while just +1 -1 allowed
-        if abs(deltas[start]) == 1:
+        # fix while just +1 is allowed and -1 is not allowed
+        if deltas[start] == 1:
           r.append(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]))
         else:
           for i in number_range(start, act):
@@ -299,6 +309,10 @@ class Range1D(object):
   @property
   def isnone(self):
     return len(self._elems) == 0
+
+  @property
+  def isunbound(self):
+    return any((d.isunbound for d in self._elems))
 
   @property
   def _islist(self):

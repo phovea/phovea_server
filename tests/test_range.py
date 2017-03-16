@@ -1,4 +1,4 @@
-from phovea_server.range import fix, RangeElem, SingleRangeElem
+from phovea_server.range import fix, RangeElem, SingleRangeElem, Range1D
 from numpy import NaN, isnan
 import pytest
 
@@ -188,3 +188,40 @@ class TestRangeElem:
       RangeElem.parse('a')
     with pytest.raises(Exception):
       RangeElem.parse('0:a')
+
+
+class TestRange1D:
+  def test_all(self):
+    elem = Range1D.all()
+    assert elem.isall, 'isAll'
+    assert elem.isunbound, 'isUnbound'
+    assert elem.size(10) == 10, 'size'
+    with pytest.raises(ValueError):
+      assert isnan(len(elem)), 'length'
+
+  def test_none(self):
+    elem = Range1D.none()
+    assert not elem.isall, '!isAll'
+    assert not elem.isunbound, '!isUnbound'
+    assert elem.size() == 0, 'size'
+    assert len(elem) == 0, 'length'
+
+  def test_single(self):
+    elem = Range1D.single(5)
+    assert not elem.isall, '!isAll'
+    assert not elem.isunbound, '!isUnbound'
+    assert elem.size() == 1, 'size'
+    assert len(elem) == 1, 'length'
+
+  def test_from(self):
+    elem = Range1D.from_list([1, 2, 3])
+    assert not elem.isall, '!isAll'
+    assert not elem.isunbound, '!isUnbound'
+    assert elem.size() == 3, 'size'
+    assert len(elem) == 3, 'length'
+
+  def test_compress(self):
+    assert str(Range1D.from_list([1, 2, 3])) == '(1:4)', '1,2,3'
+    assert str(Range1D.from_list([1, 2, 3, 6])) == '(1:4,6)', '1,2,3,6'
+    # assert str(Range1D.from_list([1,2,3,9,8,7])) == '(1:4,9:6:-1)', '1,2,3,9,8,7'
+    assert str(Range1D.from_list([1, 2, 3, 9, 8, 7])) == '(1:4,9,8,7)', '1,2,3,9,8,7'
