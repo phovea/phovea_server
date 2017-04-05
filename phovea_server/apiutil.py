@@ -6,7 +6,7 @@
 
 
 from flask import Flask
-from flask.ext.restplus import Api, apidoc
+from flask_restplus import Api, apidoc, Resource  # noqa
 
 
 def create_api(name, **kwargs):
@@ -16,19 +16,5 @@ def create_api(name, **kwargs):
   app = Flask(name)
   app.debug = True
   api = Api(app, ui=False, **kwargs)
-
-  # remove the stupid root rule
-  try:
-    for rule in app.url_map.iter_rules('root'):
-      app.url_map._rules.remove(rule)
-  except ValueError:
-    # no static view was created yet
-    pass
-
-  # create a doc rule
-  @app.route('/doc/', endpoint='doc')
-  def swagger_ui():
-      return apidoc.ui_for(api)
-  app.register_blueprint(apidoc.apidoc)  # only needed for assets and templates
 
   return app, api
