@@ -57,7 +57,7 @@ setup(
     'Intended Audience :: Developers',
     'Operating System :: OS Independent',
     # Pick your license as you wish (should match "license" above)
-    'License :: OSI Approved :: ' + pkg['license'],
+    'License :: OSI Approved :: ' + ('BSD License' if pkg['license'] == 'BSD-3-Clause' else pkg['license']),
     'Programming Language :: Python',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.4'
