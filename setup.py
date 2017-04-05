@@ -30,15 +30,19 @@ def packaged(*files):
   return r
 
 
+def requirements(file):
+  return [r.strip().encode('ascii') for r in read_it(file).split('\n') if not r.startswith('-e git+https://')]
+
+
 def to_version(v):
   import datetime
   now = datetime.datetime.utcnow()
   return v.replace('SNAPSHOT', now.strftime('%Y%m%d-%H%M%S'))
 
-
 setup(
   name=pkg['name'],
   version=to_version(pkg['version']),
+  url=pkg['homepage'],
   description=pkg['description'],
   long_description=read_it('README.md'),
   keywords=pkg.get('keywords', ''),
@@ -65,14 +69,14 @@ setup(
 
   # You can just specify the packages manually here if your project is
   # simple. Or you can use find_packages().
-  py_modules=[pkg['name']],
+  packages=[pkg['name']],
 
   # List run-time dependencies here.  These will be installed by pip when
   # your project is installed. For an analysis of "install_requires" vs pip's
   # requirements files see:
   # https://packaging.python.org/en/latest/requirements.html
-  install_requires=[r for r in read_it('requirements.txt').split('\n') if not r.startswith('-e git+https://')],
-  tests_require=read_it('requirements_dev.txt').split('\n'),
+  install_requires=requirements('requirements.txt'),
+  tests_require=requirements('requirements_dev.txt'),
 
   # If there are data files included in your packages that need to be
   # installed, specify them here.  If using Python 2.6 or less, then these
