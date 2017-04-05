@@ -7,7 +7,7 @@
     "prebuild": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test",
     "build": "python build.py",
     "predist": "npm run build && npm run docs",
-    "dist": "python setup.py bdist_egg",
+    "dist": "python setup.py bdist_egg && mkdirp dist && cd build && tar cvzf ../dist/phovea_server.tar.gz *"
     "predocker": "npm run build",
     "docker": "docker build -t phovea_server -f deploy/Dockerfile .",
     "docker:dev": "docker build -t phovea_server -f deploy/Dockerfile_dev .",
