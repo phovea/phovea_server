@@ -25,7 +25,7 @@
   "name": "phovea_server",
   "description": "Python server implementation of Phovea",
   "homepage": "https://phovea.caleydo.org",
-  "version": "0.1.0",
+  "version": "0.1.1-SNAPSHOT",
   "author": {
     "name": "The Caleydo Team",
     "email": "contact@caleydo.org",
