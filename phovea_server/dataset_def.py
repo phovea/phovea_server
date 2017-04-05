@@ -5,6 +5,8 @@
 ###############################################################################
 
 from builtins import object
+import abc
+import numpy as np
 
 
 def to_plural(s):
@@ -14,6 +16,8 @@ def to_plural(s):
 
 
 class ADataSetEntry(object):
+  __metaclass__ = abc.ABCMeta
+
   """
   A basic dataset entry
   """
@@ -83,6 +87,7 @@ class ADataSetEntry(object):
     """
     return False
 
+  @abc.abstractmethod
   def asjson(self, range=None):
     """
     converts this dataset to a json compatible format
@@ -91,46 +96,189 @@ class ADataSetEntry(object):
     """
     return dict()
 
-    # specific api for vectors
-    # idtype
-    # shape
-    # value
-    # range
-    # rows(range=None)
-    # rowids(range=None)
-    # aslist(range=None)
-    # asnumpy(range=None)
-    # specific api for matrices
-    # rowtype
-    # coltype
-    # shape
-    # value
-    # range
-    # rows(range=None)
-    # rowids(range=None)
-    # cols(range=None)
-    # colids(range=None)
-    # aslist(range=None)
-    # asnumpy(range=None)
-    # specific api for tables
-    # idtype
-    # columns
-    # shape
-    # rows(range=None)
-    # rowids(range=None)
-    # aslist(range=None)
-    # aspandas(range=None)
-    # specific api for stratifications
-    # idtype
-    # rows(range=None)
-    # rowids(range=None)
-    # groups()
+  def can_read(self, user=None):
+    from .security import can_read
+    return can_read(self.to_description(), user)
+
+  def can_write(self, user=None):
+    from .security import can_write
+    return can_write(self.to_description(), user)
+
+
+class AStratification(ADataSetEntry):
+  __metaclass__ = abc.ABCMeta
+
+  """
+  A basic dataset entry
+  """
+
+  def __init__(self, name, project, type, id=None):
+    super(AStratification, self).__init__(name, project, type, id)
+    self.idtype = 'Custom'
+
+  @abc.abstractmethod
+  def rows(self, range=None):
+    return []
+
+  @abc.abstractmethod
+  def rowids(self, range=None):
+    return []
+
+  @abc.abstractmethod
+  def groups(self):
+    return []
+
+
+class AMatrix(ADataSetEntry):
+  __metaclass__ = abc.ABCMeta
+
+  """
+  A basic dataset entry
+  """
+
+  def __init__(self, name, project, type, id=None):
+    super(AMatrix, self).__init__(name, project, type, id)
+    self.rowtype = 'Custom'
+    self.coltype = 'Custom'
+    self.shape = [0, 0]
+    self.value = 'string'
+
+  @abc.abstractmethod
+  def rows(self, range=None):
+    return []
+
+  @abc.abstractmethod
+  def rowids(self, range=None):
+    return []
+
+  @abc.abstractmethod
+  def cols(self, range=None):
+    return []
+
+  @abc.abstractmethod
+  def colids(self, range=None):
+    return []
+
+  def aslist(self, range=None):
+    return self.asnumpy(range).tolist()
+
+  @abc.abstractmethod
+  def asnumpy(self, range=None):
+    return np.array([])
+
+  def asjson(self, range=None):
+    arr = self.asnumpy(range)
+    rows = self.rows(None if range is None else range[0])
+    cols = self.cols(None if range is None else range[1])
+    rowids = self.rowids(None if range is None else range[0])
+    colids = self.colids(None if range is None else range[1])
+
+    r = dict(data=arr, rows=rows, cols=cols, rowIds=rowids, colIds=colids)
+    return r
+
+
+class AVector(ADataSetEntry):
+  __metaclass__ = abc.ABCMeta
+
+  """
+  A basic dataset entry
+  """
+
+  def __init__(self, name, project, type, id=None):
+    super(AVector, self).__init__(name, project, type, id)
+    self.idtype = 'Custom'
+    self.value = 'string'
+    self.shape = [0]
+
+  @abc.abstractmethod
+  def rows(self, range=None):
+    return []
+
+  @abc.abstractmethod
+  def rowids(self, range=None):
+    return []
+
+  def aslist(self, range=None):
+    return self.asnumpy(range).tolist()
+
+  @abc.abstractmethod
+  def asnumpy(self, range=None):
+    return np.array([])
+
+  def asjson(self, range=None):
+    arr = self.asnumpy(range)
+    rows = self.rows(None if range is None else range[0])
+    rowids = self.rowids(None if range is None else range[0])
+    r = dict(data=arr, rows=rows, rowIds=rowids)
+
+    return r
+
+
+class AColumn(object):
+  __metaclass__ = abc.ABCMeta
+
+  def __init__(self, name, type):
+    self.name = name
+    self.type = type
+
+  def aslist(self, range=None):
+    return self.asnumpy(range).tolist()
+
+  @abc.abstractmethod
+  def asnumpy(self, range=None):
+    return np.array([])
+
+  @abc.abstractmethod
+  def dump(self):
+    return None
+
+
+class ATable(ADataSetEntry):
+  __metaclass__ = abc.ABCMeta
+
+  """
+  A basic dataset entry
+  """
+
+  def __init__(self, name, project, type, id=None):
+    super(ATable, self).__init__(name, project, type, id)
+    self.idtype = 'Custom'
+    self.shape = [0, 0]
+    self.columns = []
+
+  @abc.abstractmethod
+  def rows(self, range=None):
+    return []
+
+  @abc.abstractmethod
+  def rowids(self, range=None):
+    return []
+
+  def aslist(self, range=None):
+    return self.aspandas(range).to_dict('records')
+
+  @abc.abstractmethod
+  def aspandas(self, range=None):
+    import pandas as pd
+    return pd.DataFrame()
+
+  def asjson(self, range=None):
+    arr = self.aslist(range)
+    rows = self.rows(None if range is None else range[0])
+    rowids = self.rowids(None if range is None else range[0])
+    r = dict(data=arr, rows=rows, rowIds=rowids)
+
+    return r
 
 
 class ADataSetProvider(object):
-  def __len__(self):
-    return 0
+  __metaclass__ = abc.ABCMeta
 
+  def __len__(self):
+    import itertools
+    return itertools.count(self)
+
+  @abc.abstractmethod
   def __iter__(self):
     return iter([])
 

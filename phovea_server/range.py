@@ -275,9 +275,9 @@ class Range1D(object):
       return RangeElem.none()
     return self._elems[i]
 
-  def asslice(self):
+  def asslice(self, no_ellipsis=False):
     if self.isall:
-      return Ellipsis
+      return slice(0, -1) if no_ellipsis else Ellipsis
     if self.isnone:
       return []
     if len(self._elems) == 1:
@@ -595,10 +595,10 @@ class Range(object):
   def copy(self):
     return Range([d.copy() for d in self.dims])
 
-  def asslice(self):
+  def asslice(self, no_ellipsis=False):
     if self.isall:
       return Ellipsis
-    return tuple((d.asslice() for d in self.dims))
+    return tuple((d.asslice(no_ellipsis) for d in self.dims))
 
   def swap(self):
     a = [d.copy() for d in self.dims]

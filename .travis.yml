@@ -1,29 +1,33 @@
 language: python
 sudo: required
 env:
-  - TOXENV=py27
-  - TOXENV=py34
-
+- TOXENV=py27
+- TOXENV=py34
 install:
-  - (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get install -y))
-  - pip install -r requirements_dev.txt
-  - pip install -r requirements.txt
-
-addons:
-  firefox: 49.0.1
+- "(!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get
+  install -y))"
+- pip install -r requirements_dev.txt
+- pip install -r requirements.txt
 script: npm run dist
-
+notifications:
+  slack:
+    secure: GOwRjzfiPTbGEPnpa3OHfj5B/QNui5wA5EGenY+GX9ZEVE5gEC0zH3axg8BpUV41Kd2qZQxNE7/gelMwi3owIQwDweMdgt0d0Q//yxyusjYxgg/O0mWlPvMviEiNX67/8z0YzIjIMh8BpOdJV98FvP0WD0/XlKCJujzY5TVo0yU6C3q9I8fm6zwL89jsBJN59M1StVP+qdGPIR2sVE93Jf2hSgklFLARgVtqQULVyn4XLevM/TSB2TxDlbmyowyQd6w2J1RnIXBqy3b8C4aJVwPhe4Kvs5zw3yPn/+RIvbdgJLYav/Sc9sb3JWba40Q6B2FWgRUZsg+Rm685/6t8y++kK9G6eEn1stD1hQcUPLujHqm1pgOyWxW1TtyfCgygkW5IiUgVKtOl2xALbjHRENvsgdFRWGTAE/m7pjY+fNYRWHthuw4T8ZWP2cZWxsVCrxxJG/nuCID0miAy+ytsym3m+tV7To7OLL8wVIg/39JZXfHqqrTIapLl4bxPU4zjorpkv03+dMpFx6rbZt1+wxw5SHh67XZPUO4jVpOtUjRLSfgVu4MYDO72FWN4+Q7K1Hc+eC9quANAJyXqMq59FG1VRpt7Qr2gF2kLURI8/u7chKuZTIHKrymJ0HKCszB8tQBWSwufaeywwierMCfCEtWW2E+kcB549LJRFU+eulg=
+    on_success: change
+    on_failure: always
 deploy:
-  provider: releases
+- provider: releases
   api_key:
-    secure: TK9/P34Bi3WuppiDrBCwVcn41yCBwmILaU8hXTBzUPbT7TbeFIwsC6/4CtH85Z+ZrUve4S5pTmWRNf2dQDxWw3uYu7+bJuemV2J1LHG76mognj+TNEiYxfLQUt3Gql4W7C7FcI4Rlx5/uMN9wY1wro8TWUBMwT6jjSrUWIvK3GXoojd5bHvJx07XpjWl9wCon4D0ruZiFoM2mdeP23lbc2GckETi32oEKswnQXxkMACmxbPzoWbvkxH4aK8Bt2Rj2sl2TbPhVkN6DAkHGkGAvLI+2/aRfG27+oo3OKsaDjbuGABct8TfZccJ970CbQ8kbnCjYxstvqkg1JWjF0W67sX/flBZZOEUA5l0OLWo6HqMGMxm7/lEQhIdPMsRmvXL+HVOxkMrB2dda58QzxVwiZp+rRqUaeabPZp8Kl5xodGrVxsBvxe6zAbJ5jCtCSumG6+kLyKI00/kYlghqQNrgUw0ZsYJlQ34h3lo/24QpaeyDpQoCkGWQgtgqiXGpeKSu7bCnOqIqAy3nbT9Utwj7K8gIasTG5idosEAz/THMampNbGDuyxxc340sYGNMg9Bhm1g2ILWRdtV470p5hwBtIDTKi3/PAizEO26+Wh0zI47Sg3ao57avcbCsTmzbZUeA5J4bojmchhJCHX8su9cSCGh/2fJA/1eBIgEvOQ8LNE=
+    secure: IOK6qIVZV0u2UDorpqhXnjCwJdoFQWYVMVBujEliPOB/9zer+3dRIhdFOaTuvsk/vrPv5UxepiSUqzLUJlrPkjlJTf4yRwc+kQ1sZdnc7Av4Cd6eKRyrajhr8JM9bg1A3HUljua3mDjKUcvdWZnDIDSv9QuXvmlgO52f56MQryJ85cksTifOh6ShMDS8moqaZD09tMRx7cdBw0wVVwXNDTDAf2kkrRy96sQ4+NJBIy9QA1oShDepURjm6trr/eFfFr3lIttR6hTF6s3EqqEifxmbh3PxXo+y14uyiQWVbzoVX4teA1q0H5vBmDNs3+LZz/uYVwV4upn+R6Ph+GLY15Xwkup8WS7yB36dogaLgPuW+n8DqqEyxFqor6tkSOcqPT0sBgIdo3PX2k1caF1qFqBVe+d09lPhy/Y7GXl2bO55+UFX0iyvv3Zez7rcnho5hAmtWIf4G7IUe8aUlFyrtZbyhd/MGixTHTjgFXvKxHOKEgeJ5Ec6HUr6+7x9HHQ4O4Uznt7NE+n+37/kW6hR1Q5rqksfa1rTAapQ7uE/IBj7yOM0lEQdU9v5iwyDNGV2viG7lK60ofu68jV0K6tgPplWczxX0IIqaJYVtyWm6JGkU96fc9JpWNi/TwdRL1BvqwWBRe8Wya6Wk0KNe0jIniUlwgmp565JjFYsWTduRww=
   file_glob: true
   file: dist/phovea_server*.egg
   on:
     tags: true
-
-notifications:
-  slack:
-    secure: E8/1UIdHSczUbN+6i6gd1d5LM4vmLdwLQ30tpyjvnM0wvfDce76oPxLJAy240WJ5ybXRZUtNrttpVpt4tEXCy8aLFCmxD7s77rVloH+q1J8R/ptTFWZGhFGEujk1awEmVbzcWxJkV9/JENQaeGBKxwv8/EQwWwEkAb7p/+AJb9owmH88b3wUZUGHBWtbMiyyaF4Rm1Wg1stJB8Z1Ga7PRF4cqufTgcDdsCPVv9gAY+VxOIGqX/Vfuc9UWpUH8vq8lHUE7Inn5QS78kuFfSgLWga3H6Mu/Gko1XNlWk0QWWQBUvEZ6ZC6Wuo68KzvUjJHDTnx8WyfHue2JNHIslcX+eJq2WHLeEgM24VeNkILCGo/H/60NGHiSjrIv/Y9h6bQ9FDjo6TUyE4nbdPYN1RN9FQ5UbI9Y4Gi753H9mqnHWlEywBOzHxdZCAuz9Wh03CCF/blsvJ+Obbyo6Jrfe+g44jyi9kQdBNQ78qG6v4EXws8FiYao6x3PpgIwFix42Cpr+soAh5FpA3C1zHSAyZZpXF65/lrDl5yPNofK7Wy0B9bw+0I6Z/u7ZKFNVZXvYPGYvtUVcsALGBdmYc61+LCta36Po0KZseWVAlJj6QnOJDYzv0wvV/zsuf9A5KpYFGiqV9Q7zmtiO5FYF5sBy+lE7O9tHVO4O18IRndhRQgxhs=
-    on_success: change
-    on_failure: always
+    repo: phovea/phovea_server
+- provider: pypi
+  user: caleydo-bot
+  password:
+    secure: Zx5AkTFqrwK979lLBa0O9OstO0FSCXPb2vvmYgKaOqCp2UWjTH52Lvq83lPAVyfreRuqx5vcDOlJjy46TfmgxiS+azNS2sbX0EC67/eooWjJ3krYxoVsRPHNF+vsZIGcWEeb19ZtgteCFEwPYFzFA0O8abCBCQj/xY3o9sa90BffQ1iiOSQmtypB2+8crVtTLxMdraJo5R1ZEKEe5dJbrnPutyaWtInyGwVg6yjTymMhAwv5hxYJx1+Jpg/bkl5U+4ta7qqX7LZRIrH8asMS59aQXdvdZuRqrs2vUXmN8jZ3aOKFB56zEYnFZdiVs8nfm3OYp6ETrCjtXYsxNQj7hdKZfyaHrAmyPwBck0X3npvAxaj2KdJEzFUpGwzBxoHsNfhPvVyZl22OjEXfnk/nNWjHIU/M/Sn67LxAYRa5tK1cWgvpw3MuDsgkNbvzVRDhlj5LD7NX3E/nAGyJjSOruhNQcZiHDSmp6r/UA0bQZ0QrNzRf7t0885Q3MGV8Jk+Ir0IfrfRUmg5enoc9oeKJY4DmdEsGBYt2YeCczq4tfuEe0/8mmFEFxGwNlS7BkLP3IVI7O1x9c25l3yOmbGGNVnjwA0JE5CKyABNUpXom310xI7vgwamPL159GKhfpPsknEN+YVuk+Nl1IGLZaVsPcg0czaWkd5VRwyUToyk3Eeo=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: phovea/phovea_server

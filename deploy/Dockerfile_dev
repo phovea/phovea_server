@@ -24,6 +24,7 @@ RUN (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs apt-get 
 
 ENV PHOVEA_ENV=dev
 ENV PHOVEA_SERVICE=api
+ENV PHOVEA_CONFIG_PATH=config.json
 #start ssh and service
 CMD python phovea_server --use_reloader --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
 EXPOSE 80
