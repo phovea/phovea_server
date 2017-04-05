@@ -1,27 +1,4 @@
 {
-  "scripts": {
-    "start": "python phovea_server --use_reloader --env dev api",
-    "check": "flake8",
-    "pretest": "npm run check",
-    "test": "test ! -d tests || python setup.py test",
-    "prebuild": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test",
-    "build": "python build.py",
-    "predist": "npm run build && npm run docs",
-    "dist": "python setup.py bdist_egg && mkdirp dist && cd build && tar cvzf ../dist/phovea_server.tar.gz *",
-    "predocker": "npm run build",
-    "docker": "docker build -t phovea_server -f deploy/Dockerfile .",
-    "docker:dev": "docker build -t phovea_server -f deploy/Dockerfile_dev .",
-    "docs": "sphinx-apidoc -o docs -f ./phovea_server && sphinx-build ./docs build/docs"
-  },
-  "files": [
-    "phovea_server",
-    "__init__.py",
-    "__main__.py",
-    "build",
-    "requirements.txt",
-    "requirements_dev.txt",
-    "docker_packages.txt"
-  ],
   "name": "phovea_server",
   "description": "Python server implementation of Phovea",
   "homepage": "https://phovea.caleydo.org",
@@ -38,5 +15,28 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/phovea/phovea_server.git"
+  },
+  "files": [
+    "phovea_server",
+    "__init__.py",
+    "__main__.py",
+    "build",
+    "requirements.txt",
+    "requirements_dev.txt",
+    "docker_packages.txt"
+  ],
+  "scripts": {
+    "start": "python phovea_server --use_reloader --env dev api",
+    "check": "flake8",
+    "pretest": "npm run check",
+    "test": "test ! -d tests || python setup.py test",
+    "prebuild": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test",
+    "build": "python build.py",
+    "predist": "npm run build && npm run docs",
+    "dist": "python setup.py bdist_egg && cd build && tar cvzf ../dist/phovea_server.tar.gz *",
+    "predocker": "npm run build",
+    "docker": "docker build -t phovea_server -f deploy/Dockerfile .",
+    "docker:dev": "docker build -t phovea_server -f deploy/Dockerfile_dev .",
+    "docs": "sphinx-apidoc -o docs -f ./phovea_server && sphinx-build ./docs build/docs"
   }
 }
