@@ -4,7 +4,7 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 from __future__ import with_statement, print_function
-from setuptools import setup
+from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
@@ -31,7 +31,7 @@ def packaged(*files):
 
 
 def requirements(file):
-  return [r.strip().encode('ascii') for r in read_it(file).split('\n') if not r.startswith('-e git+https://')]
+  return [r.strip().encode('ascii') for r in read_it(file).strip().split('\n') if not r.startswith('-e git+https://')]
 
 
 def to_version(v):
@@ -69,7 +69,7 @@ setup(
 
   # You can just specify the packages manually here if your project is
   # simple. Or you can use find_packages().
-  packages=[pkg['name']],
+  packages=find_packages(exclude=['docs', 'tests*']),
 
   # List run-time dependencies here.  These will be installed by pip when
   # your project is installed. For an analysis of "install_requires" vs pip's
