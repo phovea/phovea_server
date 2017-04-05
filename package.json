@@ -24,7 +24,7 @@
     "requirements.txt",
     "requirements_dev.txt",
     "docker_packages.txt"
-  ]
+  ],
   "scripts": {
     "start": "python phovea_server --use_reloader --env dev api",
     "check": "flake8",
