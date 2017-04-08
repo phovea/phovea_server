@@ -193,7 +193,7 @@ def add_table_handler(app, dataset_getter):
     d = dataset_getter(dataset_id, 'table')
     r = asrange(ns.request.args.get('range', None))
     for col in d.columns:
-      if col.name == column:
+      if col.name == column or col.dump().get('column', '') == column:
         return jsonify(col.aslist(r), allow_nan=False)
     ns.abort(404)
 
