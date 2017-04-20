@@ -122,6 +122,7 @@ def _init_config():
     with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))
 
+
 # create an initial config guess
 _init_config()
 
