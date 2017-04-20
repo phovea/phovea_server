@@ -40,7 +40,6 @@ def to_version(v):
   return v.replace('SNAPSHOT', now.strftime('%Y%m%d-%H%M%S'))
 
 
-
 setup(
   name=pkg['name'],
   version=to_version(pkg['version']),
