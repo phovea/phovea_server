@@ -30,6 +30,18 @@ class MappingManager(object):
         from_mappings[to_idtype] = to_mappings
         to_mappings.append(mapper)
 
+  def known_idtypes(self):
+    """
+    returns a set of a all known id types in this mapping graph
+    :return:
+    """
+    s = set()
+    for from_,v in self.mappers.items():
+      s.add(from_)
+      for to_ in v.keys():
+        s.add(to_)
+    return s
+
   def can_map(self, from_idtype, to_idtype):
     from_mappings = self.mappers.get(from_idtype, {})
     return to_idtype in from_mappings
