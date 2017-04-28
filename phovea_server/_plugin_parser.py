@@ -299,8 +299,10 @@ class PluginMetaData(object):
   def __init__(self):
     self.plugins = []
 
-    entrypoints = _find_entry_point_plugins()
-    self.plugins.extend(p for p in entrypoints if not is_disabled_plugin(p))
+    if not is_development_mode():
+      entrypoints = _find_entry_point_plugins()
+      self.plugins.extend(p for p in entrypoints if not is_disabled_plugin(p))
+
     entrypoint_ids = frozenset([p.id for p in self.plugins])
 
     if is_development_mode():
