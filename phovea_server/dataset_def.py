@@ -15,6 +15,10 @@ def to_plural(s):
   return s + 's'
 
 
+def to_idtype_description(id):
+  return dict(id=id, name=id, names=to_plural(id))
+
+
 class ADataSetEntry(object):
   __metaclass__ = abc.ABCMeta
 
@@ -57,10 +61,7 @@ class ADataSetEntry(object):
     :return:
     """
 
-    def to_desc(t):
-      return dict(id=t, name=t, names=to_plural(t))
-
-    return [to_desc(t) for t in self.idtypes()]
+    return [to_idtype_description(t) for t in self.idtypes()]
 
   def update(self, args, files):
     """
