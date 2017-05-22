@@ -236,6 +236,16 @@ def _mapping_to(idtype, to_idtype):
   return _do_mapping(idtype, to_idtype, False)
 
 
+@app_idtype.route('/<idtype>/<to_idtype>/search')
+def _mapping_to_search(idtype, to_idtype):
+  query = ns.request.args.get('q', None)
+  max_results = int(ns.request.args.get('limit', 10))
+  mapper = get_mappingmanager()
+  if hasattr(mapper, 'search'):
+    return jsonify(mapper.search(idtype, to_idtype, query, max_results))
+  return jsonify([])
+
+
 def _do_mapping(idtype, to_idtype, to_ids):
   mapper = get_mappingmanager()
   args = ns.request.args

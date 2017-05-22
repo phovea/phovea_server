@@ -73,6 +73,32 @@ class MappingManager(object):
             rhash.add(id)
     return r
 
+  def search(self, from_idtype, to_idtype, query, max_results=None):
+    """
+    searches for matches in the names of the given idtype
+    :param query:
+    :param max_results
+    :return:
+    """
+    from_mappings = self.mappers.get(from_idtype, {})
+    to_mappings = from_mappings.get(to_idtype, [])
+    to_mappings = [m for m in to_mappings if hasattr(m, 'search')]
+
+    if not to_mappings:
+      _log.warn('cannot find mapping from %s to %s', from_idtype, to_idtype)
+      return []
+
+    if len(to_mappings) == 1:
+      # single mapping no need for merging
+      return to_mappings[0].search(query, max_results)
+
+    rset = set()
+    for mapper in to_mappings:
+      results = mapper.serach(query, max_results)
+      for r in results:
+        rset.add(r)
+    return list(rset)
+
 
 def create():
   return MappingManager()
