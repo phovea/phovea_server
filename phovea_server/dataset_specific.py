@@ -92,6 +92,22 @@ def _color_palette(arg):
   return None
 
 
+def _parse_color(hex):
+  import struct
+  str = hex[1:] if hex.startswith('#') else hex
+  return struct.unpack('BBB', str.decode('hex'))
+
+
+def _set_missing_values(img, arr, color):
+  import numpy as np
+  locs = np.transpose(np.where(np.isnan(arr)))
+  if locs.size > 0:
+    img = img.convert('RGB')
+    for loc in locs:
+      img.putpixel(loc, color)
+  return img
+
+
 def format_image(dataset, range, args):
   format = args.get('format', 'png')
 
@@ -108,6 +124,10 @@ def format_image(dataset, range, args):
   if d.ndim == 1:
     d = d.reshape((1, d.shape[0]))
   img = scipy.misc.toimage(d, cmin=cmin, cmax=cmax, pal=_color_palette(args.get('format_palette', None)))
+
+  # convert to real RGB image
+  # inject missing values
+  img = _set_missing_values(img, d, _parse_color(args.get('format_missing', '#d400c2')))
 
   if 'format_w' in args:
     width = int(args.get('format_w'))
