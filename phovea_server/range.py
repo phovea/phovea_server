@@ -12,17 +12,22 @@ from past.builtins import basestring
 from builtins import object
 import itertools
 from functools import reduce
+from numpy import NaN, isnan
 
 all_f = all
 
 
 def fix(v, size=0):
-  return v if v > 0 else (size + 1 + v)
+  return v if v >= 0 else (size + 1 + v)
 
 
 class SingleRangeElem(object):
   def __init__(self, val):
     self.start = val
+
+  @property
+  def end(self):
+    return self.start + 1
 
   @property
   def step(self):
@@ -38,6 +43,10 @@ class SingleRangeElem(object):
   @property
   def issingle(self):
     return True
+
+  @property
+  def isunbound(self):
+    return False
 
   def __len__(self):
     return 1
@@ -67,6 +76,17 @@ class SingleRangeElem(object):
   def __str__(self):
     return str(self.start)
 
+  def __eq__(self, other):
+    if isinstance(other, self.__class__):
+      return self.start == other.start
+    return False
+
+  def copy(self):
+    return self.__copy__()
+
+  def __copy__(self):
+    return SingleRangeElem(self.start)
+
 
 class RangeElem(object):
   def __init__(self, start, end=-1, step=1):
@@ -84,6 +104,10 @@ class RangeElem(object):
   @property
   def issingle(self):
     return (self.start + self.step) == self.end
+
+  @property
+  def isunbound(self):
+    return self.start < 0 or self.end < 0
 
   @staticmethod
   def all():
@@ -106,12 +130,14 @@ class RangeElem(object):
   def __len__(self):
     return self.size()
 
-  def size(self, size=0):
+  def size(self, size=NaN):
     t = fix(self.end, size)
     f = fix(self.start, size)
     if self.step == 1:
       return max(t - f, 0)
     elif self.step == -1:
+      if self.end == -1:
+        return max(f - -1, 0)
       return max(f - t, 0)
     d = t - f + 1 if self.step > 0 else f - t + 1
     s = abs(self.step)
@@ -120,9 +146,14 @@ class RangeElem(object):
     return (d // s)
 
   def reverse(self):
-    t = self.start if self.start < 0 else self.start + 1
-    f = self.end if self.end < 0 else self.end - 1
-    return RangeElem(f, t, - self.step)
+    if self.start > 0:
+      t = self.start - 1
+      f = self.end - 1
+      return RangeElem(f, t, - self.step)
+    else:  # step < 0
+      t = self.start - 1
+      f = self.end - 1
+      return RangeElem(f, t, - self.step)
 
   def invert(self, index, size=0):
     if self.isall:
@@ -133,15 +164,24 @@ class RangeElem(object):
     return self.iter()
 
   def iter(self, size=0):
+    if self.step < 0 and self.end == -1:
+      # keep negative to have 0 included
+      return iter(number_range(fix(self.start, size), -1, self.step))
     return iter(number_range(fix(self.start, size), fix(self.end, size), self.step))
 
-  def contains(self, value, size=0):
+  def contains(self, value, size=NaN):
+    if self.isall:
+      return True
     f = fix(self.start, size)
     t = fix(self.end, size)
     if self.step == -1:
+      if self.end == -1:
+        return 0 <= value <= f
       return (value <= f) and (value > t)
-    else:
+    elif self.step == 1:
       return (value >= f) and (value < t)
+    else:
+      return value in list(self.iter(size))
 
   def __in__(self, value):
     return self.contains(value)
@@ -156,16 +196,39 @@ class RangeElem(object):
       r = r + ':' + str(self.step)
     return r
 
+  def __eq__(self, other):
+    if isinstance(other, self.__class__):
+      return self.start == other.start and self.end == other.end and self.step == other.step
+    return False
+
+  def copy(self):
+    return self.__copy__()
+
+  def __copy__(self):
+    return RangeElem(self.start, self.end, self.step)
+
   @staticmethod
   def parse(code):
     if len(code) == 0:
       return RangeElem.all()
+
+    def parse_elem(v, default_value=None):
+      v = v.strip()
+      if len(v) == 0 and default_value is not None:
+        return default_value
+      try:
+        return int(v)
+      except ValueError:
+        raise Exception('parse error: "' + v + '" is not a valid integer')
+
     parts = code.split(':')
     if len(parts) == 1:
-      return RangeElem.single(int(parts[0]))
+      return RangeElem.single(parse_elem(parts[0]))
     elif len(parts) == 2:
-      return RangeElem(int(parts[0]), int(parts[1]))
-    return RangeElem(int(parts[0]), int(parts[1]), int(parts[2]))
+      return RangeElem(parse_elem(parts[0], 0), parse_elem(parts[1], -1))
+    elif len(parts) == 3:
+      return RangeElem(parse_elem(parts[0], 0), parse_elem(parts[1], -1), parse_elem(parts[2], 1))
+    raise Exception('parse error: "' + code + '" is not a valid range specifier')
 
 
 class Range1D(object):
@@ -178,12 +241,17 @@ class Range1D(object):
       self._elems = []
 
   def __len__(self):
-    return reduce(lambda s, x: s + len(x), self._elems, 0)
+    return self.size()
 
   def copy(self):
     return Range1D(self._elems[:])
 
-  def size(self, size=0):
+  def __copy__(self):
+    return self.copy()
+
+  def size(self, size=NaN):
+    if isnan(size) and self.isunbound:
+      return NaN
     return reduce(lambda s, x: s + x.size(size), self._elems, 0)
 
   @staticmethod
@@ -191,11 +259,15 @@ class Range1D(object):
     return Range1D([RangeElem.all()])
 
   @staticmethod
+  def single(item):
+    return Range1D([RangeElem.single(item)])
+
+  @staticmethod
   def none():
     return Range1D()
 
   @staticmethod
-  def start(indices):
+  def from_list(indices):
     return Range1D(Range1D._compress(indices))
 
   @staticmethod
@@ -217,8 +289,8 @@ class Range1D(object):
         r.append(RangeElem.single(indices[start]))
       else:
         # +1 since end is excluded
-        # fix while just +1 -1 allowed
-        if abs(deltas[start]) == 1:
+        # fix while just +1 is allowed and -1 is not allowed
+        if deltas[start] == 1:
           r.append(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]))
         else:
           for i in number_range(start, act):
@@ -237,6 +309,10 @@ class Range1D(object):
   @property
   def isnone(self):
     return len(self._elems) == 0
+
+  @property
+  def isunbound(self):
+    return any((d.isunbound for d in self._elems))
 
   @property
   def _islist(self):
