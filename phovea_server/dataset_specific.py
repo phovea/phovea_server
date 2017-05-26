@@ -109,7 +109,7 @@ def _set_missing_values(img, arr, color):
   if locs.size > 0:
     img = img.convert('RGB')
     for loc in locs:
-      img.putpixel(loc, color)
+      img.putpixel((loc[1], loc[0]), color)
   return img
 
 
