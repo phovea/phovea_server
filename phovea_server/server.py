@@ -103,8 +103,6 @@ def _pre_load_caches():
     get_mappingmanager()
 
 
-
-
 def create_application():
   from . import dispatcher
   from . import mainapp
