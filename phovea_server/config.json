@@ -14,8 +14,8 @@
   "max_file_size": 33554432,
 
   "coldstart": {
-    "mapping": true,
-    "assigner": true
+    "mapping": false,
+    "assigner": false
   },
 
   "disable": {
