@@ -85,6 +85,26 @@ def _loader(p):
   return load_app
 
 
+def _pre_load_caches():
+  """
+  preload some manager to start them up
+  :return:
+  """
+  c = _get_config().coldstart
+
+  if c['assigner']:
+    from .dataset import get_idmanager
+    _log.info('initialize id assigner')
+    get_idmanager()
+
+  if c['mapping']:
+    from .dataset import get_mappingmanager
+    _log.info('initialize mapping manager')
+    get_mappingmanager()
+
+
+
+
 def create_application():
   from . import dispatcher
   from . import mainapp
@@ -98,6 +118,9 @@ def create_application():
 
   # create a dispatcher for all the applications
   application = dispatcher.PathDispatcher(_default_app, _applications)
+
+  _pre_load_caches()
+
   return ProxyFix(application)
 
 

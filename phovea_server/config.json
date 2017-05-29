@@ -13,6 +13,11 @@
   "secret_key": "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w",
   "max_file_size": 33554432,
 
+  "coldstart": {
+    "mapping": true,
+    "assigner": true
+  },
+
   "disable": {
     "plugins": [],
     "extensions": []
