@@ -8,7 +8,7 @@ COPY requirements*.txt docker_packages.txt docker_script*.sh ./
 RUN (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs apt-get install -y)) && \
     pip install --no-cache-dir -r requirements.txt && \
     (pip install --no-cache-dir -r requirements_dev.txt)
-RUN (!(test -f docker_script.sh) || (chmod +x ./docker_script.sh && ./docker_script.sh))
+RUN (!(test -f docker_script.sh) || bash ./docker_script.sh)
 
 ENV PHOVEA_ENV=dev
 ENV PHOVEA_SERVICE=api
