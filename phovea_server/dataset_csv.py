@@ -279,7 +279,7 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
       else:
         d = d.reshape((1, d.shape[0]))
     elif d.ndim == 0:
-      d = d.reshape((1,1))
+      d = d.reshape((1, 1))
     return d
 
   @staticmethod
@@ -433,7 +433,10 @@ class CSVVector(CSVEntryMixin, AVector):
     n = self.load()['data']
     if range is None:
       return n
-    return n[range[0].asslice()]
+    d = n[range[0].asslice()]
+    if d.ndim == 0:
+      d = d.reshape((1,))
+    return d
 
   @staticmethod
   def parse(data, path, project, id=None):
