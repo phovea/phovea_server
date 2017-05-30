@@ -129,6 +129,9 @@ class AStratification(ADataSetEntry):
   def groups(self):
     return []
 
+  def idtypes(self):
+    return [self.idtype]
+
 
 class AMatrix(ADataSetEntry):
   __metaclass__ = abc.ABCMeta
@@ -177,6 +180,9 @@ class AMatrix(ADataSetEntry):
     r = dict(data=arr, rows=rows, cols=cols, rowIds=rowids, colIds=colids)
     return r
 
+  def idtypes(self):
+    return [self.rowtype, self.coltype]
+
 
 class AVector(ADataSetEntry):
   __metaclass__ = abc.ABCMeta
@@ -213,6 +219,9 @@ class AVector(ADataSetEntry):
     r = dict(data=arr, rows=rows, rowIds=rowids)
 
     return r
+
+  def idtypes(self):
+    return [self.idtype]
 
 
 class AColumn(object):
@@ -270,6 +279,9 @@ class ATable(ADataSetEntry):
     r = dict(data=arr, rows=rows, rowIds=rowids)
 
     return r
+
+  def idtypes(self):
+    return [self.idtype]
 
 
 class ADataSetProvider(object):
