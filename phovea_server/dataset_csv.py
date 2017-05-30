@@ -278,6 +278,8 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
         d = d.reshape((d.shape[0], 1))
       else:
         d = d.reshape((1, d.shape[0]))
+    elif d.ndim == 0:
+      d = d.reshape((1,1))
     return d
 
   @staticmethod
