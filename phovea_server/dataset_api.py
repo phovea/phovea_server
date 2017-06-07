@@ -132,7 +132,7 @@ def _dataset_getter(dataset_id, dataset_type):
     ns.abort(404, 'invalid dataset id "' + str(dataset_id) + '"')
   if t.type != dataset_type:
     ns.abort(400, 'the given dataset "' + str(dataset_id) + '" is not a ' + dataset_type)
-  if not t.can_read:
+  if not t.can_read():
     ns.abort(403, 'not allowed')
   return t
 
