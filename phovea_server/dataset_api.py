@@ -117,6 +117,8 @@ def _get_dataset(dataset_id):
 @app.route('/<dataset_id>/desc')
 def _get_dataset_desc(dataset_id):
   d = get(dataset_id)
+  if not d:
+    return 'invalid dataset id "' + str(dataset_id) + '"', 404
   if not d.can_read():
     return 'not allowed', 403
   return jsonify(d.to_description())
