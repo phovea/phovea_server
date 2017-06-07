@@ -48,11 +48,15 @@ def _list_items(dataset_getter, name, datasetid):
     return jsonify([n.asjson() for n in getattr(d, name + 's')(r[0] if r is not None else None)])
 
   if ns.request.method == 'DELETE':
+    if not d.can_write():
+      ns.abort(403)
     if d.clear():
       return jsonify(d.to_description(), indent=1)
     ns.abort(400)
 
   # post
+  if not d.can_write():
+    ns.abort(403)
   n = _to_desc()
   if getattr(d, 'add_' + name)(n):
     return jsonify(d.to_description(), indent=1)
@@ -67,11 +71,15 @@ def _handle_item(dataset_getter, name, datasetid, itemid):
     return jsonify(n.asjson())
 
   if ns.request.method == 'DELETE':
+    if not d.can_write():
+      ns.abort(403)
     if getattr(d, 'remove_' + name)(itemid):
       return jsonify(d.to_description(), indent=1)
     ns.abort(400)
 
   # put
+  if not d.can_write():
+    ns.abort(403)
   n = _to_desc()
   n['id'] = itemid
   if getattr(d, 'update_' + name)(n):

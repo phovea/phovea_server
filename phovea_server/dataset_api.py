@@ -106,6 +106,8 @@ def _get_dataset(dataset_id):
   d = get(dataset_id)
   if d is None:
     return 'invalid dataset id "' + str(dataset_id) + '"', 404
+  if not d.can_read():
+    return 'not allowed', 403
   r = ns.request.args.get('range', None)
   if r is not None:
     r = range.parse(r)
@@ -115,6 +117,8 @@ def _get_dataset(dataset_id):
 @app.route('/<dataset_id>/desc')
 def _get_dataset_desc(dataset_id):
   d = get(dataset_id)
+  if not d.can_read():
+    return 'not allowed', 403
   return jsonify(d.to_description())
 
 
@@ -126,6 +130,8 @@ def _dataset_getter(dataset_id, dataset_type):
     ns.abort(404, 'invalid dataset id "' + str(dataset_id) + '"')
   if t.type != dataset_type:
     ns.abort(400, 'the given dataset "' + str(dataset_id) + '" is not a ' + dataset_type)
+  if not t.can_read:
+    ns.abort(403, 'not allowed')
   return t
 
 
@@ -153,6 +159,8 @@ def _update_dataset(dataset_id, request):
     old = get(dataset_id)
     if old is None:
       return _upload_dataset(request, dataset_id)
+    if not old.can_write():
+      return 'not allowed', 403
     r = old.update(_to_upload_desc(request.values), request.files)
     if r:
       return jsonify(old.to_description(), indent=1)
@@ -167,6 +175,8 @@ def _modify_dataset(dataset_id, request):
     old = get(dataset_id)
     if old is None:
       return 'invalid dataset id "' + str(dataset_id) + '"', 404
+    if not old.can_write():
+      return 'not allowed', 403
     r = old.modify(_to_upload_desc(request.values), request.files)
     if r:
       return jsonify(old.to_description(), indent=1)
@@ -180,6 +190,8 @@ def _remove_dataset(dataset_id):
   dataset = get(dataset_id)
   if dataset is None:
     return 'invalid dataset id "' + str(dataset_id) + '"', 404
+  if not dataset.can_write():
+    return 'not allowed', 403
   r = remove(dataset_id)
   if r:
     return jsonify(
