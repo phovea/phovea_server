@@ -389,7 +389,7 @@ class Range1D(object):
       if 0 <= i < len(l):  # check for out of range
         r.append(l[i])
 
-    return Range1D.start(r)
+    return Range1D.from_list(r)
 
   def union(self, other, size=0):
     if self.isall or other.isnone:
@@ -404,7 +404,7 @@ class Range1D(object):
       if i not in r:
         r.append(i)
 
-    return Range1D.start(sorted(r))
+    return Range1D.from_list(sorted(r))
 
   def intersect(self, other, size=0):
     if self.isnone or other.isnone:
@@ -419,7 +419,7 @@ class Range1D(object):
     it1 = list(self.iter(size))
     it2 = other.iter(size)
     r = [i for i in it2 if i in it1]
-    return Range1D.start(sorted(r))
+    return Range1D.from_list(sorted(r))
 
   def without(self, without, size=0):
     if self.isnone or without.isnone:
@@ -431,7 +431,7 @@ class Range1D(object):
     it1 = self.iter(size)
     it2 = list(without.iter(size))
     r = [i for i in it1 if i not in it2]
-    return Range1D.start(sorted(r))
+    return Range1D.from_list(sorted(r))
 
   def invert(self, index, size=0):
     if self.isall:
@@ -477,7 +477,7 @@ class Range1D(object):
     else:
       arr = list(self.iter())
       result = [arr.index(d) for d in arr if d in arr]
-    return Range1D.start(result)
+    return Range1D.from_list(result)
 
   def filter(self, data, size, transform=lambda x: x):
     if self.isall:
@@ -502,13 +502,13 @@ class Range1D(object):
   def sort(self, cmp):
     arr = list(self.iter())
     arr.sort(cmp)
-    return Range1D.start(arr)
+    return Range1D.from_list(arr)
 
   def remove_duplicates(self, size=0):
     arr = list(self.iter())
     arr.sort()
     arr = [di for i, di in enumerate(arr) if di != arr[i - 1]]  # same value as before, remove
-    return Range1D.start(arr)
+    return Range1D.from_list(arr)
 
   def reverse(self):
     a = [r.reverse() for r in self._elems]
@@ -569,7 +569,7 @@ def to_base(groups):
   r = groups[0].tolist()
   for g in groups[1:]:
     r.extend((i for i in g if i not in r))
-  return Range1D.start(r)
+  return Range1D.from_list(r)
 
 
 class CompositeRange1D(Range1D):
