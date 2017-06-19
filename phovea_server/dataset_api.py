@@ -210,21 +210,21 @@ def _list_idtypes():
   return jsonify(list_idtypes())
 
 
-@app_idtype.route('/<idtype>/map')
+@app_idtype.route('/<idtype>/map', methods=['GET', 'POST'])
 def _map_ids(idtype):
-  name = ns.request.args.get('id', None)
+  name = ns.request.values.get('id', None)
   if name is not None:
     return get_idmanager()([name], idtype)[0]
-  names = ns.request.args.getlist('ids[]')
+  names = ns.request.values.getlist('ids[]')
   return jsonify(get_idmanager()(names, idtype))
 
 
-@app_idtype.route('/<idtype>/unmap')
+@app_idtype.route('/<idtype>/unmap', methods=['GET', 'POST'])
 def _unmap_ids(idtype):
-  name = ns.request.args.get('id', None)
+  name = ns.request.values.get('id', None)
   if name is not None:
     return get_idmanager().unmap([int(name)], idtype)[0]
-  names = range.parse(ns.request.args.get('ids', ''))[0].tolist()
+  names = range.parse(ns.request.values.get('ids', ''))[0].tolist()
   return jsonify(get_idmanager().unmap(names, idtype))
 
 
@@ -262,7 +262,7 @@ def _mapping_to_search(idtype, to_idtype):
 
 def _do_mapping(idtype, to_idtype, to_ids):
   mapper = get_mappingmanager()
-  args = ns.request.args
+  args = ns.request.values
   first_only = args.get('mode', 'all') == 'first'
   single = False
 
@@ -295,7 +295,7 @@ def _do_mapping(idtype, to_idtype, to_ids):
   return jsonify(mapped_list)
 
 
-@app_idtype.route('/<idtype>/<to_idtype>/map')
+@app_idtype.route('/<idtype>/<to_idtype>/map', methods=['GET', 'POST'])
 def _mapping_to_id(idtype, to_idtype):
   return _do_mapping(idtype, to_idtype, True)
 
