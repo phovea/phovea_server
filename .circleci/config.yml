@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }-{{ checksum "requirements_dev.txt" }-{{ checksum "docker_packages.txt" }}
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}-{{ checksum "docker_packages.txt" }}
       - run:
           command: |
             sudo pip install virtualenv
@@ -17,7 +17,7 @@ jobs:
             pip install -r requirements_dev.txt
             pip install -r requirements.txt
       - save_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }-{{ checksum "requirements_dev.txt" }-{{ checksum "docker_packages.txt" }}
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}-{{ checksum "docker_packages.txt" }}
           paths:
           - venv
       - run:
