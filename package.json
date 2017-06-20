@@ -27,7 +27,7 @@
   ],
   "scripts": {
     "start": "python phovea_server --use_reloader --env dev api",
-    "check": "flake8",
+    "check": "flake8 --exclude=.git,venv,deploy,docs,__pycache__",
     "pretest": "npm run check",
     "test": "test ! -d tests || python setup.py test",
     "prebuild": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test",
