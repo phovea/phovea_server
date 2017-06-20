@@ -13,17 +13,17 @@ jobs:
           key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
       - run:
           command: |
-            virtualenv /venv
+            virtualenv ~/venv
             . ~/venv/bin/activate
             pip install -r requirements_dev.txt
             pip install -r requirements.txt
       - save_cache:
           key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
           paths:
-          - /venv
+          - ~/venv
       - run:
           command: |
-            . /venv/bin/activate
+            . ~/venv/bin/activate
             npm run dist
       - store_artifacts:
           path: dist
