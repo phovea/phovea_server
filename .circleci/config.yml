@@ -12,6 +12,7 @@ jobs:
       - restore_cache:
           key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
       - run:
+          name: install-pip-wee
           command: |
             virtualenv ~/venv
             . ~/venv/bin/activate
@@ -21,7 +22,13 @@ jobs:
           key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
           paths:
           - ~/venv
+      - run: #force update of VCS dependencies?
+          name: update-pip-vcs-dependencies
+          command: |
+            . ~/venv/bin/activate
+            pip install --upgrade --upgrade-strategy=only-if-needed -r requirements.txt
       - run:
+          name: dist
           command: |
             . ~/venv/bin/activate
             npm run dist
