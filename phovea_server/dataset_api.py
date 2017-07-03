@@ -76,6 +76,7 @@ def _to_query(query):
 
 
 @app.route('/', methods=['GET', 'POST'])
+@ns.etag
 def _list_datasets():
   if ns.request.method == 'GET':
     query = _to_query(ns.request.values)
@@ -96,6 +97,7 @@ def _list_datasets():
 
 
 @app.route('/<dataset_id>', methods=['PUT', 'GET', 'DELETE', 'POST'])
+@ns.etag
 def _get_dataset(dataset_id):
   if ns.request.method == 'PUT':
     return _update_dataset(dataset_id, ns.request)
@@ -115,6 +117,7 @@ def _get_dataset(dataset_id):
 
 
 @app.route('/<dataset_id>/desc')
+@ns.etag
 def _get_dataset_desc(dataset_id):
   d = get(dataset_id)
   if not d:
@@ -206,6 +209,7 @@ def create_dataset():
 
 
 @app_idtype.route('/')
+@ns.etag
 def _list_idtypes():
   return jsonify(list_idtypes())
 
@@ -229,6 +233,7 @@ def _unmap_ids(idtype):
 
 
 @app_idtype.route('/<idtype>/')
+@ns.etag
 def _maps_to(idtype):
   mapper = get_mappingmanager()
   target_id_types = mapper.maps_to(idtype)

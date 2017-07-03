@@ -170,7 +170,7 @@ def _add_handler(app, dataset_getter, type):
     d = dataset_getter(dataset_id, type)
     return jsonify(d.to_description())
 
-  app.add_url_rule('/' + type + '/<dataset_id>', 'desc_' + type, desc_gen)
+  app.add_url_rule('/' + type + '/<dataset_id>', 'desc_' + type, ns.etag(desc_gen))
 
   def rows_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
