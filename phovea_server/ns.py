@@ -40,9 +40,6 @@ def etag(f):
   """Add entity tag (etag) handling to the decorated route."""
   import functools
   import hashlib
-  import logging
-
-  _log = logging.getLogger(__name__)
 
   @functools.wraps(f)
   def wrapped(*args, **kwargs):
@@ -63,7 +60,7 @@ def etag(f):
 
     # compute the etag for this request as the MD5 hash of the response
     # text and set it in the response header
-    etag = '"' + hashlib.md5(rv.get_data()).hexdigest() + '"'
+    etag = hashlib.sha1(rv.get_data()).hexdigest()
     rv.headers['ETag'] = etag
 
     # handle If-Match and If-None-Match request headers if present
