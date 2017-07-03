@@ -40,6 +40,9 @@ def etag(f):
   """Add entity tag (etag) handling to the decorated route."""
   import functools
   import hashlib
+  import logging
+
+  _log = logging.getLogger(__name__)
 
   @functools.wraps(f)
   def wrapped(*args, **kwargs):
@@ -66,6 +69,7 @@ def etag(f):
     # handle If-Match and If-None-Match request headers if present
     if_match = request.headers.get('If-Match')
     if_none_match = request.headers.get('If-None-Match')
+    _log.info('c--{}-- i--{}-- n--{}--', etag, if_match, if_none_match)
     if if_match:
       # only return the response if the etag for this request matches
       # any of the etags given in the If-Match header. If there is no
