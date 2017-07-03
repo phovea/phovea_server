@@ -69,13 +69,15 @@ def etag(f):
     # handle If-Match and If-None-Match request headers if present
     if_match = request.headers.get('If-Match')
     if_none_match = request.headers.get('If-None-Match')
-    _log.info('c--%s-- i--%s-- n--%s--', etag, if_match, if_none_match)
+    # weak version with prefixed W/
+    weak_etag = 'W/' + etag
+
     if if_match:
       # only return the response if the etag for this request matches
       # any of the etags given in the If-Match header. If there is no
       # match, then return a 412 Precondition Failed status code
       etag_list = [tag.strip() for tag in if_match.split(',')]
-      if etag not in etag_list and '*' not in etag_list:
+      if etag not in etag_list and weak_etag not in etag_list and '*' not in etag_list:
         response = jsonify({'status': 412, 'error': 'precondition failed',
                             'message': 'precondition failed'})
         response.status_code = 412
@@ -85,7 +87,7 @@ def etag(f):
       # match any of the etags given in the If-None-Match header. If
       # one matches, then return a 304 Not Modified status code
       etag_list = [tag.strip() for tag in if_none_match.split(',')]
-      if etag in etag_list or '*' in etag_list:
+      if etag in etag_list or weak_etag in etag_list or '*' in etag_list:
         response = jsonify({'status': 304, 'error': 'not modified',
                             'message': 'resource not modified'})
         response.status_code = 304
