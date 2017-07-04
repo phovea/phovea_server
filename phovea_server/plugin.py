@@ -8,7 +8,6 @@
 from builtins import object
 import logging
 
-_log = logging.getLogger(__name__)
 _registry = None
 
 
@@ -82,6 +81,7 @@ class ExtensionDesc(AExtensionDesc):
   def load(self):
     if self._impl is None:
       import importlib
+      _log = logging.getLogger(__name__)
       _log.info('importing %s', self.module)
       m = importlib.import_module(self.module)
       if hasattr(m, '_plugin_initialize'):  # init method
@@ -126,6 +126,7 @@ class Registry(object):
   def singletons(self):
     import collections
     from .config import view
+    _log = logging.getLogger(__name__)
     if self._singletons is not None:
       return self._singletons
 
@@ -138,7 +139,7 @@ class Registry(object):
       if e.type == 'manager':
         mm[e.id].append(e)
 
-    cc = view('phovea_server.runtime')
+    cc = view('phovea_server._runtime')
     current_command = cc.get('command', default='unknown')
 
     def compare(a, b):

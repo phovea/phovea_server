@@ -107,8 +107,9 @@ def _resolve_commands(parser):
 
 
 def _set_runtime_infos(args):
-  cc.set('command', args.launcherid, '_runtime')
-  cc.set('reloader', args.use_reloader, '_runtime')
+  runtime = cc.view('_runtime')
+  runtime.set('command', args.launcherid)
+  runtime.set('reloader', args.use_reloader)
 
 
 def run():
