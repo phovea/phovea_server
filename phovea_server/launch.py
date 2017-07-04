@@ -102,8 +102,13 @@ def _resolve_commands(parser):
       default_command = command.id
     cmdparser = subparsers.add_parser(command.id)
     instance = command.load().factory(cmdparser)
-    cmdparser.set_defaults(launcher=instance)
+    cmdparser.set_defaults(launcher=instance, launcherid=command.id)
   return default_command
+
+
+def _set_runtime_infos(args):
+  cc.set('command', args.launcherid, '_runtime')
+  cc.set('reloader', args.use_reloader, '_runtime')
 
 
 def run():
@@ -126,6 +131,7 @@ def run():
 
   args = parser.parse_args()
 
+  _set_runtime_infos(args)
   main = args.launcher(args)
 
   if args.use_reloader:

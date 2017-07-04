@@ -124,13 +124,13 @@ class Registry(object):
 
   @property
   def singletons(self):
+    import collections
+    from .config import view
     if self._singletons is not None:
       return self._singletons
 
     def loader(e):
       return lambda: e.load().factory()
-
-    import collections
 
     # select singleton impl with lowest priority default 100
     mm = collections.defaultdict(lambda: [])
@@ -138,8 +138,24 @@ class Registry(object):
       if e.type == 'manager':
         mm[e.id].append(e)
 
+    cc = view('phovea_server.runtime')
+    current_command = cc.get('command', default='unknown')
+
+    def compare(a, b):
+      a_prio = getattr(a, 'priority', 100)
+      a_command = getattr(a, 'command', None)
+      b_prio = getattr(b, 'priority', 100)
+      b_command = getattr(b, 'command', None)
+      # if the command matches the current command this has priority
+      if a_command != b_command:
+        if a_command == current_command:
+          return -1
+        elif b_command == current_command:
+          return 1
+      return a_prio - b_prio
+
     def select(v):
-      v = sorted(v, cmp=lambda a, b: getattr(a, 'priority', 100) - getattr(b, 'priority', 100))
+      v = sorted(v, cmp=compare)
       _log.info('creating singleton %s %s', v[0].id, getattr(v[0], 'module', 'server'))
       return loader(v[0])
 
