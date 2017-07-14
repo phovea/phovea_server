@@ -62,6 +62,8 @@ def etag(f):
     # text and set it in the response header
     etag = '"' + hashlib.sha1(rv.get_data()).hexdigest() + '"'
     rv.headers['ETag'] = etag
+    # insert the Cache-Control header and return response
+    rv.headers['Cache-Control'] = 'must-revalidate'
 
     # handle If-Match and If-None-Match request headers if present
     if_match = request.headers.get('If-Match')
