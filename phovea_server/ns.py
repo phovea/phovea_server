@@ -80,7 +80,6 @@ def etag(f):
                             'message': 'precondition failed'})
         response.headers['Cache-Control'] = 'must-revalidate'
         response.status_code = 412
-        print('send 412 with must-revalidate')
         return response
     elif if_none_match:
       # only return the response if the etag for this request does not
@@ -92,7 +91,6 @@ def etag(f):
                             'message': 'resource not modified'})
         response.headers['Cache-Control'] = 'must-revalidate'
         response.status_code = 304
-        print('send 304 with must-revalidate')
         return response
     return rv
   return wrapped
