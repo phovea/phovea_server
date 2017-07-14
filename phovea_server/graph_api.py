@@ -89,8 +89,11 @@ def _handle_item(dataset_getter, name, datasetid, itemid):
 
 
 def _list_type(dataset_getter, name='node'):
-  from functools import partial
-  return partial(_list_items, dataset_getter, name), partial(_handle_item, dataset_getter, name)
+  def listitem(datasetid):
+    return _list_items(dataset_getter, name, datasetid)
+  def handleitem(datasetid, itemid):
+    return _handle_item(dataset_getter, name, datasetid, itemid)
+  return listitem, handleitem
 
 
 def add_graph_handler(app, dataset_getter):
