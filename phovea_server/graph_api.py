@@ -91,8 +91,10 @@ def _handle_item(dataset_getter, name, datasetid, itemid):
 def _list_type(dataset_getter, name='node'):
   def listitem(datasetid):
     return _list_items(dataset_getter, name, datasetid)
+
   def handleitem(datasetid, itemid):
     return _handle_item(dataset_getter, name, datasetid, itemid)
+
   return listitem, handleitem
 
 
