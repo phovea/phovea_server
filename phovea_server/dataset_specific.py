@@ -177,7 +177,7 @@ def _add_handler(app, dataset_getter, type):
     r = asrange(ns.request.args.get('range', None))
     return jsonify(d.rows(r[0] if r is not None else None))
 
-  app.add_url_rule('/' + type + '/<dataset_id>/rows', 'rows_' + type, rows_gen)
+  app.add_url_rule('/' + type + '/<dataset_id>/rows', 'rows_' + type, ns.etag(rows_gen))
 
   def rowids_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
@@ -185,14 +185,14 @@ def _add_handler(app, dataset_getter, type):
     ids = d.rowids(r[0] if r is not None else None)
     return jsonify(str(ranges.from_list(list(ids))))
 
-  app.add_url_rule('/' + type + '/<dataset_id>/rowIds', 'rowids_' + type, rowids_gen)
+  app.add_url_rule('/' + type + '/<dataset_id>/rowIds', 'rowids_' + type, ns.etag(rowids_gen))
 
   def raw_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
     r = asrange(ns.request.args.get('range', None))
     return jsonify(d.aslist(r), allow_nan=False)
 
-  app.add_url_rule('/' + type + '/<dataset_id>/raw', 'raw_' + type, raw_gen)
+  app.add_url_rule('/' + type + '/<dataset_id>/raw', 'raw_' + type, ns.etag(raw_gen))
 
   def data_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
@@ -200,7 +200,7 @@ def _add_handler(app, dataset_getter, type):
     formatter = resolve_formatter(type, ns.request.args.get('format', 'json'))
     return formatter(d, r, args=ns.request.args)
 
-  app.add_url_rule('/' + type + '/<dataset_id>/data', 'data_' + type, data_gen)
+  app.add_url_rule('/' + type + '/<dataset_id>/data', 'data_' + type, ns.etag(data_gen))
 
 
 def add_table_handler(app, dataset_getter):
@@ -240,12 +240,12 @@ def add_table_handler(app, dataset_getter):
     ids = view.rowids(args)
     return jsonify(str(ranges.from_list(list(ids))))
 
-  app.add_url_rule('/table/<dataset_id>/col/<column>', 'col_table', col_table)
+  app.add_url_rule('/table/<dataset_id>/col/<column>', 'col_table', ns.etag(col_table))
 
-  app.add_url_rule('/table/<dataset_id>/view/<view_name>', 'view_table', view_table)
-  app.add_url_rule('/table/<dataset_id>/view/<view_name>/raw', 'view_raw_table', view_raw_table)
-  app.add_url_rule('/table/<dataset_id>/view/<view_name>/rows', 'view_rows_table', view_rows_table)
-  app.add_url_rule('/table/<dataset_id>/view/<view_name>/rowIds', 'view_rowids_table', view_rowids_table)
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>', 'view_table', ns.etag(view_table))
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>/raw', 'view_raw_table', ns.etag(view_raw_table))
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>/rows', 'view_rows_table', ns.etag(view_rows_table))
+  app.add_url_rule('/table/<dataset_id>/view/<view_name>/rowIds', 'view_rowids_table', ns.etag(view_rowids_table))
 
 
 def _stats_of(data):
@@ -286,8 +286,8 @@ def add_vector_handler(app, dataset_getter):
     data = d.asnumpy(r)
     return jsonify(_stats_of(data))
 
-  app.add_url_rule('/vector/<dataset_id>/hist', 'hist_vector', hist_vector)
-  app.add_url_rule('/vector/<dataset_id>/stats', 'stats_vector', stats_vector)
+  app.add_url_rule('/vector/<dataset_id>/hist', 'hist_vector', ns.etag(hist_vector))
+  app.add_url_rule('/vector/<dataset_id>/stats', 'stats_vector', ns.etag(stats_vector))
 
 
 def add_matrix_handler(app, dataset_getter):
@@ -304,7 +304,7 @@ def add_matrix_handler(app, dataset_getter):
     r = asrange(ns.request.args.get('range', None))
     return jsonify(d.cols(r[0] if r is not None else None))
 
-  app.add_url_rule('/matrix/<dataset_id>/cols', 'cols_matrix', cols_matrix)
+  app.add_url_rule('/matrix/<dataset_id>/cols', 'cols_matrix', ns.etag(cols_matrix))
 
   def colids_matrix(dataset_id):
     d = dataset_getter(dataset_id, 'matrix')
@@ -312,7 +312,7 @@ def add_matrix_handler(app, dataset_getter):
     ids = d.colids(r[0] if r is not None else None)
     return jsonify(str(ranges.from_list(list(ids))))
 
-  app.add_url_rule('/matrix/<dataset_id>/colIds', 'colids_matrix', colids_matrix)
+  app.add_url_rule('/matrix/<dataset_id>/colIds', 'colids_matrix', ns.etag(colids_matrix))
 
   def hist_matrix(dataset_id):
     d = dataset_getter(dataset_id, 'matrix')
@@ -328,5 +328,5 @@ def add_matrix_handler(app, dataset_getter):
     data = d.asnumpy(r)
     return jsonify(_stats_of(data.flat))
 
-  app.add_url_rule('/matrix/<dataset_id>/hist', 'hist_matrix', hist_matrix)
-  app.add_url_rule('/matrix/<dataset_id>/stats', 'stats_matrix', stats_matrix)
+  app.add_url_rule('/matrix/<dataset_id>/hist', 'hist_matrix', ns.etag(hist_matrix))
+  app.add_url_rule('/matrix/<dataset_id>/stats', 'stats_matrix', ns.etag(stats_matrix))
