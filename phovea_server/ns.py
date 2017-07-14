@@ -62,7 +62,6 @@ def etag(f):
     # text and set it in the response header
     etag = '"' + hashlib.sha1(rv.get_data()).hexdigest() + '"'
     rv.headers['ETag'] = etag
-    # insert the Cache-Control header and return response
     rv.headers['Cache-Control'] = 'must-revalidate'
 
     # handle If-Match and If-None-Match request headers if present
@@ -79,6 +78,7 @@ def etag(f):
       if etag not in etag_list and weak_etag not in etag_list and '*' not in etag_list:
         response = jsonify({'status': 412, 'error': 'precondition failed',
                             'message': 'precondition failed'})
+        response.headers['Cache-Control'] = 'must-revalidate'
         response.status_code = 412
         return response
     elif if_none_match:
@@ -89,6 +89,7 @@ def etag(f):
       if etag in etag_list or weak_etag in etag_list or '*' in etag_list:
         response = jsonify({'status': 304, 'error': 'not modified',
                             'message': 'resource not modified'})
+        response.headers['Cache-Control'] = 'must-revalidate'
         response.status_code = 304
         return response
     return rv
