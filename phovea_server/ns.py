@@ -55,7 +55,7 @@ def etag(f):
 
     # if the response is not a code 200 OK then we let it through
     # unchanged
-    if rv.status_code != 200:
+    if rv.status_code != 200 or rv.direct_passthrough or not rv.implicit_sequence_conversion:
       return rv
 
     # compute the etag for this request as the MD5 hash of the response
