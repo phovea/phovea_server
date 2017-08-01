@@ -1,4 +1,4 @@
-FROM caleydo/phovea_python:1.0-dev
+FROM caleydo/phovea_python:v1.1-dev
 
 MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
 WORKDIR /phovea
