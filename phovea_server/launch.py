@@ -22,7 +22,7 @@ def enable_dev_mode():
   cc.set('env', 'development')
   cc.set('debug', True)
   cc.set('error_stack_trace', True)
-  cc.set('nocache', True)
+  cc.set('nocache', False)
 
 
 def enable_prod_mode():
