@@ -107,9 +107,11 @@ def _resolve_commands(parser):
 
 
 def _set_runtime_infos(args):
+  import os
   runtime = cc.view('_runtime')
   runtime.set('command', args.launcherid)
   runtime.set('reloader', args.use_reloader)
+  cc.set('absoluteDir', os.path.abspath(cc.get('dir')) + '/')
 
 
 def run():
