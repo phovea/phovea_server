@@ -279,6 +279,9 @@ def _do_mapping(idtype, to_idtype, to_ids):
   elif 'q' in args:
     names = args['q'].split(',')
     single = len(names) == 1
+  elif 'q[]' in args:
+    names = args.getlist('q[]')
+    single = len(names) == 1
   else:
     ns.abort(400)
     return
