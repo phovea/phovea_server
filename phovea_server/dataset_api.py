@@ -250,7 +250,7 @@ def _search_ids(idtype):
   return jsonify([])
 
 
-@app_idtype.route('/<idtype>/<to_idtype>')
+@app_idtype.route('/<idtype>/<to_idtype>', methods=['GET', 'POST'])
 def _mapping_to(idtype, to_idtype):
   return _do_mapping(idtype, to_idtype, False)
 
