@@ -5,7 +5,7 @@ WORKDIR /phovea
 RUN printf "from phovea_server import launch\nlaunch.run()\n" > /phovea/launch.py
 
 # install dependencies last step such that everything before can be cached
-COPY requirements*.txt docker_packages.txt docker_script*.sh ./
+COPY requirements*.txt docker_packages.txt docker_script*.sh _docker_data* ./
 RUN (!(test -s docker_packages.txt) || (apt-get update && \
     (cat docker_packages.txt | xargs apt-get install -y))) && \
     (pip install --no-cache-dir -r requirements.txt)
