@@ -269,19 +269,15 @@ def _do_mapping(idtype, to_idtype, to_ids):
   mapper = get_mappingmanager()
   args = ns.request.values
   first_only = args.get('mode', 'all') == 'first'
-  single = False
 
   if 'id' in args:
     names = get_idmanager().unmap([int(args['id'])], idtype)
-    single = True
   elif 'ids' in args:
     names = get_idmanager().unmap(range.parse(args['ids'])[0].tolist(), idtype)
   elif 'q' in args:
     names = args['q'].split(',')
-    single = len(names) == 1
   elif 'q[]' in args:
     names = args.getlist('q[]')
-    single = len(names) == 1
   else:
     ns.abort(400)
     return
@@ -296,9 +292,6 @@ def _do_mapping(idtype, to_idtype, to_ids):
       mapped_list = m(mapped_list, to_idtype)
     else:
       mapped_list = [m(entry, to_idtype) for entry in mapped_list]
-
-  if single:
-    return mapped_list[0] if first_only else jsonify(mapped_list[0])
 
   return jsonify(mapped_list)
 
