@@ -137,6 +137,10 @@ def manager():
   return _manager
 
 
+def is_logged_in():
+  return manager().is_authenticated()
+
+
 def current_username():
   u = manager().current_user
   return u.name if hasattr(u, 'name') else ANONYMOUS
