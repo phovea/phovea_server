@@ -25,7 +25,13 @@ def get(item, section=None, default=None):
   act = _c
   for p in keys[0:-1]:
     act = act.get(p, {})
-  v = act.get(keys[len(keys) - 1], None)
+  last_key = keys[len(keys) - 1]
+
+  if last_key not in act:
+    # prop does not exist
+    return default
+
+  v = act[last_key]
 
   def resolve(x):
     if '.' in x:  # assume absolute
@@ -36,7 +42,7 @@ def get(item, section=None, default=None):
   v = replace_nested_variables(v, resolve)
   # print key, v
 
-  return v if v is not None else default
+  return v
 
 
 def set(item, value, section=None):
