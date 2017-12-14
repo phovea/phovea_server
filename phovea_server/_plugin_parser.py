@@ -100,6 +100,7 @@ class DirectoryPlugin(object):
     with open(package_file) as f:
       pkg = json.load(f)
     self.id = pkg['name']
+    self._clean_id = self.id.lower().replace('-', '_')
     self.pkg = pkg
     self.name = self.id
     desc = pkg.get('description', '').split('\n')
@@ -118,11 +119,10 @@ class DirectoryPlugin(object):
 
   def config_file(self):
     import os.path as p
-    f = p.join(self.folder, 'config.json')
-    if p.exists(f):
-      return f
-    f = p.join(self.folder, self.id, 'config.json')
-    return f if p.exists(f) else None
+    for f in [p.join(self.folder, 'config.json'), p.join(self.folder, self.id, 'config.json'), p.join(self.folder, self._clean_id, 'config.json')]:
+      if p.exists(f):
+        return f
+    return None
 
   def register(self, reg):
     import os.path as p
@@ -130,16 +130,18 @@ class DirectoryPlugin(object):
 
     def regfile(f):
       if not p.exists(f):
-        return
+        return False
       # append path ../__init__.py
       sys.path.append(p.abspath(p.dirname(p.dirname(f))))
       import importlib
       m = importlib.import_module(self.id)
       if hasattr(m, 'phovea'):
         m.phovea(reg)
+      return True
 
     regfile(p.join(self.folder, '__init__.py'))
-    regfile(p.join(self.folder, self.id, '__init__.py'))
+    if not regfile(p.join(self.folder, self.id, '__init__.py')):
+      regfile(p.join(self.folder, self._clean_id, '__init__.py'))
 
   @property
   def resolved(self):
