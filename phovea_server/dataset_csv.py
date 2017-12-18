@@ -59,7 +59,7 @@ class CSVEntryMixin(object):
       return self._loaded
 
     data = []
-    with io.open(self._path, 'r', newline='', encoding='utf-8') as csvfile:
+    with io.open(self._path, 'r', newline='', encoding=self._desc.get('encoding', 'utf-8')) as csvfile:
       reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ','),
                           quotechar=str(self._desc.get('quotechar', '|')))
       data.extend(reader)
@@ -191,7 +191,7 @@ class CSVStratification(CSVEntryMixin, AStratification):
     else:  # derive from the data
       clusters = set()
       count = 0
-      with io.open(path, 'r', newline='', encoding='utf-8') as csvfile:
+      with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
         reader = csv.reader(csvfile, delimiter=desc.get('separator', ','),
                             quotechar=str(desc.get('quotechar', '|')))
         for row in reader:
@@ -308,7 +308,7 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
       cols = None
       min_v = None
       max_v = None
-      with io.open(path, 'r', newline='', encoding='utf-8') as csvfile:
+      with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
         reader = csv.reader(csvfile, delimiter=desc.get('separator', ','),
                             quotechar=str(desc.get('quotechar', '|')))
         for row in reader:
@@ -449,7 +449,7 @@ def to_files(plugins):
     index = os.path.join(plugin.folder + '/data/' if not hasattr(plugin, 'inplace') else plugin.folder, 'index.json')
     if not os.path.isfile(index):
       continue
-    with io.open(index, 'r', newline='', encoding='utf-8') as f:
+    with open(index, 'r') as f:
       desc = json.load(f)
       for di in desc:
         if di['type'] == 'matrix':
@@ -485,10 +485,10 @@ class DataPlugin(object):
     index = os.path.join(self.folder, 'index.json')
     old = []
     if os.path.isfile(index):
-      with io.open(index, 'r', newline='', encoding='utf-8') as f:
+      with io.open(index, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as f:
         old = json.load(f)
     old.append(desc)
-    with io.open(index, 'w', newline='', encoding='utf-8') as f:
+    with io.open(index, 'w', newline='', encoding=desc.get('encoding', 'utf-8')) as f:
       json.dump(old, f, indent=1)
 
 
