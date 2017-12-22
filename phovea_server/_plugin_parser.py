@@ -134,7 +134,9 @@ class DirectoryPlugin(object):
       # append path ../__init__.py
       sys.path.append(p.abspath(p.dirname(p.dirname(f))))
       import importlib
-      m = importlib.import_module(p.dirname(f))
+      module = p.basename(p.dirname(f))
+      _log.info('importing module: %s', module)
+      m = importlib.import_module(module)
       if hasattr(m, 'phovea'):
         m.phovea(reg)
       return True
@@ -193,7 +195,9 @@ class DirectoryProductionPlugin(object):
       # append path ../__init__.py
       sys.path.append(p.abspath(p.dirname(p.dirname(f))))
       import importlib
-      m = importlib.import_module(self.id)
+      module = p.basename(p.dirname(f))
+      _log.info('importing module: %s', module)
+      m = importlib.import_module(module)
       if hasattr(m, 'phovea'):
         m.phovea(reg)
 
