@@ -55,6 +55,12 @@ def _init_app(app, is_default_app=False):
   """
   from . import security
 
+  if hasattr(app, 'got_first_request') and app.got_first_request:
+    _log.warn('already inited: ' + str(app))
+    return
+
+  _log.info('init application: ' + str(app))
+
   if hasattr(app, 'debug'):
     app.debug = cc.debug
   if cc.nocache and hasattr(app, 'after_request'):
@@ -75,7 +81,7 @@ def _init_app(app, is_default_app=False):
 
 # helper to plugin in function scope
 def _loader(p):
-  _log.info('add application: ' + p.id + ' at namespace: ' + p.namespace)
+  print('add application: ' + p.id + ' at namespace: ' + p.namespace)
 
   def load_app():
     app = p.load().factory()
