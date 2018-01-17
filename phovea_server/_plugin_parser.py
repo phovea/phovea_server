@@ -132,7 +132,7 @@ class DirectoryPlugin(object):
       if not p.exists(f):
         return False
       # append path ../__init__.py
-      sys.path.append(p.abspath(p.dirname(p.dirname(f))))
+      sys.path.insert(0, p.abspath(p.dirname(p.dirname(f))))
       import importlib
       module = p.basename(p.dirname(f))
       _log.info('importing module: %s', module)
@@ -193,7 +193,7 @@ class DirectoryProductionPlugin(object):
       if not p.exists(f):
         return
       # append path ../__init__.py
-      sys.path.append(p.abspath(p.dirname(p.dirname(f))))
+      sys.path.insert(0, p.abspath(p.dirname(p.dirname(f))))
       import importlib
       module = p.basename(p.dirname(f))
       _log.info('importing module: %s', module)
