@@ -7,7 +7,8 @@
 
 from builtins import str, object
 import json
-import csv
+from backports import csv
+import io
 import os
 import numpy as np
 from .dataset_def import ADataSetProvider, AColumn, AMatrix, AStratification, ATable, AVector
@@ -58,9 +59,9 @@ class CSVEntryMixin(object):
       return self._loaded
 
     data = []
-    with open(self._path, 'r') as csvfile:
-      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ',').encode('ascii', 'ignore'),
-                          quotechar=str(self._desc.get('quotechar', '|')).encode('ascii', 'ignore'))
+    with io.open(self._path, 'r', newline='', encoding=self._desc.get('encoding', 'utf-8')) as csvfile:
+      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', u','),
+                          quotechar=str(self._desc.get('quotechar', u'|')))
       data.extend(reader)
 
     # print data
@@ -190,9 +191,9 @@ class CSVStratification(CSVEntryMixin, AStratification):
     else:  # derive from the data
       clusters = set()
       count = 0
-      with open(path, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii', 'ignore'),
-                            quotechar=str(desc.get('quotechar', '|')).encode('ascii', 'ignore'))
+      with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', u','),
+                            quotechar=str(desc.get('quotechar', u'|')))
         for row in reader:
           count += 1
           clusters.add(row[1])
@@ -307,9 +308,9 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
       cols = None
       min_v = None
       max_v = None
-      with open(path, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', ',').encode('ascii', 'ignore'),
-                            quotechar=str(desc.get('quotechar', '|')).encode('ascii', 'ignore'))
+      with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', u','),
+                            quotechar=str(desc.get('quotechar', u'|')))
         for row in reader:
           if cols is None:
             cols = len(row) - 1
@@ -484,10 +485,10 @@ class DataPlugin(object):
     index = os.path.join(self.folder, 'index.json')
     old = []
     if os.path.isfile(index):
-      with open(index, 'r') as f:
+      with io.open(index, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as f:
         old = json.load(f)
     old.append(desc)
-    with open(index, 'w') as f:
+    with io.open(index, 'w', newline='', encoding=desc.get('encoding', 'utf-8')) as f:
       json.dump(old, f, indent=1)
 
 

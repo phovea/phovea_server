@@ -33,11 +33,13 @@ class FileMapper(object):
     pass
 
   def _load(self):
-    import csv
+    from backports import csv
+    import io
 
     _log.info('loading real mapping file from %s to %s', self.from_idtype, self.to_idtype)
-    with open(self._path, 'r', 'utf-8') as csvfile:
-      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ',').encode('ascii', 'ignore'), quotechar='"')
+    with io.open(self._path, 'r', newline='', encoding=self._desc.get('encoding', 'utf-8')) as csvfile:
+      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', u','),
+                          quotechar=str(self._desc.get('quotechar', u'"')))
       self._map = dict()
       for i, line in enumerate(reader):
         if i == 0 and self._desc.get('header', False):
