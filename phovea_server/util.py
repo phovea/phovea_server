@@ -46,6 +46,12 @@ def to_json(obj, *args, **kwargs):
   if 'indent' in kwargs:
     del kwargs['indent']
   kwargs['ensure_ascii'] = False
+
+  if 'use_decimal' in kwargs:
+    del kwargs['use_decimal']
+    import json
+    return json.dumps(obj, cls=JSONExtensibleEncoder, **kwargs)
+
   return ujson.dumps(obj, *args, **kwargs)
 
 
