@@ -9,6 +9,7 @@ from builtins import range
 from builtins import object
 import numpy as np
 import numpy.ma as ma
+from decimal import Decimal
 
 
 class NumpyTablesEncoder(object):
@@ -33,8 +34,23 @@ class NumpyTablesEncoder(object):
     return None
 
 
+class JSONDecimalEncoder(object):
+  def __contains__(self, obj):
+    return isinstance(obj, Decimal)
+
+  def __call__(self, obj, base_encoder):
+    return str(obj)
+
+
 n = NumpyTablesEncoder()
 
 
 def create():
   return n
+
+
+d = JSONDecimalEncoder()
+
+
+def create_decimal():
+  return d

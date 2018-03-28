@@ -36,6 +36,12 @@ def to_json(obj, *args, **kwargs):
   :param kwargs:
   :return:
   """
+
+  if 'use_decimal' in kwargs:
+    del kwargs['use_decimal']
+    import json
+    return json.dumps(obj, cls=JSONExtensibleEncoder, **kwargs)
+
   # try:
   #  doesnt work since we can't convert numpy arrays
   #  import ujson
@@ -46,6 +52,7 @@ def to_json(obj, *args, **kwargs):
   if 'indent' in kwargs:
     del kwargs['indent']
   kwargs['ensure_ascii'] = False
+
   return ujson.dumps(obj, *args, **kwargs)
 
 
