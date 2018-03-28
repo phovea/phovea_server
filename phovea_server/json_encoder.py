@@ -32,9 +32,23 @@ class NumpyTablesEncoder(object):
       return a
     return None
 
+class JSONDecimalEncoder(object):
+  def __contains__(self, obj):
+    return isinstance(obj, Decimal)
+
+  def __call__(self, obj, base_encoder):
+    return str(obj)
+
 
 n = NumpyTablesEncoder()
 
 
 def create():
   return n
+
+
+d = JSONDecimalEncoder()
+
+
+def create_decimal():
+  return d
