@@ -15,6 +15,10 @@ def to_plural(s):
   return s + 's'
 
 
+def to_idtype_description(id):
+  return dict(id=id, name=id, names=to_plural(id))
+
+
 class ADataSetEntry(object):
   __metaclass__ = abc.ABCMeta
 
@@ -57,10 +61,7 @@ class ADataSetEntry(object):
     :return:
     """
 
-    def to_desc(t):
-      return dict(id=t, name=t, names=to_plural(t))
-
-    return [to_desc(t) for t in self.idtypes()]
+    return [to_idtype_description(t) for t in self.idtypes()]
 
   def update(self, args, files):
     """
@@ -128,6 +129,9 @@ class AStratification(ADataSetEntry):
   def groups(self):
     return []
 
+  def idtypes(self):
+    return [self.idtype]
+
 
 class AMatrix(ADataSetEntry):
   __metaclass__ = abc.ABCMeta
@@ -176,6 +180,9 @@ class AMatrix(ADataSetEntry):
     r = dict(data=arr, rows=rows, cols=cols, rowIds=rowids, colIds=colids)
     return r
 
+  def idtypes(self):
+    return [self.rowtype, self.coltype]
+
 
 class AVector(ADataSetEntry):
   __metaclass__ = abc.ABCMeta
@@ -212,6 +219,9 @@ class AVector(ADataSetEntry):
     r = dict(data=arr, rows=rows, rowIds=rowids)
 
     return r
+
+  def idtypes(self):
+    return [self.idtype]
 
 
 class AColumn(object):
@@ -269,6 +279,9 @@ class ATable(ADataSetEntry):
     r = dict(data=arr, rows=rows, rowIds=rowids)
 
     return r
+
+  def idtypes(self):
+    return [self.idtype]
 
 
 class ADataSetProvider(object):

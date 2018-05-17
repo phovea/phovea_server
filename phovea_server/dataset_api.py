@@ -76,6 +76,7 @@ def _to_query(query):
 
 
 @app.route('/', methods=['GET', 'POST'])
+@ns.etag
 def _list_datasets():
   if ns.request.method == 'GET':
     query = _to_query(ns.request.values)
@@ -96,6 +97,7 @@ def _list_datasets():
 
 
 @app.route('/<dataset_id>', methods=['PUT', 'GET', 'DELETE', 'POST'])
+@ns.etag
 def _get_dataset(dataset_id):
   if ns.request.method == 'PUT':
     return _update_dataset(dataset_id, ns.request)
@@ -106,6 +108,8 @@ def _get_dataset(dataset_id):
   d = get(dataset_id)
   if d is None:
     return 'invalid dataset id "' + str(dataset_id) + '"', 404
+  if not d.can_read():
+    return 'not allowed', 403
   r = ns.request.args.get('range', None)
   if r is not None:
     r = range.parse(r)
@@ -113,8 +117,13 @@ def _get_dataset(dataset_id):
 
 
 @app.route('/<dataset_id>/desc')
+@ns.etag
 def _get_dataset_desc(dataset_id):
   d = get(dataset_id)
+  if not d:
+    return 'invalid dataset id "' + str(dataset_id) + '"', 404
+  if not d.can_read():
+    return 'not allowed', 403
   return jsonify(d.to_description())
 
 
@@ -126,6 +135,8 @@ def _dataset_getter(dataset_id, dataset_type):
     ns.abort(404, 'invalid dataset id "' + str(dataset_id) + '"')
   if t.type != dataset_type:
     ns.abort(400, 'the given dataset "' + str(dataset_id) + '" is not a ' + dataset_type)
+  if not t.can_read():
+    ns.abort(403, 'not allowed')
   return t
 
 
@@ -153,6 +164,8 @@ def _update_dataset(dataset_id, request):
     old = get(dataset_id)
     if old is None:
       return _upload_dataset(request, dataset_id)
+    if not old.can_write():
+      return 'not allowed', 403
     r = old.update(_to_upload_desc(request.values), request.files)
     if r:
       return jsonify(old.to_description(), indent=1)
@@ -167,6 +180,8 @@ def _modify_dataset(dataset_id, request):
     old = get(dataset_id)
     if old is None:
       return 'invalid dataset id "' + str(dataset_id) + '"', 404
+    if not old.can_write():
+      return 'not allowed', 403
     r = old.modify(_to_upload_desc(request.values), request.files)
     if r:
       return jsonify(old.to_description(), indent=1)
@@ -180,6 +195,8 @@ def _remove_dataset(dataset_id):
   dataset = get(dataset_id)
   if dataset is None:
     return 'invalid dataset id "' + str(dataset_id) + '"', 404
+  if not dataset.can_write():
+    return 'not allowed', 403
   r = remove(dataset_id)
   if r:
     return jsonify(
@@ -192,29 +209,31 @@ def create_dataset():
 
 
 @app_idtype.route('/')
+@ns.etag
 def _list_idtypes():
   return jsonify(list_idtypes())
 
 
-@app_idtype.route('/<idtype>/map')
+@app_idtype.route('/<idtype>/map', methods=['GET', 'POST'])
 def _map_ids(idtype):
-  name = ns.request.args.get('id', None)
+  name = ns.request.values.get('id', None)
   if name is not None:
     return get_idmanager()([name], idtype)[0]
-  names = ns.request.args.getlist('ids[]')
+  names = ns.request.values.getlist('ids[]')
   return jsonify(get_idmanager()(names, idtype))
 
 
-@app_idtype.route('/<idtype>/unmap')
+@app_idtype.route('/<idtype>/unmap', methods=['GET', 'POST'])
 def _unmap_ids(idtype):
-  name = ns.request.args.get('id', None)
+  name = ns.request.values.get('id', None)
   if name is not None:
     return get_idmanager().unmap([int(name)], idtype)[0]
-  names = range.parse(ns.request.args.get('ids', ''))[0].tolist()
+  names = range.parse(ns.request.values.get('ids', ''))[0].tolist()
   return jsonify(get_idmanager().unmap(names, idtype))
 
 
 @app_idtype.route('/<idtype>/')
+@ns.etag
 def _maps_to(idtype):
   mapper = get_mappingmanager()
   target_id_types = mapper.maps_to(idtype)
@@ -231,25 +250,34 @@ def _search_ids(idtype):
   return jsonify([])
 
 
-@app_idtype.route('/<idtype>/<to_idtype>')
+@app_idtype.route('/<idtype>/<to_idtype>', methods=['GET', 'POST'])
 def _mapping_to(idtype, to_idtype):
   return _do_mapping(idtype, to_idtype, False)
 
 
+@app_idtype.route('/<idtype>/<to_idtype>/search')
+def _mapping_to_search(idtype, to_idtype):
+  query = ns.request.args.get('q', None)
+  max_results = int(ns.request.args.get('limit', 10))
+  mapper = get_mappingmanager()
+  if hasattr(mapper, 'search'):
+    return jsonify(mapper.search(idtype, to_idtype, query, max_results))
+  return jsonify([])
+
+
 def _do_mapping(idtype, to_idtype, to_ids):
   mapper = get_mappingmanager()
-  args = ns.request.args
+  args = ns.request.values
   first_only = args.get('mode', 'all') == 'first'
-  single = False
 
   if 'id' in args:
     names = get_idmanager().unmap([int(args['id'])], idtype)
-    single = True
   elif 'ids' in args:
     names = get_idmanager().unmap(range.parse(args['ids'])[0].tolist(), idtype)
   elif 'q' in args:
     names = args['q'].split(',')
-    single = len(names) == 1
+  elif 'q[]' in args:
+    names = args.getlist('q[]')
   else:
     ns.abort(400)
     return
@@ -265,13 +293,10 @@ def _do_mapping(idtype, to_idtype, to_ids):
     else:
       mapped_list = [m(entry, to_idtype) for entry in mapped_list]
 
-  if single:
-    return mapped_list[0] if first_only else jsonify(mapped_list[0])
-
   return jsonify(mapped_list)
 
 
-@app_idtype.route('/<idtype>/<to_idtype>/map')
+@app_idtype.route('/<idtype>/<to_idtype>/map', methods=['GET', 'POST'])
 def _mapping_to_id(idtype, to_idtype):
   return _do_mapping(idtype, to_idtype, True)
 

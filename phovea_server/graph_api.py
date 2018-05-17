@@ -48,11 +48,15 @@ def _list_items(dataset_getter, name, datasetid):
     return jsonify([n.asjson() for n in getattr(d, name + 's')(r[0] if r is not None else None)])
 
   if ns.request.method == 'DELETE':
+    if not d.can_write():
+      ns.abort(403)
     if d.clear():
       return jsonify(d.to_description(), indent=1)
     ns.abort(400)
 
   # post
+  if not d.can_write():
+    ns.abort(403)
   n = _to_desc()
   if getattr(d, 'add_' + name)(n):
     return jsonify(d.to_description(), indent=1)
@@ -67,11 +71,15 @@ def _handle_item(dataset_getter, name, datasetid, itemid):
     return jsonify(n.asjson())
 
   if ns.request.method == 'DELETE':
+    if not d.can_write():
+      ns.abort(403)
     if getattr(d, 'remove_' + name)(itemid):
       return jsonify(d.to_description(), indent=1)
     ns.abort(400)
 
   # put
+  if not d.can_write():
+    ns.abort(403)
   n = _to_desc()
   n['id'] = itemid
   if getattr(d, 'update_' + name)(n):
@@ -81,17 +89,24 @@ def _handle_item(dataset_getter, name, datasetid, itemid):
 
 
 def _list_type(dataset_getter, name='node'):
-  from functools import partial
-  return partial(_list_items, dataset_getter, name), partial(_handle_item, dataset_getter, name)
+  def listitem(datasetid):
+    return _list_items(dataset_getter, name, datasetid)
+
+  def handleitem(datasetid, itemid):
+    return _handle_item(dataset_getter, name, datasetid, itemid)
+
+  return listitem, handleitem
 
 
 def add_graph_handler(app, dataset_getter):
   @app.route('/graph/<datasetid>')
+  @ns.etag
   def list_graphs(datasetid):
     d = dataset_getter(datasetid, 'graph')
     return jsonify(d.to_description())
 
   @app.route('/graph/<datasetid>/data')
+  @ns.etag
   def get_graph_data(datasetid):
     d = dataset_getter(datasetid, 'graph')
     r = asrange(ns.request.args.get('range', None))
@@ -99,12 +114,12 @@ def add_graph_handler(app, dataset_getter):
     return formatter(d, r, args=ns.request.args)
 
   list_nodes, handle_node = _list_type(dataset_getter, 'node')
-  app.add_url_rule('/graph/<datasetid>/node', 'list_nodes', list_nodes, methods=['GET', 'POST', 'DELETE'])
-  app.add_url_rule('/graph/<datasetid>/node/<int:itemid>', 'handle_node', handle_node, methods=['GET', 'PUT', 'DELETE'])
+  app.add_url_rule('/graph/<datasetid>/node', 'list_nodes', ns.etag(list_nodes), methods=['GET', 'POST', 'DELETE'])
+  app.add_url_rule('/graph/<datasetid>/node/<int:itemid>', 'handle_node', ns.etag(handle_node), methods=['GET', 'PUT', 'DELETE'])
 
   list_edges, handle_edge = _list_type(dataset_getter, 'edge')
-  app.add_url_rule('/graph/<datasetid>/edge', 'list_edges', list_edges, methods=['GET', 'POST', 'DELETE'])
-  app.add_url_rule('/graph/<datasetid>/edge/<int:itemid>', 'handle_edge', handle_edge, methods=['GET', 'PUT', 'DELETE'])
+  app.add_url_rule('/graph/<datasetid>/edge', 'list_edges', ns.etag(list_edges), methods=['GET', 'POST', 'DELETE'])
+  app.add_url_rule('/graph/<datasetid>/edge/<int:itemid>', 'handle_edge', ns.etag(handle_edge), methods=['GET', 'PUT', 'DELETE'])
 
   # websocket = ws.Socket(app)
   # @websocket.route('/ws')

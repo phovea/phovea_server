@@ -22,7 +22,7 @@ def enable_dev_mode():
   cc.set('env', 'development')
   cc.set('debug', True)
   cc.set('error_stack_trace', True)
-  cc.set('nocache', True)
+  cc.set('nocache', False)
 
 
 def enable_prod_mode():
@@ -102,8 +102,16 @@ def _resolve_commands(parser):
       default_command = command.id
     cmdparser = subparsers.add_parser(command.id)
     instance = command.load().factory(cmdparser)
-    cmdparser.set_defaults(launcher=instance)
+    cmdparser.set_defaults(launcher=instance, launcherid=command.id)
   return default_command
+
+
+def _set_runtime_infos(args):
+  import os
+  runtime = cc.view('_runtime')
+  runtime.set('command', args.launcherid)
+  runtime.set('reloader', args.use_reloader)
+  cc.set('absoluteDir', os.path.abspath(cc.get('dir')) + '/')
 
 
 def run():
@@ -126,6 +134,7 @@ def run():
 
   args = parser.parse_args()
 
+  _set_runtime_infos(args)
   main = args.launcher(args)
 
   if args.use_reloader:

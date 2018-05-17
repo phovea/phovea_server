@@ -8,10 +8,16 @@
   "address": "0.0.0.0",
 
   "dir": "./",
-  "dataDir": "${dir}/_data",
+  "dataDir": "${dir}_data",
+  "absoluteDataDir": "${absoluteDir}_data",
 
   "secret_key": "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w",
   "max_file_size": 33554432,
+
+  "coldstart": {
+    "mapping": false,
+    "assigner": false
+  },
 
   "disable": {
     "plugins": [],
@@ -50,5 +56,9 @@
         "console"
       ]
     }
+  },
+
+  "_runtime": {
+
   }
 }

@@ -61,7 +61,7 @@ def _generate_index():
   text = ["""
     <!DOCTYPE html><html><head lang="en">
     <meta charset="UTF-8"> <title>Caleydo Web Apps</title>
-    <link href="//fonts.googleapis.com/css?family=Yantramanav:400,300" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Yantramanav:700,400" rel="stylesheet" type="text/css">
     <link href="assets/main.css" rel="stylesheet" type="text/css"></head>
     <body><div class="container"> <header>
     <h1><img src="assets/caleydo_text_right.svg" alt="Caleydo" width="200" height="40"> Web Apps</h1> </header>

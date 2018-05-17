@@ -58,7 +58,7 @@ def jsonify(obj, *args, **kwargs):
   :return:
   """
   from .ns import Response
-  return Response(to_json(obj, *args, **kwargs), mimetype='application/json')
+  return Response(to_json(obj, *args, **kwargs), mimetype='application/json; charset=utf-8')
 
 
 def glob_recursivly(path, match):

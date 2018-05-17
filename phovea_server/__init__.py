@@ -13,10 +13,6 @@ def phovea(registry):
   register extension points
   :param registry:
   """
-  registry.append('namespace', 'caleydo-last-deployment', 'phovea_server.last_deployment', {
-      'namespace': '/api/last_deployment',
-      'factory': 'create_last_deployment'
-  })
   registry.append('namespace', 'caleydo-dataset', 'phovea_server.dataset_api', {
       'namespace': '/api/dataset',
       'factory': 'create_dataset'

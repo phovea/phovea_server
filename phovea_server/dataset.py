@@ -9,6 +9,7 @@ from past.builtins import basestring
 import phovea_server.plugin
 import phovea_server.range
 import phovea_server.util
+from phovea_server.dataset_def import to_idtype_description
 import itertools
 
 _providers_r = None
@@ -99,6 +100,11 @@ def list_idtypes():
   for d in list_datasets():
     for idtype in d.to_idtype_descriptions():
       tmp[idtype['id']] = idtype
+
+  # also include the known elements from the mapping graph
+  mapping = get_mappingmanager()
+  for idtype_id in mapping.known_idtypes():
+    tmp[idtype_id] = to_idtype_description(idtype_id)
   return list(tmp.values())
 
 
