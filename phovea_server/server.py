@@ -56,8 +56,7 @@ def _rest_cache(namespace):
   def save(response):
     from flask import request
 
-    if request.method != 'GET' or response.status_code != 200 or response.mimetype != 'application/json' or
-    response.is_streamed or response.cache_control.no_cache:
+    if request.method != 'GET' or response.status_code != 200 or response.mimetype != 'application/json' or response.is_streamed or response.cache_control.no_cache:
       return response
 
     file_name = to_filename(request)
