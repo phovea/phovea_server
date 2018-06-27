@@ -10,6 +10,8 @@
   "dir": "./",
   "dataDir": "${dir}_data",
   "absoluteDataDir": "${absoluteDir}_data",
+  "restCacheDir": "${dir}_cache",
+  "restCache": false, // record, true
 
   "secret_key": "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w",
   "max_file_size": 33554432,
