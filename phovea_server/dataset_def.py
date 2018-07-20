@@ -265,7 +265,14 @@ class ATable(ADataSetEntry):
     return []
 
   def aslist(self, range=None):
-    return self.aspandas(range).to_dict('records')
+    data = self.aspandas(range)
+
+    # if range is only one element, aspandas returns a Series, otherwise a Dataframe
+    # to_dict('records') throws error on Series
+    if range is not None and range.dims[0].size() == 1:
+      return data.to_dict()
+
+    return data.to_dict('records')
 
   @abc.abstractmethod
   def aspandas(self, range=None):
