@@ -37,6 +37,51 @@ def _add_no_cache_header(response):
   return response
 
 
+def _rest_cache(namespace):
+  import os
+  from os import path
+  import hashlib
+  from werkzeug import url_quote
+
+  dir_name = path.join(cc.restCacheDir, namespace[1:])
+  if not path.exists(dir_name):
+    os.makedirs(dir_name)
+
+  def to_filename(request):
+    secure = url_quote(request.full_path[1:].replace('/', ' ').replace('?', '_').replace('=', '-').replace('&', '_'), safe=' ')
+    key = hashlib.sha256(namespace + secure).hexdigest()
+    file_name = '{}_{}.json'.format(secure[:min(128, len(secure))], key)
+    return file_name.replace('%', '_')
+
+  def save(response):
+    from flask import request
+
+    if request.method != 'GET' or response.status_code != 200 or response.mimetype != 'application/json' or response.is_streamed or response.cache_control.no_cache:
+      return response
+
+    file_name = to_filename(request)
+    _log.info('cache %s %s -> %s %s', namespace, request.full_path, dir_name, file_name)
+
+    with open(path.join(dir_name, file_name), 'w') as f:
+      f.write(response.get_data())
+
+    # print(response.mimetype, data)
+    return response
+
+  def load():
+    from flask import request, send_from_directory
+    file_name = to_filename(request)
+
+    full = path.join(dir_name, file_name)
+
+    if path.exists(full):
+      _log.info('use cache cache %s %s <- %s', namespace, request.full_path, full)
+      return send_from_directory(path.abspath(dir_name), file_name, add_etags=False)
+    return None
+
+  return save, load
+
+
 def _to_stack_trace():
   import traceback
   return traceback.format_exc()
@@ -46,7 +91,7 @@ def _exception_handler(error):
   return 'Internal Server Error\n' + _to_stack_trace(), 500
 
 
-def _init_app(app, is_default_app=False):
+def _init_app(app, namespace, is_default_app=False):
   """
   initializes an application by setting common properties and options
   :param app:
@@ -68,6 +113,11 @@ def _init_app(app, is_default_app=False):
   if cc.error_stack_trace and hasattr(app, 'register_error_handler'):
     app.register_error_handler(500, _exception_handler)
 
+  if cc['restCache'] == 'record' and hasattr(app, 'after_request'):
+    app.after_request(_rest_cache(namespace)[0])
+  if cc['restCache'] is True and hasattr(app, 'before_request'):
+    app.before_request(_rest_cache(namespace)[1])
+
   if cc.secret_key:
     app.config['SECRET_KEY'] = cc.secret_key
 
@@ -85,7 +135,7 @@ def _loader(p):
 
   def load_app():
     app = p.load().factory()
-    _init_app(app)
+    _init_app(app, p.namespace)
     return app
 
   return load_app
@@ -117,7 +167,7 @@ def create_application():
 
   # create a path dispatcher
   _default_app = mainapp.default_app()
-  _init_app(_default_app, True)
+  _init_app(_default_app, '/', True)
   _applications = {p.namespace: _loader(p) for p in list_plugins('namespace')}
 
   # create a dispatcher for all the applications

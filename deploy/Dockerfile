@@ -9,7 +9,7 @@ COPY requirements*.txt docker_packages.txt docker_script*.sh _docker_data* ./
 RUN (!(test -s docker_packages.txt) || (apt-get update && \
     (cat docker_packages.txt | xargs apt-get install -y))) && \
     (pip install --no-cache-dir -r requirements.txt)
-RUN (!(test -f docker_script.sh) || (bash ./docker_script.sh))
+RUN (!(test -s docker_script.sh) || (bash ./docker_script.sh))
 
 COPY ./build/source ./
 
