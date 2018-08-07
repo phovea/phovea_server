@@ -12,6 +12,7 @@ __pycache__/
 *.log
 *.pot
 *.pyc
+*.pytest_cache/
 *.swp
 *.lock
 # due to using tox and pytest
