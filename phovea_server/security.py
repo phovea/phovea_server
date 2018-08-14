@@ -242,6 +242,15 @@ def _includes(items, item):
 def can(item, permission, user=None):
   if user is None:
     user = current_user()
+
+  if not isinstance(item, dict):
+    # assume we have an object
+    item = {
+      'creator': getattr(item, 'creator', ANONYMOUS),
+      'buddies': getattr(item, 'buddies', []),
+      'group': getattr(item, 'group', ANONYMOUS)
+    }
+
   owner, group, others, buddies = _decode(item.get('permissions', DEFAULT_PERMISSION))
 
   # I'm the creator
