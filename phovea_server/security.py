@@ -248,7 +248,8 @@ def can(item, permission, user=None):
     item = {
       'creator': getattr(item, 'creator', ANONYMOUS),
       'buddies': getattr(item, 'buddies', []),
-      'group': getattr(item, 'group', ANONYMOUS)
+      'group': getattr(item, 'group', ANONYMOUS),
+      'permissions': getattr(item, 'permissions', DEFAULT_PERMISSION)
     }
 
   owner, group, others, buddies = _decode(item.get('permissions', DEFAULT_PERMISSION))
