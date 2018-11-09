@@ -6,8 +6,6 @@
 from __future__ import absolute_import
 import gevent.monkey
 import logging.config
-from os import path
-
 
 gevent.monkey.patch_all()  # ensure the standard libraries are patched
 
