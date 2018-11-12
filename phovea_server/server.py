@@ -7,7 +7,6 @@ from __future__ import absolute_import
 import gevent.monkey
 import logging.config
 
-
 gevent.monkey.patch_all()  # ensure the standard libraries are patched
 
 
@@ -50,8 +49,12 @@ def _rest_cache(namespace):
   def to_filename(request):
     secure = url_quote(request.full_path[1:].replace('/', ' ').replace('?', '_').replace('=', '-').replace('&', '_'), safe=' ')
     key = hashlib.sha256(namespace + secure).hexdigest()
-    file_name = '{}_{}.json'.format(secure[:min(128, len(secure))], key)
-    return file_name.replace('%', '_')
+    file_name_old = '{}_{}.json'.format(secure[:min(128, len(secure))], key)
+    file_name = '{}_{}.json'.format(secure[:min(64, len(secure))], key)  # use a shorter filename for restCache, to avoid file system errors with too long file names
+    return {
+      "file_name_128": file_name_old.replace('%', '_'),  # file_name_128 = file name with 128 characters in front of the hash
+      "file_name_64": file_name.replace('%', '_')  # file_name_64 = file name with 64 characters in front of the hash
+    }
 
   def save(response):
     from flask import request
@@ -59,7 +62,8 @@ def _rest_cache(namespace):
     if request.method != 'GET' or response.status_code != 200 or response.mimetype != 'application/json' or response.is_streamed or response.cache_control.no_cache:
       return response
 
-    file_name = to_filename(request)
+    file_name = to_filename(request)['file_name_64']  # only use the short file name for storing new files
+
     _log.info('cache %s %s -> %s %s', namespace, request.full_path, dir_name, file_name)
 
     with open(path.join(dir_name, file_name), 'w') as f:
@@ -70,7 +74,11 @@ def _rest_cache(namespace):
 
   def load():
     from flask import request, send_from_directory
-    file_name = to_filename(request)
+
+    file_names = to_filename(request)
+
+    # use the legacy file name ('file_name_128') if a file with this name exists and the new file name format otherwise
+    file_name = file_names['file_name_128'] if path.exists(file_names['file_name_128']) else file_names['file_name_64']
 
     full = path.join(dir_name, file_name)
 
