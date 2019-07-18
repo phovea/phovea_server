@@ -40,6 +40,8 @@ def basic_description(data, type, path):
     desc['group'] = data['group']
   if 'permissions' in data:
     desc['permissions'] = data['permissions']
+  if 'buddies' in data:
+    desc['buddies'] = data['buddies']
 
   return desc
 
