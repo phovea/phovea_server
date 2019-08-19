@@ -1,8 +1,7 @@
 language: python
 sudo: required
 env:
-- TOXENV=py27
-- TOXENV=py34
+- TOXENV=py37
 install:
 - "(!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get
   install -y))"
@@ -19,7 +18,7 @@ deploy:
   api_key:
     secure: IOK6qIVZV0u2UDorpqhXnjCwJdoFQWYVMVBujEliPOB/9zer+3dRIhdFOaTuvsk/vrPv5UxepiSUqzLUJlrPkjlJTf4yRwc+kQ1sZdnc7Av4Cd6eKRyrajhr8JM9bg1A3HUljua3mDjKUcvdWZnDIDSv9QuXvmlgO52f56MQryJ85cksTifOh6ShMDS8moqaZD09tMRx7cdBw0wVVwXNDTDAf2kkrRy96sQ4+NJBIy9QA1oShDepURjm6trr/eFfFr3lIttR6hTF6s3EqqEifxmbh3PxXo+y14uyiQWVbzoVX4teA1q0H5vBmDNs3+LZz/uYVwV4upn+R6Ph+GLY15Xwkup8WS7yB36dogaLgPuW+n8DqqEyxFqor6tkSOcqPT0sBgIdo3PX2k1caF1qFqBVe+d09lPhy/Y7GXl2bO55+UFX0iyvv3Zez7rcnho5hAmtWIf4G7IUe8aUlFyrtZbyhd/MGixTHTjgFXvKxHOKEgeJ5Ec6HUr6+7x9HHQ4O4Uznt7NE+n+37/kW6hR1Q5rqksfa1rTAapQ7uE/IBj7yOM0lEQdU9v5iwyDNGV2viG7lK60ofu68jV0K6tgPplWczxX0IIqaJYVtyWm6JGkU96fc9JpWNi/TwdRL1BvqwWBRe8Wya6Wk0KNe0jIniUlwgmp565JjFYsWTduRww=
   file_glob: true
-  file: 
+  file:
   - dist/phovea_server*.egg
   - dist/phovea_server.tar.gz
   on:
