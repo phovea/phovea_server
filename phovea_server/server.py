@@ -139,7 +139,7 @@ def _init_app(app, namespace, is_default_app=False):
 
 # helper to plugin in function scope
 def _loader(p):
-  print(('add application: ' + p.id + ' at namespace: ' + p.namespace))
+  _log.info('add application: ' + p.id + ' at namespace: ' + p.namespace)
 
   def load_app():
     app = p.load().factory()
