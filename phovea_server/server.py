@@ -3,7 +3,7 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
-from __future__ import absolute_import
+
 import gevent.monkey
 import logging.config
 
@@ -139,7 +139,7 @@ def _init_app(app, namespace, is_default_app=False):
 
 # helper to plugin in function scope
 def _loader(p):
-  print('add application: ' + p.id + ' at namespace: ' + p.namespace)
+  print(('add application: ' + p.id + ' at namespace: ' + p.namespace))
 
   def load_app():
     app = p.load().factory()

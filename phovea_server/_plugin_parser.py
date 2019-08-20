@@ -5,7 +5,7 @@
 ###############################################################################
 
 from builtins import map
-from past.builtins import basestring
+from past.builtins import str
 from builtins import object
 from ._utils import replace_variables
 from .config import view
@@ -19,7 +19,7 @@ def is_disabled_plugin(p):
   import re
 
   def check(disable):
-    return isinstance(disable, basestring) and re.match(disable, p.id)
+    return isinstance(disable, str) and re.match(disable, p.id)
 
   return any(map(check, cc.disable['plugins']))
 
@@ -39,9 +39,9 @@ def is_disabled_extension(extension, extension_type, p):
     return re.match(v, vk)
 
   def check(disable):
-    if isinstance(disable, basestring):
+    if isinstance(disable, str):
       return re.match(disable, extension['id'])
-    return all(check_elem(k, v) for k, v in disable.items())
+    return all(check_elem(k, v) for k, v in list(disable.items()))
 
   return any(map(check, cc.disable['extensions']))
 
@@ -53,7 +53,7 @@ def _resolve_server_config(d, vars={}):
   elif isinstance(d, list):
     return [_resolve_server_config(i) for i in d]
   elif isinstance(d, dict):
-    for k, v in d.items():
+    for k, v in list(d.items()):
       d[k] = _resolve_server_config(v)
     return d
   return d
@@ -61,7 +61,7 @@ def _resolve_server_config(d, vars={}):
 
 # extend a dictionary recursivly
 def _extend(target, w):
-  for k, v in w.items():
+  for k, v in list(w.items()):
     if isinstance(v, dict):
       if k not in target:
         target[k] = _extend({}, v)

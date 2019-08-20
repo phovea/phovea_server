@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-from __future__ import print_function
+
 from builtins import range
 from builtins import object
 
@@ -38,7 +38,7 @@ class PathDispatcher(object):
   def __init__(self, default_app, applications):
     self.default_app = default_app
 
-    self.applications = [ApplicationProxy(key, value) for key, value in applications.items()]
+    self.applications = [ApplicationProxy(key, value) for key, value in list(applications.items())]
     # print self.applications
     from threading import Lock
     self.lock = Lock()

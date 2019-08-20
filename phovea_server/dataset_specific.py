@@ -4,11 +4,11 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-from __future__ import division
-from __future__ import absolute_import
+
+
 from builtins import zip
 from builtins import str
-from past.builtins import basestring
+from past.builtins import str
 from . import ns
 from . import range as ranges
 from .util import jsonify
@@ -37,7 +37,7 @@ def format_csv(dataset, range, args):  # noqa
   import numpy.ma as ma
 
   def to_str(v):
-    if isinstance(v, basestring):
+    if isinstance(v, str):
       return v
     if np.isnan(v) or ma.is_masked(v):
       return ''

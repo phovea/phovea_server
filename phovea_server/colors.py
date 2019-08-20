@@ -4,7 +4,7 @@
 # Licensed under the new BSD license,  available at http://caleydo.org/license
 ###############################################################################
 
-from __future__ import division
+
 from builtins import zip
 from builtins import range
 from builtins import object

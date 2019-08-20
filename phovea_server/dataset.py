@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-from past.builtins import basestring
+from past.builtins import str
 import phovea_server.plugin
 import phovea_server.range
 import phovea_server.util
@@ -73,7 +73,7 @@ def update(dataset, desc, files=[]):
   :param files: a list of FileStorage
   :return:
   """
-  old = get(dataset) if isinstance(dataset, basestring) else dataset
+  old = get(dataset) if isinstance(dataset, str) else dataset
   if old is None:
     return add(desc, files)
   r = old.update(desc, files)
@@ -86,7 +86,7 @@ def remove(dataset):
   :param dataset: a dataset or a dataset id
   :return: boolean whether the operation was successful
   """
-  old = get(dataset) if isinstance(dataset, basestring) else dataset
+  old = get(dataset) if isinstance(dataset, str) else dataset
   if old is None:
     return False
   for p in _providers():

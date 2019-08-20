@@ -7,7 +7,7 @@
 
 from builtins import object, set
 from .plugin import list as list_plugin
-from itertools import izip, chain
+from itertools import chain
 import logging
 
 _log = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class MappingManager(object):
       # calculate all paths
       all_paths = {_to: self.__find_all_paths(graph, _from, _to) for _to in entries if _to != _from}
       # remove missing paths
-      for key, value in all_paths.items():
+      for key, value in list(all_paths.items()):
         if not value:
           del all_paths[key]
       self.paths[_from] = all_paths
@@ -49,9 +49,9 @@ class MappingManager(object):
     :return:
     """
     s = set()
-    for from_, v in self.mappers.items():
+    for from_, v in list(self.mappers.items()):
       s.add(from_)
-      for to_ in v.keys():
+      for to_ in list(v.keys()):
         s.add(to_)
     return s
 
@@ -89,7 +89,7 @@ class MappingManager(object):
     rset = [set() for _ in ids]
     for mapper in to_mappings:
       mapped_ids = mapper(ids)
-      for mapped_id, rlist, rhash in izip(mapped_ids, r, rset):
+      for mapped_id, rlist, rhash in zip(mapped_ids, r, rset):
         for id in mapped_id:
           if id not in rhash:
             rlist.append(id)

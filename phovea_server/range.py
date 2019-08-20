@@ -5,10 +5,10 @@
 ###############################################################################
 
 
-from __future__ import division
+
 from builtins import str
 from builtins import range as number_range
-from past.builtins import basestring
+from past.builtins import str
 from builtins import object
 import itertools
 from functools import reduce
@@ -320,7 +320,7 @@ class Range1D(object):
 
   def append(self, *args):
     def convert(p):
-      if isinstance(p, basestring):
+      if isinstance(p, str):
         return RangeElem.parse(p)
       elif isinstance(p, int):
         return RangeElem.single(p)

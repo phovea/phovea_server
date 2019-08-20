@@ -5,7 +5,6 @@
 ###############################################################################
 
 
-from __future__ import absolute_import
 from builtins import object
 import os
 import jsoncfg
@@ -137,7 +136,7 @@ def _init_config():
   _merge_config(f, 'phovea_server')
   global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
   if os.path.exists(global_) and global_ != f:
-    print('configuration file: ' + global_)
+    print(('configuration file: ' + global_))
     with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))
 

@@ -62,8 +62,8 @@ class CSVEntryMixin(object):
 
     data = []
     with io.open(self._path, 'r', newline='', encoding=self._desc.get('encoding', 'utf-8')) as csvfile:
-      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', u','),
-                          quotechar=str(self._desc.get('quotechar', u'|')))
+      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ','),
+                          quotechar=str(self._desc.get('quotechar', '|')))
       data.extend(reader)
 
     # print data
@@ -88,7 +88,7 @@ class CSVEntryMixin(object):
     return self._desc
 
   def idtypes(self):
-    return [v for k, v in self._desc.items() if k in ['rowtype', 'coltype', 'idtype']]
+    return [v for k, v in list(self._desc.items()) if k in ['rowtype', 'coltype', 'idtype']]
 
 
 def guess_color(name, i):
@@ -181,7 +181,7 @@ class CSVStratification(CSVEntryMixin, AStratification):
     desc = basic_description(data, 'stratification', path)
     desc['idtype'] = data.get('idtype', data.get('rowtype', 'unknown'))
 
-    for k, v in data.items():
+    for k, v in list(data.items()):
       if k not in desc:
         desc[k] = v
     if id is not None:
@@ -194,8 +194,8 @@ class CSVStratification(CSVEntryMixin, AStratification):
       clusters = set()
       count = 0
       with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', u','),
-                            quotechar=str(desc.get('quotechar', u'|')))
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ','),
+                            quotechar=str(desc.get('quotechar', '|')))
         for row in reader:
           count += 1
           clusters.add(row[1])
@@ -292,7 +292,7 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
     desc['coltype'] = data.get('coltype', 'unknown')
     desc['value'] = dict(type=data.get('value_type', 'real'))
 
-    for k, v in data.items():
+    for k, v in list(data.items()):
       if k not in desc:
         desc[k] = v
     if id is not None:
@@ -311,8 +311,8 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
       min_v = None
       max_v = None
       with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', u','),
-                            quotechar=str(desc.get('quotechar', u'|')))
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ','),
+                            quotechar=str(desc.get('quotechar', '|')))
         for row in reader:
           if cols is None:
             cols = len(row) - 1
