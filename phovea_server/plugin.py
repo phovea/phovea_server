@@ -7,6 +7,7 @@
 
 from builtins import object
 import logging
+from functools import cmp_to_key
 
 _registry = None
 
@@ -156,7 +157,7 @@ class Registry(object):
       return a_prio - b_prio
 
     def select(v):
-      v = sorted(v, cmp=compare)
+      v = sorted(v, key=cmp_to_key(compare))
       _log.info('creating singleton %s %s', v[0].id, getattr(v[0], 'module', 'server'))
       return loader(v[0])
 
