@@ -33,6 +33,23 @@ def enable_prod_mode():
   cc.set('nocache', False)
 
 
+def attach_ptvsd_debugger():
+  if cc.getboolean('ptvsd_debugger', default=False) is False:
+    _log.info('Tip: You can enable the remote debugger `ptvsd` for Visual Studio Code by adding configuration `"ptvsd_debugger": true` to `phovea_server` section in the config.json of your workspace.')
+    return
+
+  try:
+    import ptvsd
+    ptvsd.enable_attach()
+    _log.info('Debugger is started')
+    _log.info('You can now start the debugger in Visual Studio Code')
+    _log.info('Waiting for a debugger to attach ...')
+    ptvsd.wait_for_attach()
+    _log.info('Debugger successfully attached')
+  except OSError as exc:
+    _log.error(exc)
+
+
 def _config_files():
   """
   list all known config files
@@ -125,6 +142,7 @@ def run():
   args = parser.parse_known_args()[0]
   if args.env.startswith('dev'):
     enable_dev_mode()
+    attach_ptvsd_debugger()
   else:
     enable_prod_mode()
 

@@ -4,6 +4,8 @@
   "nocache": false,
   "error_stack_trace": false,
 
+  "ptvsd_debugger": false,
+
   "port": 80,
   "address": "0.0.0.0",
 
