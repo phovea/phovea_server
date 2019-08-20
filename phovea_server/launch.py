@@ -5,6 +5,7 @@
 ###############################################################################
 from __future__ import print_function
 import logging.config
+import logging
 
 
 # set configured registry
@@ -14,6 +15,8 @@ def _get_config():
 
 
 cc = _get_config()
+# configure logging
+logging.config.dictConfig(cc.logging)
 _log = logging.getLogger(__name__)
 
 
