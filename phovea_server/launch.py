@@ -35,20 +35,19 @@ def enable_prod_mode():
 
 def attach_ptvsd_debugger():
   if cc.getboolean('ptvsd_debugger', default=False) is False:
-    print('Enable remote debugger by adding config key `phovea_server.ptvsd_debugger: true` to the workspace config.json.')
+    _log.info('Tip: You can enable the remote debugger `ptvsd` for Visual Studio Code by adding configuration `"ptvsd_debugger": true` to `phovea_server` section in the config.json of your workspace.')
     return
 
   try:
-    # import socket
-    # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # sock.close()
     import ptvsd
     ptvsd.enable_attach()
-    print('Debugger `ptvsd` is started')
+    _log.info('Debugger is started')
+    _log.info('You can now start the debugger in Visual Studio Code')
+    _log.info('Waiting for a debugger to attach ...')
     ptvsd.wait_for_attach()
-    print('Debugger successfully attached')
+    _log.info('Debugger successfully attached')
   except OSError as exc:
-    print(exc)
+    _log.error(exc)
 
 
 def _config_files():
