@@ -46,7 +46,7 @@ def to_json(obj, *args, **kwargs):
   if 'indent' in kwargs:
     del kwargs['indent']
   kwargs['ensure_ascii'] = False
-  return json.dumps(obj, *args, **kwargs)
+  return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
 
 
 def jsonify(obj, *args, **kwargs):
