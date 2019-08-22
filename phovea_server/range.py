@@ -5,10 +5,8 @@
 ###############################################################################
 
 
-
 from builtins import str
 from builtins import range as number_range
-from past.builtins import str
 from builtins import object
 import itertools
 from functools import reduce

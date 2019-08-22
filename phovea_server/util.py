@@ -7,7 +7,7 @@
 
 from builtins import range
 import json
-import pandas.json as ujson
+# import pandas as pd
 
 
 class JSONExtensibleEncoder(json.JSONEncoder):
@@ -46,7 +46,7 @@ def to_json(obj, *args, **kwargs):
   if 'indent' in kwargs:
     del kwargs['indent']
   kwargs['ensure_ascii'] = False
-  return ujson.dumps(obj, *args, **kwargs)
+  return json.dumps(obj, *args, **kwargs)
 
 
 def jsonify(obj, *args, **kwargs):
@@ -66,6 +66,8 @@ def glob_recursivly(path, match):
   import fnmatch
 
   for dirpath, dirnames, files in os.walk(path):
+    if match is None:
+      return None
     for f in fnmatch.filter(files, match):
       yield os.path.join(dirpath, f)
 
