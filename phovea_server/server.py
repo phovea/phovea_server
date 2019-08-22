@@ -19,7 +19,7 @@ def _get_config():
 # append the plugin directories as primary lookup path
 cc = _get_config()
 # configure logging
-logging.config.dictConfig(cc.logging)
+# logging.config.dictConfig(cc.logging) # configuration already set in launch.py
 _log = logging.getLogger(__name__)
 
 
