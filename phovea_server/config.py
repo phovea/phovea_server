@@ -9,7 +9,7 @@ from builtins import object
 import os
 import jsoncfg
 import codecs
-from ._utils import replace_nested_variables, extend
+from _utils import replace_nested_variables, extend
 import logging
 
 
@@ -131,7 +131,7 @@ def _merge_config(config_file, plugin_id):
 
 
 def _init_config():
-  from . import phovea_config
+  from __init__ import phovea_config
   f = phovea_config()
   _merge_config(f, 'phovea_server')
   global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))

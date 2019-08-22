@@ -7,8 +7,8 @@
 from builtins import map
 from past.builtins import str
 from builtins import object
-from ._utils import replace_variables
-from .config import view
+from _utils import replace_variables
+from config import view
 import logging
 
 cc = view('phovea_server')
@@ -298,7 +298,8 @@ def _find_production_neighbor_plugins():
   dirs = [p.dirname(p.abspath(pi)) for pi in glob.glob(base_dir + '/*/__init__.py')]
   dirs = [d for d in dirs if p.exists(p.join(d, 'config.json'))]
   # files contains all plugins
-  return [DirectoryProductionPlugin(d) for d in dirs]
+  v = [DirectoryProductionPlugin(d) for d in dirs]
+  return v
 
 
 class PluginMetaData(object):

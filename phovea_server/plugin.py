@@ -15,9 +15,9 @@ _registry = None
 def _get_registry():
   global _registry
   if _registry is None:
-    from ._plugin_parser import parse
+    from _plugin_parser import parse
     metadata = parse()
-    from .config import merge_plugin_configs
+    from config import merge_plugin_configs
     merge_plugin_configs(metadata.plugins)
     _registry = Registry(metadata.plugins, metadata.server_extensions, metadata)
   return _registry
@@ -63,7 +63,7 @@ class AExtensionDesc(object):
     self.version = '1.0'
     self.description = ''
     # copy all values
-    for key, value in list(desc.items()):
+    for key, value in desc.items():
       self.__dict__[key] = value
 
 

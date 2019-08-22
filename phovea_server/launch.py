@@ -10,7 +10,7 @@ import logging
 
 # set configured registry
 def _get_config():
-  from . import config
+  import config
   return config.view('phovea_server')
 
 
@@ -58,7 +58,7 @@ def _config_files():
   list all known config files
   :return:
   """
-  from .plugin import plugins
+  from plugin import plugins
   return [p for p in (p.config_file() for p in plugins()) if p is not None]
 
 
@@ -100,7 +100,7 @@ def set_default_subparser(parser, name, args=None):
     for x in parser._subparsers._actions:
       if not isinstance(x, argparse._SubParsersAction):
         continue
-      for sp_name in list(x._name_parser_map.keys()):
+      for sp_name in x._name_parser_map.keys():
         if sp_name in sys.argv[1:]:
           subparser_found = True
     if not subparser_found:
@@ -113,7 +113,7 @@ def set_default_subparser(parser, name, args=None):
 
 
 def _resolve_commands(parser):
-  from .plugin import list as list_plugins
+  from plugin import list as list_plugins
   subparsers = parser.add_subparsers(dest='cmd')
   default_command = None
   for command in list_plugins('command'):
