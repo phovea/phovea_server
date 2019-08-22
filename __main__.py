@@ -6,7 +6,9 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('/phovea/phovea_server/phovea_server'))
+path = os.path.dirname(os.path.realpath(__file__))
+# required to import files in python 3.7
+sys.path.insert(0, os.path.abspath(path + '/phovea_server'))
 
 if __name__ == '__main__':
   import launch
