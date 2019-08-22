@@ -13,7 +13,9 @@ _log = logging.getLogger(__name__)
 
 # extend a dictionary recursivly
 def extend(target, w):
-  for k, v in list(w.items()):
+  if w is None:
+    return target
+  for k, v in w.items():
     if isinstance(v, dict):
       if k not in target:
         target[k] = extend({}, v)
