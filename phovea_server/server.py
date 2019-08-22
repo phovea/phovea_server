@@ -187,17 +187,31 @@ def create_application():
 
 
 def create(parser):
-  parser.add_argument('--port', '-p', type=int, default=cc.getint('port'),
+  """
+  Add arguments to the parser and return a launcher function, which in-turn creates a server instance
+
+  parser: ArgumentParser that allows to add custom arguments. The arguments will be passed as parameter to the launcher function.
+  """
+  parser.add_argument('--port', '-p', type=int, default=cc.getint('port'), # get default value from config.json
                       help='server port')
-  parser.add_argument('--address', '-a', default=cc.get('address'),
+  parser.add_argument('--address', '-a', default=cc.get('address'), # get default value from config.json
                       help='server address')
 
   def _launcher(args):
+    """
+    Prepare the launch of the server instance
+
+    args: contains the arguments that are parsed from the command line (or set in the config as default value)
+    """
     from geventwebsocket.handler import WebSocketHandler
     from gevent.pywsgi import WSGIServer
+
+    # create phovea server application
     application = create_application()
+
+    _log.info('prepare server that will listen on %s:%s', args.address, args.port)
     http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
 
-    return http_server.serve_forever
+    return http_server.serve_forever # return function name only; initialization will be done later
 
   return _launcher
