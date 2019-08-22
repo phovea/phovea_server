@@ -5,11 +5,12 @@
 ###############################################################################
 
 
+from importlib import import_module
 from builtins import str, object
 import json
-from backports import csv
 import io
 import os
+import csv
 import numpy as np
 from .dataset_def import ADataSetProvider, AColumn, AMatrix, AStratification, ATable, AVector
 from .config import view
@@ -62,8 +63,7 @@ class CSVEntryMixin(object):
 
     data = []
     with io.open(self._path, 'r', newline='', encoding=self._desc.get('encoding', 'utf-8')) as csvfile:
-      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ','),
-                          quotechar=str(self._desc.get('quotechar', '|')))
+      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ','), quotechar=str(self._desc.get('quotechar', '|')))
       data.extend(reader)
 
     # print data
@@ -194,8 +194,7 @@ class CSVStratification(CSVEntryMixin, AStratification):
       clusters = set()
       count = 0
       with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', ','),
-                            quotechar=str(desc.get('quotechar', '|')))
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ','), quotechar=str(desc.get('quotechar', '|')))
         for row in reader:
           count += 1
           clusters.add(row[1])
@@ -311,8 +310,7 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
       min_v = None
       max_v = None
       with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', ','),
-                            quotechar=str(desc.get('quotechar', '|')))
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ','), quotechar=str(desc.get('quotechar', '|')))
         for row in reader:
           if cols is None:
             cols = len(row) - 1

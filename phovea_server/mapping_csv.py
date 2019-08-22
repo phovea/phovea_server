@@ -33,7 +33,7 @@ class FileMapper(object):
     pass
 
   def _load(self):
-    from backports import csv
+    import csv
     import io
 
     _log.info('loading real mapping file from %s to %s', self.from_idtype, self.to_idtype)
