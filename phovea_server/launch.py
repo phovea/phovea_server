@@ -160,8 +160,9 @@ def run():
 
   if args.use_reloader:
     _log.info('start using reloader...')
-    from werkzeug._reloader import run_with_reloader
-    run_with_reloader(main, extra_files=_config_files())
+    # from werkzeug._reloader import run_with_reloader
+    # run_with_reloader(main, extra_files=_config_files())
+    main()
   else:
     _log.info('start...')
     main()
