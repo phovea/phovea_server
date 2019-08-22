@@ -5,10 +5,8 @@
 ###############################################################################
 
 
-
 from builtins import zip
 from builtins import str
-from past.builtins import str
 from . import ns
 from . import range as ranges
 from .util import jsonify
