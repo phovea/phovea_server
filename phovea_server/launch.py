@@ -207,7 +207,7 @@ def run():
   args = parser.parse_args()
   _set_runtime_infos(args)
 
-  main = args.launcher(args) # execute the launcher function, which returns another function
+  main = args.launcher(args)  # execute the launcher function, which returns another function
 
   if args.use_reloader:
     _log.info('start application using reloader...')

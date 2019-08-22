@@ -192,9 +192,9 @@ def create(parser):
 
   parser: ArgumentParser that allows to add custom arguments. The arguments will be passed as parameter to the launcher function.
   """
-  parser.add_argument('--port', '-p', type=int, default=cc.getint('port'), # get default value from config.json
+  parser.add_argument('--port', '-p', type=int, default=cc.getint('port'),  # get default value from config.json
                       help='server port')
-  parser.add_argument('--address', '-a', default=cc.get('address'), # get default value from config.json
+  parser.add_argument('--address', '-a', default=cc.get('address'),  # get default value from config.json
                       help='server address')
 
   def _launcher(args):
@@ -212,6 +212,6 @@ def create(parser):
     _log.info('prepare server that will listen on %s:%s', args.address, args.port)
     http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
 
-    return http_server.serve_forever # return function name only; initialization will be done later
+    return http_server.serve_forever  # return function name only; initialization will be done later
 
   return _launcher
