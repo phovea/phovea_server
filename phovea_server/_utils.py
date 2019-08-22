@@ -57,5 +57,5 @@ def replace_nested_variables(obj, lookup):
   elif isinstance(obj, str):
     return replace_variables_f(obj, lookup)
   elif isinstance(obj, dict):
-    return {k: replace_nested_variables(v, lookup) for k, v in list(obj.items())}
+    return {k: replace_nested_variables(v, lookup) for k, v in obj.items()}
   return obj

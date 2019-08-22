@@ -64,13 +64,13 @@ def _list_format_csv(data):
 
 def _to_query(query):
   keys = ['name', 'id', 'fqname', 'type']
-  act_query = {k: v for k, v in list(query.items()) if k in keys}
+  act_query = {k: v for k, v in query.items() if k in keys}
   if len(act_query) == 0:  # no query
     return lambda x: True
   import re
 
   def filter_elem(elem):
-    return all((re.match(v, getattr(elem, k, '')) for k, v in list(act_query.items())))
+    return all((re.match(v, getattr(elem, k, '')) for k, v in act_query.items()))
 
   return filter_elem
 
@@ -90,7 +90,7 @@ def _list_datasets():
     formats = dict(json=_list_format_json, treejson=_list_format_treejson, csv=_list_format_csv)
     if format not in formats:
       ns.abort(
-          ns.make_response('invalid format: "{0}" possible ones: {1}'.format(format, ','.join(list(formats.keys()))), 400))
+          ns.make_response('invalid format: "{0}" possible ones: {1}'.format(format, ','.join(formats.keys())), 400))
     return formats[format](data)
   else:
     return _upload_dataset(ns.request)

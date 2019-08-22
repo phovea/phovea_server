@@ -49,9 +49,9 @@ class MappingManager(object):
     :return:
     """
     s = set()
-    for from_, v in list(self.mappers.items()):
+    for from_, v in self.mappers.items():
       s.add(from_)
-      for to_ in list(v.keys()):
+      for to_ in v.keys():
         s.add(to_)
     return s
 

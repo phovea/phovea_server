@@ -4,7 +4,7 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-from . import launch
+import launch
 
 if __name__ == '__main__':
   launch.run()

@@ -88,7 +88,7 @@ class CSVEntryMixin(object):
     return self._desc
 
   def idtypes(self):
-    return [v for k, v in list(self._desc.items()) if k in ['rowtype', 'coltype', 'idtype']]
+    return [v for k, v in self._desc.items() if k in ['rowtype', 'coltype', 'idtype']]
 
 
 def guess_color(name, i):
@@ -181,7 +181,7 @@ class CSVStratification(CSVEntryMixin, AStratification):
     desc = basic_description(data, 'stratification', path)
     desc['idtype'] = data.get('idtype', data.get('rowtype', 'unknown'))
 
-    for k, v in list(data.items()):
+    for k, v in data.items():
       if k not in desc:
         desc[k] = v
     if id is not None:
@@ -292,7 +292,7 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
     desc['coltype'] = data.get('coltype', 'unknown')
     desc['value'] = dict(type=data.get('value_type', 'real'))
 
-    for k, v in list(data.items()):
+    for k, v in data.items():
       if k not in desc:
         desc[k] = v
     if id is not None:

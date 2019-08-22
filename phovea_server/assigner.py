@@ -30,7 +30,7 @@ class MemoryIDAssigner(object):
     cache = self._idsmapping[idtype]
 
     def lookup(id):
-      for k, v in list(cache.items()):
+      for k, v in cache.items():
         if v == id:
           return k
       return None
@@ -54,7 +54,7 @@ class MemoryIDAssigner(object):
     mappings = self._idsmapping[idtype]
     query = query.lower()
 
-    return list(islice((dict(id=v, name=k) for k, v in list(mappings.items()) if query in k.lower()), max_results))
+    return list(islice((dict(id=v, name=k) for k, v in mappings.items() if query in k.lower()), max_results))
 
   def __call__(self, ids, idtype):
     """
@@ -119,7 +119,7 @@ class DBIDAssigner(object):
     # assuming incremental ids
     if idtype in self._db:
       # clear old data
-      for key in list(self._db.keys()):
+      for key in self._db.keys():
         if key.startswith(idtype + '2id.') or key.startswith('id2' + idtype + '.'):
           del self._db[key]
 
@@ -134,7 +134,7 @@ class DBIDAssigner(object):
     from fnmatch import fnmatch
     pattern = idtype + '2id.*' + query + '*'
 
-    return list(islice((dict(id=v, name=k) for k, v in list(self._db.items()) if fnmatch(k, pattern)), max_results))
+    return list(islice((dict(id=v, name=k) for k, v in self._db.items() if fnmatch(k, pattern)), max_results))
 
   def __call__(self, ids, idtype):
     """
@@ -179,7 +179,7 @@ class SqliteIDAssigner(object):
     existing = self.get_cache(idtype)
 
     def lookup(id):
-      for k, v in list(existing.items()):
+      for k, v in existing.items():
         if v == id:
           return k
       return None
@@ -245,7 +245,7 @@ class SqliteIDAssigner(object):
   def search(self, idtype, query, max_results=None):
     mappings = self.get_cache(idtype)
     query = query.lower()
-    return list(islice((dict(id=v, name=k) for k, v in list(mappings.items()) if query in k.lower()), max_results))
+    return list(islice((dict(id=v, name=k) for k, v in mappings.items() if query in k.lower()), max_results))
 
 
 # TODO implement a real id mappper

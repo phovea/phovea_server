@@ -161,7 +161,7 @@ class Registry(object):
       _log.info('creating singleton %s %s', v[0].id, getattr(v[0], 'module', 'server'))
       return loader(v[0])
 
-    self._singletons = {k: select(v) for k, v in list(mm.items())}
+    self._singletons = {k: select(v) for k, v in mm.items()}
 
     return self._singletons
 
