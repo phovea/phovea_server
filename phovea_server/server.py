@@ -4,10 +4,7 @@
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
 
-import gevent.monkey
 import logging.config
-
-gevent.monkey.patch_all()  # ensure the standard libraries are patched
 
 
 # set configured registry
