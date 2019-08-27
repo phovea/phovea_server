@@ -10,6 +10,11 @@ from . import ns
 import os
 import re
 
+import logging
+
+_log = logging.getLogger(__name__)
+
+
 black_list = re.compile(r'(.*\.(py|pyc|gitignore|gitattributes)|(\w+)/((config|package)\.json|_deploy/.*))')
 public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'public'))
 
