@@ -93,14 +93,13 @@ class DBIDAssigner(object):
 
   @staticmethod
   def to_forward_key(idtype, identifier):
-    return ascii(idtype + '2id.' + str(identifier))
+    return idtype + '2id.' + str(identifier)
 
   @staticmethod
   def to_backward_key(idtype, id):
-    return ascii('id2' + idtype + '.' + str(id))
+    return 'id2' + idtype + '.' + str(id)
 
   def unmap(self, uids, idtype):
-    idtype = ascii(idtype)
 
     def lookup(id):
       key = self.to_backward_key(idtype, id)
@@ -115,7 +114,6 @@ class DBIDAssigner(object):
     :param mapping: array of tuples (id, uid)
     :return:
     """
-    idtype = ascii(idtype)
     # assuming incremental ids
     if idtype in self._db:
       # clear old data
@@ -128,7 +126,7 @@ class DBIDAssigner(object):
       key = self.to_forward_key(idtype, id)
       max_uid = uid if max_uid is None else max(uid, max_uid)
       self._db[key] = str(uid)
-      self._db[self.to_backward_key(idtype, uid)] = str(id).encode('ascii', 'ignore')
+      self._db[self.to_backward_key(idtype, uid)] = str(id)
 
   def search(self, idtype, query, max_results=None):
     from fnmatch import fnmatch
@@ -140,7 +138,6 @@ class DBIDAssigner(object):
     """
      return the integer index ids for the given ids in the given idtype
     """
-    idtype = ascii(idtype)
     max_old = -1 if idtype not in self._db else int(self._db[idtype])
     r = []
     for id in ids:
@@ -152,7 +149,7 @@ class DBIDAssigner(object):
         _log.debug('create %s %d', key, i)
         max_old += 1
         self._db[key] = str(i)
-        self._db[self.to_backward_key(idtype, i)] = str(id).encode('ascii', 'ignore')
+        self._db[self.to_backward_key(idtype, i)] = str(id)
         r.append(i)
 
     self._db[idtype] = str(max_old)
@@ -205,7 +202,6 @@ class SqliteIDAssigner(object):
     :param mapping: array of tuples (id, uid)
     :return:
     """
-    idtype = ascii(idtype)
     # delete cache
     del self._cache[idtype]
     self._db.execute('DELETE FROM mapping WHERE idtype=?', (idtype,))
