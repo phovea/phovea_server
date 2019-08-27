@@ -5,7 +5,7 @@
 ###############################################################################
 
 from builtins import map
-from past.builtins import str
+from builtins import str
 from builtins import object
 from _utils import replace_variables
 from config import view
