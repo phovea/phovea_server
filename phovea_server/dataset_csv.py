@@ -12,7 +12,8 @@ import os
 import csv
 import numpy as np
 from .dataset_def import ADataSetProvider, AColumn, AMatrix, AStratification, ATable, AVector
-from .config import view
+# relative imports don't work -> use config.view instead of former import statement
+import config
 
 
 def assign_ids(ids, idtype):
@@ -496,7 +497,7 @@ class StaticFileProvider(ADataSetProvider):
 
     self.files = list(to_files(plugins))
 
-    cc = view('phovea_server')
+    cc = config.view('phovea_server')
     self.data_plugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
     self.files.extend(to_files([self.data_plugin]))
     import glob

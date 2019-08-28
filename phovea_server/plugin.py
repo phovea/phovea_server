@@ -85,6 +85,7 @@ class ExtensionDesc(AExtensionDesc):
       import gevent.monkey
       _log = logging.getLogger(__name__)
       _log.info('importing %s', self.module)
+
       m = importlib.import_module(self.module)
       gevent.monkey.patch_all()  # ensure the standard libraries are patched
       if hasattr(m, '_plugin_initialize'):  # init method
@@ -128,7 +129,8 @@ class Registry(object):
   @property
   def singletons(self):
     import collections
-    from .config import view
+    # relative imports don't work -> use config.view instead of former import statement
+    import config
     _log = logging.getLogger(__name__)
     if self._singletons is not None:
       return self._singletons
@@ -142,7 +144,7 @@ class Registry(object):
       if e.type == 'manager':
         mm[e.id].append(e)
 
-    cc = view('phovea_server._runtime')
+    cc = config.view('phovea_server._runtime')
     current_command = cc.get('command', default='unknown')
 
     def compare(a, b):

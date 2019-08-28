@@ -9,7 +9,9 @@ import logging.config
 
 # set configured registry
 def _get_config():
-  from . import config
+  # change import statements (no relative imports allowed)
+  import importlib
+  config = importlib.import_module('config')
   return config.view('phovea_server')
 
 
@@ -171,7 +173,8 @@ def create_application():
   from werkzeug.contrib.fixers import ProxyFix
 
   # create a path dispatcher
-  _default_app = mainapp.default_app()
+  # add parameter to avoid reload
+  _default_app = mainapp.default_app(cc)
   _init_app(_default_app, '/', True)
   _applications = {p.namespace: _loader(p) for p in list_plugins('namespace')}
 
