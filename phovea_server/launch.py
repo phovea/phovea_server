@@ -14,7 +14,15 @@ def _get_config():
   return config.view('phovea_server')
 
 
+# added for testing
+def _get_config_hdf():
+  import config
+  return config.view('phovea_data_hdf')
+
 cc = _get_config()
+
+cc_hdf = _get_config_hdf()
+
 # configure logging
 logging.config.dictConfig(cc.logging)
 _log = logging.getLogger(__name__)

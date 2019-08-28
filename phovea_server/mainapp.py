@@ -128,10 +128,11 @@ def _build_info():
   return ns.jsonify(build_info)
 
 
-def default_app():
-  from .config import view
+# added parameter to avoid reload of config (init)
+def default_app(cc):
+  # from .config import view
   app = ns.Namespace(__name__)
-  cc = view('phovea_server')
+  # cc = view('phovea_server')
   if cc.env.startswith('dev'):
     app.add_url_rule('/', 'index', _generate_index)
     app.add_url_rule('/index.html', 'index', _generate_index)

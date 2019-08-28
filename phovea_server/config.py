@@ -14,11 +14,18 @@ import logging
 
 
 _log = logging.getLogger(__name__)
-_c = {}
+# set to None instead of {} for Type checking
+_c = None
 _preMergeChanges = {}
 
+## Method to ensure the usage of the global _c
+def get_c():
+  global _c
+  return _c
 
 def get(item, section=None, default=None):
+  # use global _c
+  global _c
   key = item if section is None else section + '.' + item
   keys = key.split('.')
   act = _c
@@ -123,17 +130,22 @@ class CaleydoConfigSection(object):
     return CaleydoConfigSection(self._expand(section))
 
 
-def _merge_config(config_file, plugin_id):
+# add global_config as parameter and call extend() in return statement
+def _merge_config(global_config, config_file, plugin_id):
   _log.info(plugin_id)
   with codecs.open(config_file, 'r', 'utf-8') as fi:
     c = jsoncfg.loads(fi.read())
-  extend(_c, {plugin_id: c})
+  return extend(global_config, {plugin_id: c})
 
 
 def _init_config():
   from __init__ import phovea_config
   f = phovea_config()
-  _merge_config(f, 'phovea_server')
+  # use global _c
+  global _c
+  _c = {}
+  _c = _merge_config(_c, f, 'phovea_server')
+  print(_c)
   global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
   if os.path.exists(global_) and global_ != f:
     print(('configuration file: ' + global_))
@@ -141,26 +153,36 @@ def _init_config():
       extend(_c, jsoncfg.loads(fi.read()))
 
 # create an initial config guess
-_init_config()
+# ensure that _init_config() is only called when global _c is None
+if get_c() is None:
+  print('init config')
+  _init_config()
 
 
 def merge_plugin_configs(plugins):
   # merge all the plugins
   global _c, _preMergeChanges
-  _c = {}
-
+  # removed in order to avoid reset
+  # _c = {}
   for plugin in plugins:
     f = plugin.config_file()
     if f:
       _log.info('merging config of %s', plugin.id)
-      _merge_config(f, plugin.id)
+      print('merging config of ' + plugin.id)
+      # improved usage of method in context
+      _c = _merge_config(_c, f, plugin.id)
+      print(_c)
 
   # override with more important settings
   global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
   if os.path.exists(global_):
     with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))
-
+      print(_c['phovea_data_hdf'])
   # merge changes done before the merge
-  extend(_c, _preMergeChanges)
-  _preMergeChanges = None
+  # check whether _preMergeChanges is of NoneType
+  if _preMergeChanges is not None:
+    extend(_c, _preMergeChanges)
+    _preMergeChanges = None
+    print('last')
+    print(_c['phovea_data_hdf'])
