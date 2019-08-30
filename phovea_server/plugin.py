@@ -17,7 +17,10 @@ def _get_registry():
   if _registry is None:
     from _plugin_parser import parse
     metadata = parse()
-    from config import merge_plugin_configs
+    from config import merge_plugin_configs, _c, _initialize
+    # force initialization
+    if _c is None:
+      _initialize()
     merge_plugin_configs(metadata.plugins)
     _registry = Registry(metadata.plugins, metadata.server_extensions, metadata)
   return _registry
@@ -131,6 +134,7 @@ class Registry(object):
     import collections
     # relative imports don't work -> use config.view instead of former import statement
     import config
+    # force initialization
     _log = logging.getLogger(__name__)
     if self._singletons is not None:
       return self._singletons
@@ -144,6 +148,8 @@ class Registry(object):
       if e.type == 'manager':
         mm[e.id].append(e)
 
+    if config._c is None:
+      config._initialize()
     cc = config.view('phovea_server._runtime')
     current_command = cc.get('command', default='unknown')
 

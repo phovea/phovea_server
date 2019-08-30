@@ -12,16 +12,22 @@ import codecs
 from _utils import replace_nested_variables, extend
 import logging
 
-
 _log = logging.getLogger(__name__)
 # set to None instead of {} for Type checking
 _c = None
 _preMergeChanges = {}
 
-## Method to ensure the usage of the global _c
-def get_c():
-  global _c
-  return _c
+
+# method to control call of _init_config()
+def _initialize():
+  print('init config')
+  _init_config()
+
+
+# Method to ensure the usage of the global _c
+# def get_c():
+#   global _c
+#   return _c
 
 def get(item, section=None, default=None):
   # use global _c
@@ -133,6 +139,9 @@ class CaleydoConfigSection(object):
 # add global_config as parameter and call extend() in return statement
 def _merge_config(global_config, config_file, plugin_id):
   _log.info(plugin_id)
+  # force initialization
+  if global_config is None:
+    _initialize()
   with codecs.open(config_file, 'r', 'utf-8') as fi:
     c = jsoncfg.loads(fi.read())
   return extend(global_config, {plugin_id: c})
@@ -152,18 +161,15 @@ def _init_config():
     with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))
 
-# create an initial config guess
-# ensure that _init_config() is only called when global _c is None
-if get_c() is None:
-  print('init config')
-  _init_config()
-
 
 def merge_plugin_configs(plugins):
   # merge all the plugins
   global _c, _preMergeChanges
   # removed in order to avoid reset
   # _c = {}
+  # force initialization
+  if _c is None:
+    _initialize()
   for plugin in plugins:
     f = plugin.config_file()
     if f:
@@ -182,7 +188,7 @@ def merge_plugin_configs(plugins):
   # merge changes done before the merge
   # check whether _preMergeChanges is of NoneType
   if _preMergeChanges is not None:
-    extend(_c, _preMergeChanges)
+    # extend(_c, _preMergeChanges)
     _preMergeChanges = None
     print('last')
     print(_c['phovea_data_hdf'])

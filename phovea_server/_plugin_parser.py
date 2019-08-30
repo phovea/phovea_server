@@ -7,10 +7,14 @@
 from builtins import map
 from builtins import str
 from builtins import object
+from importlib import import_module
 from _utils import replace_variables
-from config import view
+from config import view, _c, _initialize
 import logging
 
+# force initialization
+if _c is None:
+  _initialize()
 cc = view('phovea_server')
 _log = logging.getLogger(__name__)
 
