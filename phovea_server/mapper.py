@@ -19,8 +19,8 @@ class MappingManager(object):
   """
   def __init__(self, providers):
     self.mappers = {}
-    self.graph = {}
     self.paths = {}
+    graph = {}
     for (from_idtype, to_idtype, mapper) in providers:
       # generate mapper mapping
       from_mappings = self.mappers.get(from_idtype, {})
@@ -29,14 +29,14 @@ class MappingManager(object):
       from_mappings[to_idtype] = to_mappings
       to_mappings.append(mapper)
       # generate type graph
-      from_graph = self.graph.get(from_idtype, [])
+      from_graph = graph.get(from_idtype, [])
       from_graph.append(to_idtype)
-      self.graph[from_idtype] = from_graph
+      graph[from_idtype] = from_graph
     # generate path map
     entries = self.known_idtypes()
     for _from in entries:
       # calculate all paths
-      all_paths = {_to: self.__find_all_paths(self.graph, _from, _to) for _to in entries if _to != _from}
+      all_paths = {_to: self.__find_all_paths(graph, _from, _to) for _to in entries if _to != _from}
       # remove missing paths
       for key, value in all_paths.items():
         if not value:
@@ -54,29 +54,6 @@ class MappingManager(object):
       for to_ in v.keys():
         s.add(to_)
     return s
-
-  def __reaches(self, graph, start, visited=None):
-    """
-    Iterates and yields all reachable nodes from a starting node within a graph
-    :return: yield for each reachable node
-    """
-    # Reassign default parameter because otherwise Python assigns them on function definition (and not call)
-    if not visited:
-      visited = set()
-    else:
-      yield start
-    visited.add(start)
-    for next in graph.get(start, []):
-      if next not in visited:
-        for bar in self.__reaches(graph, next, visited):
-          yield bar
-
-  def __does_reach(self, graph, start, end):
-    """
-    Returns True if a node is reachable from a starting node within a graph
-    :return: True if reachable, False if not
-    """
-    return end in self.__reaches(graph, start)
 
   def __find_all_paths(self, graph, start, end, path=[]):
     """
