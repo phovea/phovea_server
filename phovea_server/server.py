@@ -173,8 +173,7 @@ def create_application():
   from werkzeug.contrib.fixers import ProxyFix
 
   # create a path dispatcher
-  # add parameter to avoid reload
-  _default_app = mainapp.default_app(cc)
+  _default_app = mainapp.default_app()
   _init_app(_default_app, '/', True)
   _applications = {p.namespace: _loader(p) for p in list_plugins('namespace')}
 
