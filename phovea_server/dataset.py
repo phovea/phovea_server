@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-from past.builtins import str
+from builtins import str
 import phovea_server.plugin
 import phovea_server.range
 import phovea_server.util
