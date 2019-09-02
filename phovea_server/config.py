@@ -152,6 +152,8 @@ def _init_config():
   f = phovea_config()
   # use global _c
   global _c
+  if _c is not None:
+    return
   _c = {}
   _c = _merge_config(_c, f, 'phovea_server')
   print(_c)
@@ -188,7 +190,7 @@ def merge_plugin_configs(plugins):
   # merge changes done before the merge
   # check whether _preMergeChanges is of NoneType
   if _preMergeChanges is not None:
-    # extend(_c, _preMergeChanges)
+    extend(_c, _preMergeChanges)
     _preMergeChanges = None
     print('last')
     print(_c['phovea_data_hdf'])
