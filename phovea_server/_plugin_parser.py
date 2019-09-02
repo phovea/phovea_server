@@ -7,7 +7,6 @@
 from builtins import map
 from builtins import str
 from builtins import object
-from importlib import import_module
 from _utils import replace_variables
 from config import view, _c, _initialize
 import logging
