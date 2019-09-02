@@ -13,7 +13,6 @@ from _utils import replace_nested_variables, extend
 import logging
 
 _log = logging.getLogger(__name__)
-# set to None instead of {} for Type checking
 _c = None
 _preMergeChanges = {}
 
@@ -22,11 +21,6 @@ _preMergeChanges = {}
 def _initialize():
   _init_config()
 
-
-# Method to ensure the usage of the global _c
-# def get_c():
-#   global _c
-#   return _c
 
 def get(item, section=None, default=None):
   # use global _c
@@ -156,7 +150,6 @@ def _init_config():
   print('init config')
   _c = {}
   _c = _merge_config(_c, f, 'phovea_server')
-  print(_c)
   global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
   if os.path.exists(global_) and global_ != f:
     print(('configuration file: ' + global_))
@@ -167,8 +160,6 @@ def _init_config():
 def merge_plugin_configs(plugins):
   # merge all the plugins
   global _c, _preMergeChanges
-  # removed in order to avoid reset
-  # _c = {}
   # force initialization
   if _c is None:
     _initialize()
@@ -176,21 +167,16 @@ def merge_plugin_configs(plugins):
     f = plugin.config_file()
     if f:
       _log.info('merging config of %s', plugin.id)
-      print('merging config of ' + plugin.id)
       # improved usage of method in context
       _c = _merge_config(_c, f, plugin.id)
-      print(_c)
 
   # override with more important settings
   global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
   if os.path.exists(global_):
     with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))
-      print(_c['phovea_data_hdf'])
   # merge changes done before the merge
   # check whether _preMergeChanges is of NoneType
   if _preMergeChanges is not None:
     extend(_c, _preMergeChanges)
     _preMergeChanges = None
-    print('last')
-    print(_c['phovea_data_hdf'])
