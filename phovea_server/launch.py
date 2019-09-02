@@ -11,7 +11,7 @@ import logging
 # set configured registry
 def _get_config():
   import config
-  # force initialization
+  # check initialization
   if config._c is None:
     config._initialize()
   return config.view('phovea_server')
@@ -20,7 +20,7 @@ def _get_config():
 # added for testing
 def _get_config_hdf():
   import config
-  # force initialization
+  # check initialization
   if config._c is None:
     config._initialize()
   return config.view('phovea_data_hdf')

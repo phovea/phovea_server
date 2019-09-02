@@ -132,7 +132,7 @@ class CaleydoConfigSection(object):
 # add global_config as parameter and call extend() in return statement
 def _merge_config(global_config, config_file, plugin_id):
   _log.info(plugin_id)
-  # force initialization
+  # check initialization
   if global_config is None:
     _initialize()
   with codecs.open(config_file, 'r', 'utf-8') as fi:
@@ -160,7 +160,7 @@ def _init_config():
 def merge_plugin_configs(plugins):
   # merge all the plugins
   global _c, _preMergeChanges
-  # force initialization
+  # check initialization
   if _c is None:
     _initialize()
   for plugin in plugins:

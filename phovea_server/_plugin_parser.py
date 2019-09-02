@@ -12,7 +12,7 @@ from _utils import replace_variables
 from config import view, _c, _initialize
 import logging
 
-# force initialization
+# check initialization
 if _c is None:
   _initialize()
 cc = view('phovea_server')

@@ -131,7 +131,7 @@ def _build_info():
 def default_app():
   # from .config import view, _initialize
   from phovea_server import config
-  # force initialization
+  # check initialization
   if config._c is None:
     config._initialize()
   app = ns.Namespace(__name__)
