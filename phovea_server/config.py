@@ -20,7 +20,6 @@ _preMergeChanges = {}
 
 # method to control call of _init_config()
 def _initialize():
-  print('init config')
   _init_config()
 
 
@@ -154,6 +153,7 @@ def _init_config():
   global _c
   if _c is not None:
     return
+  print('init config')
   _c = {}
   _c = _merge_config(_c, f, 'phovea_server')
   print(_c)
