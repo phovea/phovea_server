@@ -15,9 +15,9 @@ _registry = None
 def _get_registry():
   global _registry
   if _registry is None:
-    from _plugin_parser import parse
+    from ._plugin_parser import parse
     metadata = parse()
-    from config import merge_plugin_configs, _c, _initialize
+    from .config import merge_plugin_configs, _c, _initialize
     # check initialization
     if _c is None:
       _initialize()
@@ -132,8 +132,7 @@ class Registry(object):
   @property
   def singletons(self):
     import collections
-    # relative imports don't work -> use config.view instead of former import statement
-    import config
+    from . import config
     # check initialization
     _log = logging.getLogger(__name__)
     if self._singletons is not None:

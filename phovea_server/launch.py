@@ -6,11 +6,10 @@
 
 import logging.config
 import logging
-
+from . import config
 
 # set configured registry
 def _get_config():
-  import config
   # check initialization
   if config._c is None:
     config._initialize()
@@ -19,7 +18,6 @@ def _get_config():
 
 # added for testing
 def _get_config_hdf():
-  import config
   # check initialization
   if config._c is None:
     config._initialize()
@@ -127,7 +125,7 @@ def set_default_subparser(parser, name, args=None):
 
 
 def _resolve_commands(parser):
-  from plugin import list as list_plugins
+  from .plugin import list as list_plugins
   subparsers = parser.add_subparsers(dest='cmd')
   default_command = None
   for command in list_plugins('command'):

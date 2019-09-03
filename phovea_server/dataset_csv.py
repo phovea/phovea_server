@@ -12,8 +12,7 @@ import os
 import csv
 import numpy as np
 from .dataset_def import ADataSetProvider, AColumn, AMatrix, AStratification, ATable, AVector
-# relative imports don't work -> use config.view instead of former import statement
-import config
+from . import config
 
 
 def assign_ids(ids, idtype):

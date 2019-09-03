@@ -7,8 +7,8 @@
 from builtins import map
 from builtins import str
 from builtins import object
-from _utils import replace_variables
-from config import view, _c, _initialize
+from ._utils import replace_variables
+from .config import view, _c, _initialize
 import logging
 
 # check initialization

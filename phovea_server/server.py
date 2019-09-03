@@ -9,9 +9,7 @@ import logging.config
 
 # set configured registry
 def _get_config():
-  # change import statements (no relative imports allowed)
-  import importlib
-  config = importlib.import_module('config')
+  from . import config
   return config.view('phovea_server')
 
 
