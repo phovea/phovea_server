@@ -8,6 +8,7 @@ import logging.config
 import logging
 from . import config
 
+
 # set configured registry
 def _get_config():
   # check initialization
