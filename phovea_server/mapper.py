@@ -162,8 +162,8 @@ class MappingManager(object):
 
   def search(self, from_idtype, to_idtype, query, max_results=None):
     """
-    Searches for matches in the names of the given idtype. 
-    This operation does not resolve transitive mappings. 
+    Searches for matches in the names of the given idtype.
+    This operation does not resolve transitive mappings.
     :param query:
     :param max_results
     :return:
