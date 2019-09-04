@@ -20,9 +20,9 @@ _log = logging.getLogger(__name__)
 
 @app.errorhandler(ValueError)
 def on_value_error(error):
-  _log.error('ValueError: (' + str(error.message) + ') at ' + str(ns.request.environ))
+  _log.error('ValueError: (' + str(error) + ') at ' + str(ns.request.environ))
   _log.error(error)
-  return '<strong>{2} - {0}</strong><pre>{1}</pre>'.format('ValueError', error.message, 500), 500
+  return '<strong>{2} - {0}</strong><pre>{1}</pre>'.format('ValueError', error, 500), 500
 
 
 def _list_format_json(data):
