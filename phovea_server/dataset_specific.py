@@ -80,11 +80,11 @@ def format_csv(dataset, range, args):  # noqa
                      headers={'Content-Disposition': 'attachment;filename=' + dataset.name + '.csv'})
 
 
-def _parse_color(hex):
-  import struct
-  s = hex[1:] if hex.startswith('#') else hex
-  fmt = 'B' * len(s)
-  return struct.unpack(fmt, str.encode(s))
+def _hex_to_rgb(hex):
+  hex = hex.lstrip('#')
+  # hlen = len(hex)
+  hlen = 6 # assume 6-digits HEX value! Does not work with 3- or 8-digits HEX values!
+  return tuple(int(hex[i:i + hlen // 3], 16) for i in range(0, hlen, hlen // 3))
 
 
 def _color_palette(arg):
@@ -100,7 +100,7 @@ def _color_palette(arg):
   # generate color palette
   from .colors import ColorPalette
   colors = arg.split('-')
-  colors = [_parse_color(c) for c in colors]
+  colors = [_hex_to_rgb(c) for c in colors]
   return ColorPalette(*colors).as_palette()
 
 
@@ -298,11 +298,11 @@ def format_image(dataset, range, args):
   d = np.array(dataset.aslist(range))
   if d.ndim == 1:
     d = d.reshape((1, d.shape[0]))
-  img = toimage(d, cmin=cmin, cmax=cmax, pal=_color_palette(args.get('format_palette'[0], None)))
+  img = toimage(d, cmin=cmin, cmax=cmax, pal=_color_palette(args.get('format_palette', None)))
 
   # convert to real RGB image
   # inject missing values
-  img = _set_missing_values(img, d, _parse_color(args.get('format_missing'[0], '#d400c2')))
+  img = _set_missing_values(img, d, _hex_to_rgb(args.get('format_missing'[0], '#d400c2')))
 
   if 'format_w' in args:
     width = int(args.get('format_w'))
