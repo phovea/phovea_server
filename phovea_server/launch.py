@@ -173,9 +173,7 @@ def run():
 
   if args.use_reloader:
     _log.info('start using reloader...')
-    # from werkzeug._reloader import run_with_reloader
-    # run_with_reloader(main, extra_files=_config_files())
-    main()
+    run_with_reloader(main, extra_files=_config_files())
   else:
     _log.info('start...')
     main()
@@ -184,3 +182,27 @@ def run():
 def create_embedded():
   from .server import create_application
   return create_application()
+
+
+# copied code of method run_with_reloader from werkzeug._reloader, because it causes import problems otherwise
+def run_with_reloader(main_func, extra_files=None, interval=1, reloader_type="auto"):
+  """Run the given function in an independent python interpreter."""
+  import signal
+  import os
+  import sys
+  import threading
+  from werkzeug._reloader import reloader_loops, ensure_echo_on
+
+  reloader = reloader_loops[reloader_type](extra_files, interval)
+  signal.signal(signal.SIGTERM, lambda *args: sys.exit(0))
+  try:
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+      ensure_echo_on()
+      t = threading.Thread(target=main_func, args=())
+      t.setDaemon(True)
+      t.start()
+      reloader.run()
+    else:
+      sys.exit(reloader.restart_with_reloader())
+  except KeyboardInterrupt:
+    pass
