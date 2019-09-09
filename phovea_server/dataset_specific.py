@@ -196,11 +196,11 @@ def _add_handler(app, dataset_getter, type):
 
   def data_gen(dataset_id):
     d = dataset_getter(dataset_id, type)
-    r = asrange(ns.request.args.get('range', None))
-    formatter = resolve_formatter(type, ns.request.args.get('format', 'json'))
-    return formatter(d, r, args=ns.request.args)
+    r = asrange(ns.request.values.get('range', None))
+    formatter = resolve_formatter(type, ns.request.values.get('format', 'json'))
+    return formatter(d, r, args=ns.request.values)
 
-  app.add_url_rule('/' + type + '/<dataset_id>/data', 'data_' + type, ns.etag(data_gen))
+  app.add_url_rule('/' + type + '/<dataset_id>/data', 'data_' + type, ns.etag(data_gen), methods=['GET', 'POST'])
 
 
 def add_table_handler(app, dataset_getter):
