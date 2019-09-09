@@ -71,7 +71,7 @@ def _config_files():
   list all known config files
   :return:
   """
-  from plugin import plugins
+  from .plugin import plugins
   return [p for p in (p.config_file() for p in plugins()) if p is not None]
 
 
