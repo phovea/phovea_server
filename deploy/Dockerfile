@@ -1,6 +1,6 @@
 FROM python:3.7
 
-MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
+MAINTAINER datavisyn <contact@datavisyn.io>
 WORKDIR /phovea
 
 RUN printf "deb http://archive.debian.org/debian/ buster main\ndeb-src http://archive.debian.org/debian/ buster main\ndeb http://security.debian.org buster/updates main\ndeb-src http://security.debian.org buster/updates main" > /etc/apt/sources.list
