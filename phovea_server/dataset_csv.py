@@ -13,6 +13,7 @@ import csv
 import numpy as np
 from .dataset_def import ADataSetProvider, AColumn, AMatrix, AStratification, ATable, AVector
 from . import config
+from functools import cmp_to_key
 
 
 def assign_ids(ids, idtype):
@@ -139,7 +140,7 @@ class CSVStratification(CSVEntryMixin, AStratification):
         return r
       return cmp_string(a['row'], b['row']) if r == 0 else r
 
-    d.sort(cmp)  # sort by cluster;
+    d.sort(key=cmp_to_key(cmp))  # sort by cluster;
     clusters = dict()
     for di in d:
       c = di['cluster']
