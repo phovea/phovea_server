@@ -90,7 +90,7 @@ def _resolve_plugin(p):
     repo = p.repository
     if repo.endswith('.git'):
       repo = repo[0:-4]
-    return repo + '/commit/' + _git_head(p.folder)
+    return str(repo) + '/commit/' + str(_git_head(p.folder))
   # not a git repo
   return p.version
 
