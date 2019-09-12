@@ -9,6 +9,7 @@ from builtins import range
 from builtins import object
 import numpy as np
 import numpy.ma as ma
+import datetime as dt
 
 
 class NumpyTablesEncoder(object):
@@ -16,6 +17,8 @@ class NumpyTablesEncoder(object):
     if isinstance(obj, np.ndarray):
       return True
     if isinstance(obj, np.generic):
+      return True
+    if isinstance(obj, dt.datetime):
       return True
     return False
 
@@ -30,6 +33,8 @@ class NumpyTablesEncoder(object):
       if (isinstance(a, float) and np.isnan(a)) or ma.is_masked(a):
         return None
       return a
+    if isinstance(obj, dt.datetime):
+      return obj.isoformat()
     return None
 
 
