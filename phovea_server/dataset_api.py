@@ -10,6 +10,7 @@ from . import ns, plugin, range
 from .util import jsonify, to_json
 import logging
 from .dataset import list_idtypes, get_idmanager, iter, get_mappingmanager, get, list_datasets, add, remove
+from flask import abort
 
 
 app = ns.Namespace(__name__)
@@ -245,6 +246,8 @@ def _search_ids(idtype):
   query = ns.request.args.get('q', None)
   max_results = int(ns.request.args.get('limit', 10))
   manager = get_idmanager()
+  if query is None:
+    return abort(400, 'Parameter "q" must be defined')
   if hasattr(manager, 'search'):
     return jsonify(manager.search(idtype, query, max_results))
   return jsonify([])
