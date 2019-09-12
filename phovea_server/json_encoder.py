@@ -34,7 +34,7 @@ class NumpyTablesEncoder(object):
         return None
       return a
     if isinstance(obj, dt.datetime):
-      return obj.isoformat()
+      return obj.strftime("%s")
     return None
 
 
