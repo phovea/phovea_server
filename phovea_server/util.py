@@ -92,7 +92,7 @@ def fix_id(id):
 def random_id(length):
   import string
   import random
-  s = string.lowercase + string.digits
+  s = string.ascii_lowercase + string.digits
   id = ''
   for i in range(0, length):
     id += random.choice(s)
