@@ -10,15 +10,19 @@ from builtins import object
 import numpy as np
 import numpy.ma as ma
 import datetime as dt
-
+import decimal
 
 class NumpyTablesEncoder(object):
   def __contains__(self, obj):
     if isinstance(obj, np.ndarray):
       return True
+    if isinstance(obj, bytes):
+      return True
     if isinstance(obj, np.generic):
       return True
     if isinstance(obj, dt.datetime):
+      return True
+    if isinstance(obj, decimal.Decimal):
       return True
     return False
 
@@ -35,6 +39,10 @@ class NumpyTablesEncoder(object):
       return a
     if isinstance(obj, dt.datetime):
       return obj.strftime("%s")
+    if isinstance(obj, decimal.Decimal):
+      return float(obj)
+    if isinstance(obj, bytes):
+      return obj.decode('utf-8')
     return None
 
 
