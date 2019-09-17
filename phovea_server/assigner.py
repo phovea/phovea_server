@@ -116,7 +116,7 @@ class DBIDAssigner(object):
     # assuming incremental ids
     if idtype in self._db:
       # clear old data
-      for key in self._db.keys():
+      for key in list(self._db.keys()):
         if key.startswith(idtype + '2id.') or key.startswith('id2' + idtype + '.'):
           del self._db[key]
 

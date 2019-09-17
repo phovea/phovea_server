@@ -91,7 +91,7 @@ def _list_datasets():
     formats = dict(json=_list_format_json, treejson=_list_format_treejson, csv=_list_format_csv)
     if format not in formats:
       ns.abort(
-          ns.make_response('invalid format: "{0}" possible ones: {1}'.format(format, ','.join(formats.keys())), 400))
+          ns.make_response('invalid format: "{0}" possible ones: {1}'.format(format, ','.join(list(formats.keys()))), 400))
     return formats[format](data)
   else:
     return _upload_dataset(ns.request)
