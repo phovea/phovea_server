@@ -45,6 +45,7 @@ setup(
   url=pkg['homepage'],
   description=pkg['description'],
   long_description=read_it('README.md'),
+  long_description_content_type='text/markdown',
   keywords=pkg.get('keywords', ''),
   author=pkg['author']['name'],
   author_email=pkg['author']['email'],
