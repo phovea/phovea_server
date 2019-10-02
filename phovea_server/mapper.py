@@ -155,7 +155,7 @@ class MappingManager(object):
       # Otherwise, check if every mapping was 1 to 1
       lengths = [len(x) for x in result]
       # If any result array is longer than 1, we need to flatten and later merge it
-      needs_merging = max(lengths) > 1
+      needs_merging = max(lengths, default=0) > 1
       # Flatten result and assign to values
       values = list(chain.from_iterable(result))
     return result
