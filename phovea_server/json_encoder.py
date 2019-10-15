@@ -38,7 +38,7 @@ class NumpyTablesEncoder(object):
         return None
       return a
     if isinstance(obj, dt.datetime):
-      return obj.strftime("%s")
+      return int(obj.timestamp() * 1000)
     if isinstance(obj, decimal.Decimal):
       return float(obj)
     if isinstance(obj, bytes):
