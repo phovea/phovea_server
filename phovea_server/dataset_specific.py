@@ -83,7 +83,7 @@ def format_csv(dataset, range, args):  # noqa
 def _hex_to_rgb(hex):
   hex = hex.lstrip('#')
   # hlen = len(hex)
-  hlen = 6 # assume 6-digits HEX value! Does not work with 3- or 8-digits HEX values!
+  hlen = 6  # assume 6-digits HEX value! Does not work with 3- or 8-digits HEX values!
   return tuple(int(hex[i:i + hlen // 3], 16) for i in range(0, hlen, hlen // 3))
 
 

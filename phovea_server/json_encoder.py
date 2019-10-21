@@ -12,6 +12,7 @@ import numpy.ma as ma
 import datetime as dt
 import decimal
 
+
 class NumpyTablesEncoder(object):
   def __contains__(self, obj):
     if isinstance(obj, np.ndarray):
