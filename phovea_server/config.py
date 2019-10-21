@@ -14,7 +14,7 @@ import logging
 
 _log = logging.getLogger(__name__)
 _c = None
-_preMergeChanges = {}
+_pre_merge_changes = {}
 
 
 # method to control call of _init_config()
@@ -51,7 +51,7 @@ def get(item, section=None, default=None):
 
 
 def set(item, value, section=None):
-  global _c, _preMergeChanges
+  global _c, _pre_merge_changes
   key = item if section is None else section + '.' + item
   keys = key.split('.')
   act = _c
@@ -61,9 +61,9 @@ def set(item, value, section=None):
     act = act[p]
   act[keys[len(keys) - 1]] = value
 
-  if _preMergeChanges is not None:
+  if _pre_merge_changes is not None:
     # keep track of changes that were done before the recreation of the configuration
-    act = _preMergeChanges
+    act = _pre_merge_changes
     for p in keys[0:-1]:
       if p not in act:
         act[p] = {}
@@ -158,7 +158,7 @@ def _init_config():
 
 def merge_plugin_configs(plugins):
   # merge all the plugins
-  global _c, _preMergeChanges
+  global _c, _pre_merge_changes
   # check initialization
   if _c is None:
     _initialize()
@@ -175,7 +175,7 @@ def merge_plugin_configs(plugins):
     with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))
   # merge changes done before the merge
-  # check whether _preMergeChanges is of NoneType
-  if _preMergeChanges is not None:
-    extend(_c, _preMergeChanges)
-    _preMergeChanges = None
+  # check whether _pre_merge_changes is of NoneType
+  if _pre_merge_changes is not None:
+    extend(_c, _pre_merge_changes)
+    _pre_merge_changes = None
