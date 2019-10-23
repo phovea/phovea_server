@@ -1,6 +1,6 @@
 FROM caleydo/phovea_python:v1.0-dev
 
-MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
+LABEL maintainer="contact@caleydo.org"
 WORKDIR /phovea
 
 # install dependencies last step such that everything before can be cached
