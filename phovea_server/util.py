@@ -7,7 +7,6 @@
 
 from builtins import range
 import json
-# import pandas as pd
 
 
 class JSONExtensibleEncoder(json.JSONEncoder):
@@ -36,16 +35,13 @@ def to_json(obj, *args, **kwargs):
   :param kwargs:
   :return:
   """
-  # try:
-  #  doesnt work since we can't convert numpy arrays
-  #  import ujson
-  #  return ujson.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
-  # except ImportError:
   if 'allow_nan' in kwargs:
     del kwargs['allow_nan']
   if 'indent' in kwargs:
     del kwargs['indent']
   kwargs['ensure_ascii'] = False
+
+  # Pandas JSON module has been deprecated and removed. UJson cannot convert numpy arrays, so it cannot be used here. The JSON used here does not support the `double_precision` keyword.
   return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
 
 
