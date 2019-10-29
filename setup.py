@@ -64,7 +64,7 @@ setup(
     # Pick your license as you wish (should match "license" above)
     'License :: OSI Approved :: ' + ('BSD License' if pkg['license'] == 'BSD-3-Clause' else pkg['license']),
     'Programming Language :: Python',
-    'Programming Language :: Python :: 3.7'
+    'Programming Language :: Python :: 3.8'
   ],
 
   # You can just specify the packages manually here if your project is
