@@ -1,4 +1,4 @@
-image: circleci/python:3.7-node-browsers
+image: circleci/python:3.8-node-browsers
 
 variables:
   NODE_VERSION: "10.16.3"
