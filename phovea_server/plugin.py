@@ -141,6 +141,7 @@ class Registry(object):
 
     cc = view('phovea_server._runtime')
     current_command = cc.get('command', default='unknown')
+    _log.info('read currently executed command from config: %s', current_command)
 
     def compare(a, b):
       a_prio = getattr(a, 'priority', 100)

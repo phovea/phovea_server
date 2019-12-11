@@ -10,9 +10,27 @@ RUN (!(test -s docker_packages.txt) || (apt-get -y update && cat docker_packages
     (pip install --no-cache-dir -r requirements_dev.txt)
 RUN (!(test -s docker_script.sh) || bash ./docker_script.sh)
 
+####
+# Environment mode (dev or prod)
+####
 ENV PHOVEA_ENV=dev
+
+####
+# The name must match the registred command in /phovea_server/phovea_server/__init__.py
+# Example: `registry.append('command', 'api', 'phovea_server.server', {'isDefault': True})`
+####
 ENV PHOVEA_SERVICE=api
+
+####
+# The path to the phovea config.json
+# In a local workspace setup the <workspace>/config.json is used here.
+####
 ENV PHOVEA_CONFIG_PATH=config.json
-#start ssh and service
+
+####
+# Use `phovea_server` as entry point and add some arguments and the service as command.
+# In a local workspace setup it will call the /phovea_server/__main__.py, which runs the /phovea_server/launcher.py
+####
 CMD python phovea_server --use_reloader --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
+
 EXPOSE 80
