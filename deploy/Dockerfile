@@ -1,4 +1,4 @@
-FROM caleydo/phovea_python:v1.0
+FROM caleydo/phovea_python:v1.1
 
 LABEL maintainer="contact@caleydo.org"
 WORKDIR /phovea
