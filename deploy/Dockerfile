@@ -1,6 +1,6 @@
-FROM caleydo/phovea_python:v1.0
+FROM caleydo/phovea_python:v1.1
 
-MAINTAINER Samuel Gratzl <samuel.gratzl@datavisyn.io>
+LABEL maintainer="contact@caleydo.org"
 WORKDIR /phovea
 RUN printf "from phovea_server import launch\nlaunch.run()\n" > /phovea/launch.py
 # RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
