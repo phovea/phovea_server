@@ -5,14 +5,13 @@
 ###############################################################################
 
 
-from past.builtins import basestring
 from builtins import str
 import logging
 
 _log = logging.getLogger(__name__)
 
 
-# extend a dictionary recursivly
+# extend a dictionary recursively
 def extend(target, w):
   for k, v in w.items():
     if isinstance(v, dict):
@@ -53,7 +52,7 @@ def replace_variables(s, variables):
 def replace_nested_variables(obj, lookup):
   if isinstance(obj, list):
     return [replace_nested_variables(o, lookup) for o in obj]
-  elif isinstance(obj, basestring):
+  elif isinstance(obj, str):
     return replace_variables_f(obj, lookup)
   elif isinstance(obj, dict):
     return {k: replace_nested_variables(v, lookup) for k, v in obj.items()}

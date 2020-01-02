@@ -3,11 +3,8 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
-from __future__ import absolute_import
-import gevent.monkey
-import logging.config
 
-gevent.monkey.patch_all()  # ensure the standard libraries are patched
+import logging.config
 
 
 # set configured registry
@@ -139,7 +136,7 @@ def _init_app(app, namespace, is_default_app=False):
 
 # helper to plugin in function scope
 def _loader(p):
-  print('add application: ' + p.id + ' at namespace: ' + p.namespace)
+  _log.info('add application: ' + p.id + ' at namespace: ' + p.namespace)
 
   def load_app():
     app = p.load().factory()
@@ -187,17 +184,29 @@ def create_application():
 
 
 def create(parser):
-  parser.add_argument('--port', '-p', type=int, default=cc.getint('port'),
+  """
+  Add arguments to the parser and return a launcher function, which in-turn creates a server instance
+  parser: ArgumentParser that allows to add custom arguments. The arguments will be passed as parameter to the launcher function.
+  """
+  parser.add_argument('--port', '-p', type=int, default=cc.getint('port'),  # get default value from config.json
                       help='server port')
-  parser.add_argument('--address', '-a', default=cc.get('address'),
+  parser.add_argument('--address', '-a', default=cc.get('address'),  # get default value from config.json
                       help='server address')
 
   def _launcher(args):
+    """
+    Prepare the launch of the server instance
+    args: contains the arguments that are parsed from the command line (or set in the config as default value)
+    """
     from geventwebsocket.handler import WebSocketHandler
     from gevent.pywsgi import WSGIServer
+
+    # create phovea server application
     application = create_application()
+
+    _log.info('prepare server that will listen on %s:%s', args.address, args.port)
     http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
 
-    return http_server.serve_forever
+    return http_server.serve_forever  # return function name only; initialization will be done later
 
   return _launcher

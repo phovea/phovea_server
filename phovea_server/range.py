@@ -5,13 +5,11 @@
 ###############################################################################
 
 
-from __future__ import division
 from builtins import str
 from builtins import range as number_range
-from past.builtins import basestring
 from builtins import object
 import itertools
-from functools import reduce
+from functools import reduce, cmp_to_key
 from numpy import NaN, isnan
 
 all_f = all
@@ -320,7 +318,7 @@ class Range1D(object):
 
   def append(self, *args):
     def convert(p):
-      if isinstance(p, basestring):
+      if isinstance(p, str):
         return RangeElem.parse(p)
       elif isinstance(p, int):
         return RangeElem.single(p)
@@ -501,7 +499,7 @@ class Range1D(object):
 
   def sort(self, cmp):
     arr = list(self.iter())
-    arr.sort(cmp)
+    arr.sort(key=cmp_to_key(cmp))
     return Range1D.from_list(arr)
 
   def remove_duplicates(self, size=0):

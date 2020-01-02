@@ -7,12 +7,13 @@
 
 from builtins import str, object
 import json
-from backports import csv
 import io
 import os
+import csv
 import numpy as np
 from .dataset_def import ADataSetProvider, AColumn, AMatrix, AStratification, ATable, AVector
-from .config import view
+from . import config
+from functools import cmp_to_key
 
 
 def assign_ids(ids, idtype):
@@ -62,8 +63,7 @@ class CSVEntryMixin(object):
 
     data = []
     with io.open(self._path, 'r', newline='', encoding=self._desc.get('encoding', 'utf-8')) as csvfile:
-      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', u','),
-                          quotechar=str(self._desc.get('quotechar', u'|')))
+      reader = csv.reader(csvfile, delimiter=self._desc.get('separator', ','), quotechar=str(self._desc.get('quotechar', '|')))
       data.extend(reader)
 
     # print data
@@ -140,7 +140,7 @@ class CSVStratification(CSVEntryMixin, AStratification):
         return r
       return cmp_string(a['row'], b['row']) if r == 0 else r
 
-    d.sort(cmp)  # sort by cluster;
+    d.sort(key=cmp_to_key(cmp))  # sort by cluster;
     clusters = dict()
     for di in d:
       c = di['cluster']
@@ -194,8 +194,7 @@ class CSVStratification(CSVEntryMixin, AStratification):
       clusters = set()
       count = 0
       with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', u','),
-                            quotechar=str(desc.get('quotechar', u'|')))
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ','), quotechar=str(desc.get('quotechar', '|')))
         for row in reader:
           count += 1
           clusters.add(row[1])
@@ -311,8 +310,7 @@ class CSVMatrix(CSVEntryMixin, AMatrix):
       min_v = None
       max_v = None
       with io.open(path, 'r', newline='', encoding=desc.get('encoding', 'utf-8')) as csvfile:
-        reader = csv.reader(csvfile, delimiter=desc.get('separator', u','),
-                            quotechar=str(desc.get('quotechar', u'|')))
+        reader = csv.reader(csvfile, delimiter=desc.get('separator', ','), quotechar=str(desc.get('quotechar', '|')))
         for row in reader:
           if cols is None:
             cols = len(row) - 1
@@ -499,7 +497,7 @@ class StaticFileProvider(ADataSetProvider):
 
     self.files = list(to_files(plugins))
 
-    cc = view('phovea_server')
+    cc = config.view('phovea_server')
     self.data_plugin = DataPlugin(os.path.join(cc.dataDir, 'data'))
     self.files.extend(to_files([self.data_plugin]))
     import glob

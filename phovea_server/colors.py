@@ -4,7 +4,7 @@
 # Licensed under the new BSD license,  available at http://caleydo.org/license
 ###############################################################################
 
-from __future__ import division
+
 from builtins import zip
 from builtins import range
 from builtins import object
@@ -36,7 +36,8 @@ class ColorPalette(object):
       b = self._colors[2]
       center_a = _mix(a, center, 127.5 / 128)
       center_b = _mix(center, b, 0.5 / 128)
-      return [_mix(a, center_a, i / 128.) for i in range(128)] + [_mix(center_b, b, i / 128.) for i in range(128)]
+      r = [_mix(a, center_a, i / 128.) for i in range(128)] + [_mix(center_b, b, i / 128.) for i in range(128)]
+      return r
     return None  # not yet done
 
 

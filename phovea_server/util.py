@@ -7,7 +7,6 @@
 
 from builtins import range
 import json
-import pandas.json as ujson
 
 
 class JSONExtensibleEncoder(json.JSONEncoder):
@@ -36,17 +35,14 @@ def to_json(obj, *args, **kwargs):
   :param kwargs:
   :return:
   """
-  # try:
-  #  doesnt work since we can't convert numpy arrays
-  #  import ujson
-  #  return ujson.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
-  # except ImportError:
   if 'allow_nan' in kwargs:
     del kwargs['allow_nan']
   if 'indent' in kwargs:
     del kwargs['indent']
   kwargs['ensure_ascii'] = False
-  return ujson.dumps(obj, *args, **kwargs)
+
+  # Pandas JSON module has been deprecated and removed. UJson cannot convert numpy arrays, so it cannot be used here. The JSON used here does not support the `double_precision` keyword.
+  return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
 
 
 def jsonify(obj, *args, **kwargs):
@@ -66,6 +62,8 @@ def glob_recursivly(path, match):
   import fnmatch
 
   for dirpath, dirnames, files in os.walk(path):
+    if match is None:
+      return None
     for f in fnmatch.filter(files, match):
       yield os.path.join(dirpath, f)
 
@@ -90,7 +88,7 @@ def fix_id(id):
 def random_id(length):
   import string
   import random
-  s = string.lowercase + string.digits
+  s = string.ascii_lowercase + string.digits
   id = ''
   for i in range(0, length):
     id += random.choice(s)

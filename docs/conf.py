@@ -15,7 +15,6 @@
 #
 import sys
 import os
-import json
 from codecs import open
 
 sys.path.insert(0, os.path.abspath('..'))
