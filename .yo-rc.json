@@ -209,6 +209,12 @@
         "future==0.16.0"
       ]
     },
-    "today": "Thu, 03 Nov 2016 14:43:16 GMT"
+    "today": "Thu, 03 Nov 2016 14:43:16 GMT",
+    "promptValues": {
+      "authorName": "The Caleydo Team",
+      "authorEmail": "contact@caleydo.org",
+      "authorUrl": "https://caleydo.org",
+      "githubAccount": "phovea"
+    }
   }
 }

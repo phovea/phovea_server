@@ -40,7 +40,7 @@ def to_version(v):
 
 
 setup(
-  name=pkg['name'],
+  name=pkg['name'].lower(),
   version=to_version(pkg['version']),
   url=pkg['homepage'],
   description=pkg['description'],
