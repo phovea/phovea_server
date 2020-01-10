@@ -10,6 +10,11 @@ from . import ns
 import os
 import re
 
+import logging
+
+_log = logging.getLogger(__name__)
+
+
 black_list = re.compile(r'(.*\.(py|pyc|gitignore|gitattributes)|(\w+)/((config|package)\.json|_deploy/.*))')
 public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'public'))
 
@@ -124,9 +129,13 @@ def _build_info():
 
 
 def default_app():
-  from .config import view
+  # from .config import view, _initialize
+  from phovea_server import config
+  # check initialization
+  if config._c is None:
+    config._initialize()
   app = ns.Namespace(__name__)
-  cc = view('phovea_server')
+  cc = config.view('phovea_server')
   if cc.env.startswith('dev'):
     app.add_url_rule('/', 'index', _generate_index)
     app.add_url_rule('/index.html', 'index', _generate_index)

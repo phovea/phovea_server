@@ -10,6 +10,7 @@ from . import ns, plugin, range
 from .util import jsonify, to_json
 import logging
 from .dataset import list_idtypes, get_idmanager, iter, get_mappingmanager, get, list_datasets, add, remove
+from flask import abort
 
 
 app = ns.Namespace(__name__)
@@ -20,9 +21,9 @@ _log = logging.getLogger(__name__)
 
 @app.errorhandler(ValueError)
 def on_value_error(error):
-  _log.error('ValueError: (' + str(error.message) + ') at ' + str(ns.request.environ))
+  _log.error('ValueError: (' + str(error) + ') at ' + str(ns.request.environ))
   _log.error(error)
-  return '<strong>{2} - {0}</strong><pre>{1}</pre>'.format('ValueError', error.message, 500), 500
+  return '<strong>{2} - {0}</strong><pre>{1}</pre>'.format('ValueError', error, 500), 500
 
 
 def _list_format_json(data):
@@ -90,7 +91,7 @@ def _list_datasets():
     formats = dict(json=_list_format_json, treejson=_list_format_treejson, csv=_list_format_csv)
     if format not in formats:
       ns.abort(
-          ns.make_response('invalid format: "{0}" possible ones: {1}'.format(format, ','.join(formats.keys())), 400))
+          ns.make_response('invalid format: "{0}" possible ones: {1}'.format(format, ','.join(list(formats.keys()))), 400))
     return formats[format](data)
   else:
     return _upload_dataset(ns.request)
@@ -245,6 +246,8 @@ def _search_ids(idtype):
   query = ns.request.args.get('q', None)
   max_results = int(ns.request.args.get('limit', 10))
   manager = get_idmanager()
+  if query is None:
+    return abort(400, 'Parameter "q" must be defined')
   if hasattr(manager, 'search'):
     return jsonify(manager.search(idtype, query, max_results))
   return jsonify([])

@@ -214,9 +214,9 @@ DEFAULT_PERMISSION = 744
 def _decode(permission=DEFAULT_PERMISSION):
   permission = int(permission)
   others = _from_number(permission % 10)
-  group = _from_number((permission / 10) % 10)
-  user = _from_number((permission / 100) % 10)
-  buddies = _from_number((permission / 1000) % 10)
+  group = _from_number((permission // 10) % 10)
+  user = _from_number((permission // 100) % 10)
+  buddies = _from_number((permission // 1000) % 10)
   return user, group, others, buddies
 
 

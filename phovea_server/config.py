@@ -5,7 +5,6 @@
 ###############################################################################
 
 
-from __future__ import absolute_import
 from builtins import object
 import os
 import jsoncfg
@@ -13,13 +12,19 @@ import codecs
 from ._utils import replace_nested_variables, extend
 import logging
 
-
 _log = logging.getLogger(__name__)
-_c = {}
-_preMergeChanges = {}
+_c = None
+_pre_merge_changes = {}
+
+
+# method to control call of _init_config()
+def _initialize():
+  _init_config()
 
 
 def get(item, section=None, default=None):
+  # use global _c
+  global _c
   key = item if section is None else section + '.' + item
   keys = key.split('.')
   act = _c
@@ -46,7 +51,7 @@ def get(item, section=None, default=None):
 
 
 def set(item, value, section=None):
-  global _c, _preMergeChanges
+  global _c, _pre_merge_changes
   key = item if section is None else section + '.' + item
   keys = key.split('.')
   act = _c
@@ -56,9 +61,9 @@ def set(item, value, section=None):
     act = act[p]
   act[keys[len(keys) - 1]] = value
 
-  if _preMergeChanges is not None:
+  if _pre_merge_changes is not None:
     # keep track of changes that were done before the recreation of the configuration
-    act = _preMergeChanges
+    act = _pre_merge_changes
     for p in keys[0:-1]:
       if p not in act:
         act[p] = {}
@@ -124,44 +129,53 @@ class CaleydoConfigSection(object):
     return CaleydoConfigSection(self._expand(section))
 
 
-def _merge_config(config_file, plugin_id):
+# add global_config as parameter and call extend() in return statement
+def _merge_config(global_config, config_file, plugin_id):
   _log.info(plugin_id)
+  # check initialization
+  if global_config is None:
+    _initialize()
   with codecs.open(config_file, 'r', 'utf-8') as fi:
     c = jsoncfg.loads(fi.read())
-  extend(_c, {plugin_id: c})
+  return extend(global_config, {plugin_id: c})
 
 
 def _init_config():
-  from . import phovea_config
+  from .__init__ import phovea_config
   f = phovea_config()
-  _merge_config(f, 'phovea_server')
+  global _c
+  if _c is not None:
+    return
+  print('init config')
+  _c = {}
+  _c = _merge_config(_c, f, 'phovea_server')
   global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
   if os.path.exists(global_) and global_ != f:
-    print('configuration file: ' + global_)
+    print(('configuration file: ' + global_))
     with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))
-
-# create an initial config guess
-_init_config()
 
 
 def merge_plugin_configs(plugins):
   # merge all the plugins
-  global _c, _preMergeChanges
-  _c = {}
-
+  global _c, _pre_merge_changes
+  # check initialization
+  if _c is None:
+    _initialize()
   for plugin in plugins:
     f = plugin.config_file()
     if f:
       _log.info('merging config of %s', plugin.id)
-      _merge_config(f, plugin.id)
+      # improved usage of method in context
+      _c = _merge_config(_c, f, plugin.id)
 
   # override with more important settings
   global_ = os.path.abspath(os.environ.get('PHOVEA_CONFIG_PATH', 'config.json'))
   if os.path.exists(global_):
     with codecs.open(global_, 'r', 'utf-8') as fi:
       extend(_c, jsoncfg.loads(fi.read()))
-
   # merge changes done before the merge
-  extend(_c, _preMergeChanges)
-  _preMergeChanges = None
+  # check whether _pre_merge_changes is of NoneType
+  if _pre_merge_changes is not None:
+    extend(_c, _pre_merge_changes)
+    _pre_merge_changes = None
