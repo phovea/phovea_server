@@ -4,4 +4,4 @@ services:
     ports:
       - '5678:5678'
     environment:
-      GEVENT_SUPPORT: true
+      GEVENT_SUPPORT: 'true'
