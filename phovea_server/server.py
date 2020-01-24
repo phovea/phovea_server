@@ -3,11 +3,8 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
-from __future__ import absolute_import
-import gevent.monkey
-import logging.config
 
-gevent.monkey.patch_all()  # ensure the standard libraries are patched
+import logging.config
 
 
 # set configured registry
@@ -189,7 +186,6 @@ def create_application():
 def create(parser):
   """
   Add arguments to the parser and return a launcher function, which in-turn creates a server instance
-
   parser: ArgumentParser that allows to add custom arguments. The arguments will be passed as parameter to the launcher function.
   """
   parser.add_argument('--port', '-p', type=int, default=cc.getint('port'),  # get default value from config.json
@@ -200,7 +196,6 @@ def create(parser):
   def _launcher(args):
     """
     Prepare the launch of the server instance
-
     args: contains the arguments that are parsed from the command line (or set in the config as default value)
     """
     from geventwebsocket.handler import WebSocketHandler

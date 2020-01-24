@@ -3,7 +3,7 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
-from __future__ import print_function
+
 from phovea_server import launch
 
 # Test if the phovea_server runs as main program or is embedded (i.e., imported) in a different Python script

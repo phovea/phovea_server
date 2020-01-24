@@ -1,14 +1,14 @@
 {
   "name": "phovea_server",
   "description": "Python server implementation of Phovea",
-  "homepage": "https://phovea.caleydo.org",
-  "version": "2.2.0",
+  "version": "4.0.2-SNAPSHOT",
   "author": {
     "name": "The Caleydo Team",
     "email": "contact@caleydo.org",
     "url": "https://caleydo.org"
   },
   "license": "BSD-3-Clause",
+  "homepage": "https://phovea.caleydo.org",
   "bugs": {
     "url": "https://github.com/phovea/phovea_server/issues"
   },
@@ -27,13 +27,13 @@
   ],
   "scripts": {
     "start": "python phovea_server --use_reloader --env dev api",
-    "check": "flake8 --exclude=.git,venv,deploy,docs,__pycache__,node_modules,.eggs",
+    "check": "flake8 --exclude=.git,venv,deploy,docs,__pycache__,node_modules",
     "pretest": "npm run check",
     "test": "test ! -d tests || python setup.py test",
     "prebuild": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test",
     "build": "rm -rf build/source && find . -name '*.pyc' -delete && node buildPython.js && cp -r ./phovea_server build/source/",
     "predist": "npm run build && npm run docs",
-    "dist": "python setup.py sdist bdist_wheel",
+    "dist": "python setup.py sdist bdist_wheel && cd build && tar cvzf ../dist/phovea_server.tar.gz *",
     "publish": "twine upload --repository-url https://upload.pypi.org/legacy/ dist/*",
     "predocker": "npm run build",
     "docker": "docker build -t phovea_server -f deploy/Dockerfile .",

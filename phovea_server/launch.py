@@ -3,18 +3,32 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
-from __future__ import print_function
-import logging.config
+
 import logging
+import logging.config
+
+from . import config
 
 
 # set configured registry
 def _get_config():
-  from . import config
+  # check initialization
+  if config._c is None:
+    config._initialize()
   return config.view('phovea_server')
 
 
+# added for testing
+def _get_config_hdf():
+  # check initialization
+  if config._c is None:
+    config._initialize()
+  return config.view('phovea_data_hdf')
+
 cc = _get_config()
+
+cc_hdf = _get_config_hdf()
+
 # configure logging
 logging.config.dictConfig(cc.logging)
 _log = logging.getLogger(__name__)
@@ -100,7 +114,7 @@ def set_default_subparser(parser, name, args=None):
     for x in parser._subparsers._actions:
       if not isinstance(x, argparse._SubParsersAction):
         continue
-      for sp_name in x._name_parser_map.keys():
+      for sp_name in list(x._name_parser_map.keys()):
         if sp_name in sys.argv[1:]:
           subparser_found = True
     if not subparser_found:
@@ -132,8 +146,8 @@ def _resolve_commands(parser):
 
     # create a argument parser for the command
     cmdparser = subparsers.add_parser(command.id)
-
     _log.info('loading and initializing the command: ' + command.id)
+
     # use the phovea extension point loading mechanism.
     # pass the parser as argument to the factory method so that the extension point (i.e., command)
     # can add further arguments to the parser (e.g., the address or port of the server).
@@ -164,24 +178,19 @@ def _set_runtime_infos(args):
 def run():
   """
   Run an application. The execution of the application can be configured using a command and arguments.
-
   Example terminal command:
   ```
   cd <workspace>
   python phovea_server --use_reloader --env dev api
   ```
-
   Supported arguments:
   `--use_reloader`: whether to automatically reload the server
   `--env`: environment mode (dev or prod)
-
   The last argument (e.g., `api`) is the command that must be registered as extension in the __init__.py and points to an execution file.
-
   Example:
   ```py
   registry.append('command', 'api', 'phovea_server.server', {'isDefault': True})
   ```
-
   The example registers the api command that runs the `create()` factory method from the server.py.
   """
   import argparse
@@ -211,7 +220,6 @@ def run():
 
   if args.use_reloader:
     _log.info('start application using reloader...')
-    from werkzeug._reloader import run_with_reloader
     run_with_reloader(main, extra_files=_config_files())
   else:
     _log.info('start application...')
@@ -224,3 +232,27 @@ def create_embedded():
   """
   from .server import create_application
   return create_application()
+
+
+# copied code of method run_with_reloader from werkzeug._reloader, because it causes import problems otherwise
+def run_with_reloader(main_func, extra_files=None, interval=1, reloader_type="auto"):
+  """Run the given function in an independent python interpreter."""
+  import signal
+  import os
+  import sys
+  import threading
+  from werkzeug._reloader import reloader_loops, ensure_echo_on
+
+  reloader = reloader_loops[reloader_type](extra_files, interval)
+  signal.signal(signal.SIGTERM, lambda *args: sys.exit(0))
+  try:
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+      ensure_echo_on()
+      t = threading.Thread(target=main_func, args=())
+      t.setDaemon(True)
+      t.start()
+      reloader.run()
+    else:
+      sys.exit(reloader.restart_with_reloader())
+  except KeyboardInterrupt:
+    pass

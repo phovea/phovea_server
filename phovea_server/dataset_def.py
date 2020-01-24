@@ -19,9 +19,7 @@ def to_idtype_description(id):
   return dict(id=id, name=id, names=to_plural(id))
 
 
-class ADataSetEntry(object):
-  __metaclass__ = abc.ABCMeta
-
+class ADataSetEntry(object, metaclass=abc.ABCMeta):
   """
   A basic dataset entry
   """
@@ -106,9 +104,7 @@ class ADataSetEntry(object):
     return can_write(self.to_description(), user)
 
 
-class AStratification(ADataSetEntry):
-  __metaclass__ = abc.ABCMeta
-
+class AStratification(ADataSetEntry, metaclass=abc.ABCMeta):
   """
   A basic dataset entry
   """
@@ -133,9 +129,7 @@ class AStratification(ADataSetEntry):
     return [self.idtype]
 
 
-class AMatrix(ADataSetEntry):
-  __metaclass__ = abc.ABCMeta
-
+class AMatrix(ADataSetEntry, metaclass=abc.ABCMeta):
   """
   A basic dataset entry
   """
@@ -184,9 +178,7 @@ class AMatrix(ADataSetEntry):
     return [self.rowtype, self.coltype]
 
 
-class AVector(ADataSetEntry):
-  __metaclass__ = abc.ABCMeta
-
+class AVector(ADataSetEntry, metaclass=abc.ABCMeta):
   """
   A basic dataset entry
   """
@@ -224,9 +216,7 @@ class AVector(ADataSetEntry):
     return [self.idtype]
 
 
-class AColumn(object):
-  __metaclass__ = abc.ABCMeta
-
+class AColumn(object, metaclass=abc.ABCMeta):
   def __init__(self, name, type):
     self.name = name
     self.type = type
@@ -243,9 +233,7 @@ class AColumn(object):
     return None
 
 
-class ATable(ADataSetEntry):
-  __metaclass__ = abc.ABCMeta
-
+class ATable(ADataSetEntry, metaclass=abc.ABCMeta):
   """
   A basic dataset entry
   """
@@ -291,9 +279,7 @@ class ATable(ADataSetEntry):
     return [self.idtype]
 
 
-class ADataSetProvider(object):
-  __metaclass__ = abc.ABCMeta
-
+class ADataSetProvider(object, metaclass=abc.ABCMeta):
   def __len__(self):
     import itertools
     return itertools.count(self)

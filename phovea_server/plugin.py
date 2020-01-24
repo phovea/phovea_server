@@ -7,6 +7,7 @@
 
 from builtins import object
 import logging
+from functools import cmp_to_key
 
 _registry = None
 
@@ -16,7 +17,10 @@ def _get_registry():
   if _registry is None:
     from ._plugin_parser import parse
     metadata = parse()
-    from .config import merge_plugin_configs
+    from .config import merge_plugin_configs, _c, _initialize
+    # check initialization
+    if _c is None:
+      _initialize()
     merge_plugin_configs(metadata.plugins)
     _registry = Registry(metadata.plugins, metadata.server_extensions, metadata)
   return _registry
@@ -81,9 +85,12 @@ class ExtensionDesc(AExtensionDesc):
   def load(self):
     if self._impl is None:
       import importlib
+      import gevent.monkey
       _log = logging.getLogger(__name__)
       _log.info('importing %s', self.module)
+
       m = importlib.import_module(self.module)
+      gevent.monkey.patch_all()  # ensure the standard libraries are patched
       if hasattr(m, '_plugin_initialize'):  # init method
         # import inspect
         # inspect.getcallargs()
@@ -125,7 +132,8 @@ class Registry(object):
   @property
   def singletons(self):
     import collections
-    from .config import view
+    from . import config
+    # check initialization
     _log = logging.getLogger(__name__)
     if self._singletons is not None:
       return self._singletons
@@ -139,7 +147,9 @@ class Registry(object):
       if e.type == 'manager':
         mm[e.id].append(e)
 
-    cc = view('phovea_server._runtime')
+    if config._c is None:
+      config._initialize()
+    cc = config.view('phovea_server._runtime')
     current_command = cc.get('command', default='unknown')
     _log.info('read currently executed command from config: %s', current_command)
 
@@ -157,7 +167,7 @@ class Registry(object):
       return a_prio - b_prio
 
     def select(v):
-      v = sorted(v, cmp=compare)
+      v = sorted(v, key=cmp_to_key(compare))
       _log.info('creating singleton %s %s', v[0].id, getattr(v[0], 'module', 'server'))
       return loader(v[0])
 

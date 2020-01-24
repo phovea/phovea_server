@@ -5,12 +5,15 @@
 ###############################################################################
 
 from builtins import map
-from past.builtins import basestring
+from builtins import str
 from builtins import object
 from ._utils import replace_variables
-from .config import view
+from .config import view, _c, _initialize
 import logging
 
+# check initialization
+if _c is None:
+  _initialize()
 cc = view('phovea_server')
 _log = logging.getLogger(__name__)
 
@@ -19,7 +22,7 @@ def is_disabled_plugin(p):
   import re
 
   def check(disable):
-    return isinstance(disable, basestring) and re.match(disable, p.id)
+    return isinstance(disable, str) and re.match(disable, p.id)
 
   return any(map(check, cc.disable['plugins']))
 
@@ -39,7 +42,7 @@ def is_disabled_extension(extension, extension_type, p):
     return re.match(v, vk)
 
   def check(disable):
-    if isinstance(disable, basestring):
+    if isinstance(disable, str):
       return re.match(disable, extension['id'])
     return all(check_elem(k, v) for k, v in disable.items())
 
@@ -87,7 +90,7 @@ def _resolve_plugin(p):
     repo = p.repository
     if repo.endswith('.git'):
       repo = repo[0:-4]
-    return repo + '/commit/' + _git_head(p.folder)
+    return str(repo) + '/commit/' + str(_git_head(p.folder))
   # not a git repo
   return p.version
 
@@ -298,7 +301,8 @@ def _find_production_neighbor_plugins():
   dirs = [p.dirname(p.abspath(pi)) for pi in glob.glob(base_dir + '/*/__init__.py')]
   dirs = [d for d in dirs if p.exists(p.join(d, 'config.json'))]
   # files contains all plugins
-  return [DirectoryProductionPlugin(d) for d in dirs]
+  v = [DirectoryProductionPlugin(d) for d in dirs]
+  return v
 
 
 class PluginMetaData(object):
