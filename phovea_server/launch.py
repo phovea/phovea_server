@@ -57,7 +57,7 @@ def attach_ptvsd_debugger():
 
   try:
     import ptvsd
-    ptvsd.enable_attach()
+    ptvsd.enable_attach(address = ('0.0.0.0', 5678))
     _log.info('Debugger is started')
     _log.info('You can now start the debugger in Visual Studio Code')
     _log.info('Waiting for a debugger to attach ...')
