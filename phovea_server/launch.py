@@ -218,12 +218,12 @@ def run():
 
   main = args.launcher(args)  # execute the launcher function, which returns another function
 
-  if args.use_reloader:
-    _log.info('start application using reloader...')
-    run_with_reloader(main, extra_files=_config_files())
-  else:
-    _log.info('start application...')
-    main()
+  # if args.use_reloader:
+  #   _log.info('start application using reloader...')
+  #   run_with_reloader(main, extra_files=_config_files())
+  # else:
+  _log.info('start application...')
+  main()
 
 
 def create_embedded():

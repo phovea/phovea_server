@@ -5,3 +5,4 @@ services:
       - '5678:5678'
     environment:
       GEVENT_SUPPORT: 'true'
+    command: python phovea_server/__main__.py --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
