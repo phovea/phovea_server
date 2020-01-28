@@ -5,4 +5,7 @@ services:
       - '5678:5678'
     environment:
       GEVENT_SUPPORT: 'true'
+      PTVSD_LOG_DIR: '/phovea'
+      PHOVEA_ENV: 'dev'
+      PHOVEA_SERVICE: 'api'
     command: python phovea_server/__main__.py --env ${PHOVEA_ENV} ${PHOVEA_SERVICE}
