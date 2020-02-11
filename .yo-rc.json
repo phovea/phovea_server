@@ -156,6 +156,12 @@
         "extras": {}
       },
       {
+        "type": "json-encoder",
+        "id": "set-encoder",
+        "module": "set_encoder",
+        "extras": {}
+      },
+      {
         "type": "manager",
         "id": "idmanager",
         "module": "assigner",
