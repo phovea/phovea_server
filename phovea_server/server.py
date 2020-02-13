@@ -168,7 +168,7 @@ def create_application():
   from . import dispatcher
   from . import mainapp
   from .plugin import list as list_plugins
-  from werkzeug.contrib.fixers import ProxyFix
+  from werkzeug.middleware.proxy_fix import ProxyFix
 
   # create a path dispatcher
   _default_app = mainapp.default_app()
