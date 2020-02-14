@@ -23,7 +23,6 @@ class NaNEncoder(object):
       return True
     return False
 
-
   def __call__(self, obj, base_encoder):
     if (isinstance(obj, float) and math.isnan(obj)):
       return None
@@ -35,7 +34,7 @@ class NaNEncoder(object):
       return [NaNEncoder(item) for item in obj]
     elif isinstance(obj, np.generic):
       a = np.asscalar(obj)
-      if (isinstance(a, float) and np.isnan(a)) or ma.is_masked(a):
+      if (isinstance(a, float) and np.isnan(a)):
         return None
     else:
       return obj
