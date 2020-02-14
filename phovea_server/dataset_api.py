@@ -117,6 +117,13 @@ def _get_dataset(dataset_id):
   return jsonify(d.asjson(r))
 
 
+@app_idtype.route('/test')
+def test():
+  _log.warn(type(float('nan')))
+  test_var = float('nan')
+  return jsonify(dict(myNum=test_var))
+
+
 @app.route('/<dataset_id>/desc')
 @ns.etag
 def _get_dataset_desc(dataset_id):
