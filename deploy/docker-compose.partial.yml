@@ -5,6 +5,6 @@ services:
       context: .
       dockerfile: deploy/Dockerfile_dev
     ports:
-    - '9000:80'
+    - '9000:9000'
     volumes:
-    - .:/phovea
+    - .:/home/phovea
