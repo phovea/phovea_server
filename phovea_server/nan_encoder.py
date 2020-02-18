@@ -4,7 +4,6 @@ This encoder is required to handle changes of data types in Python 3.7 by conver
 import math
 import json
 from flask import Response
-import simplejson
 import numpy as np
 import pandas as pd
 
@@ -27,8 +26,7 @@ class NaNEncoder(object):
     if (isinstance(obj, float) and math.isnan(obj)):
       return None
     elif isinstance(obj, dict):
-      # return simplejson.dumps(obj, ignore_nan=True)
-      df = pd.DataFrame(obj)
+      df = pd.DataFrame.from_dict(obj, orient=index)
       json.dumps(df.where(pd.notnull(df), None))
     elif isinstance(obj, Response):
       return [NaNEncoder(item) for item in obj]

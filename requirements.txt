@@ -9,4 +9,3 @@ pandas==0.25.0
 matplotlib==2.2.2
 Pillow==5.1.0
 json-cfg==0.4.2
-simplejson==3.12.0
