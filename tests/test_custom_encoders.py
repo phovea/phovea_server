@@ -8,4 +8,4 @@ class TestCustomEncoders:
   def test_nan_values(self):
     test_var = float('nan')
     test_result = to_json(dict(myNum=test_var))
-    assert test_result == {"myNum": None}
+    assert test_result == {"myNum": null}
