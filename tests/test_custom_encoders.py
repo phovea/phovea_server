@@ -7,5 +7,6 @@ class TestCustomEncoders:
 
   def test_nan_values(self):
     test_var = float('nan')
-    test_result = jsonify([test_var, 'This', 'is', 'a', 'very', 'complex', 'test', 'case', test_var])
-    assert test_result == [None, "This", "is", "a", "very", "complex", "test", "case", None]
+    test_result = to_json(dict(myNum=test_var))
+    assert test_result == {"myNum": None}
+
