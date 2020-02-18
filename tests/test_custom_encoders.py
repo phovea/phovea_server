@@ -1,4 +1,4 @@
-from phovea_server.util import jsonify
+from phovea_server.util import to_json
 
 
 class TestCustomEncoders:
@@ -9,4 +9,3 @@ class TestCustomEncoders:
     test_var = float('nan')
     test_result = to_json(dict(myNum=test_var))
     assert test_result == {"myNum": None}
-
