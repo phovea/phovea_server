@@ -42,7 +42,32 @@ def to_json(obj, *args, **kwargs):
   kwargs['ensure_ascii'] = False
 
   # Pandas JSON module has been deprecated and removed. UJson cannot convert numpy arrays, so it cannot be used here. The JSON used here does not support the `double_precision` keyword.
+  if isinstance(obj, dict) or isinstance(obj, list):
+    obj = _handle_nan_values(obj)
   return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
+
+
+def _handle_nan_values(obj_to_convert):
+    import math
+    converted_dict = {}
+    converted_list = []
+    if isinstance(obj_to_convert, dict):
+      for k, v in obj_to_convert.items():
+          if isinstance(v, dict):
+              converted_dict[k] = _handle_nan_values(v)
+          else:
+              if (isinstance(v, float) and math.isnan(v)):
+                  converted_dict[k] = None
+              else:
+                  converted_dict[k] = v
+      return converted_dict
+    elif isinstance(obj_to_convert, list):
+      for elem in obj_to_convert:
+        if (isinstance(elem, float) and math.isnan(elem)):
+          converted_list.append(None)
+        else:
+          converted_list.append(elem)
+      return converted_list
 
 
 def jsonify(obj, *args, **kwargs):
