@@ -5,7 +5,7 @@ import json
 class TestCustomEncoders:
   def test_sets(self):
     test_set = set()
-    test_resultset = json.dumps(obj, cls=JSONExtensibleEncoder)
+    test_resultset = json.dumps(test_set, cls=JSONExtensibleEncoder)
     assert test_resultset == '[]'
 
   def test_nan_values(self):
