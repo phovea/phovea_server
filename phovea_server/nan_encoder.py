@@ -26,7 +26,7 @@ class NaNEncoder(object):
     if (isinstance(obj, float) and math.isnan(obj)):
       return None
     elif isinstance(obj, dict):
-      df = pd.DataFrame.from_dict(obj, orient=index)
+      df = pd.DataFrame.from_dict(obj, orient='index')
       json.dumps(df.where(pd.notnull(df), None))
     elif isinstance(obj, Response):
       return [NaNEncoder(item) for item in obj]

@@ -6,4 +6,4 @@ class TestCustomEncoders:
     assert jsonify(set()) == []
 
   def test_nan_values(self):
-    assert float('nan') == None
+    assert float('nan') is None
