@@ -2,8 +2,8 @@ from phovea_server.util import to_json
 
 
 class TestCustomEncoders:
-  # def test_sets(self):
-  #  assert jsonify(set()) == []
+  def test_sets(self):
+    assert to_json(set()) == '[]'
 
   def test_nan_values(self):
     test_var = float('nan')
