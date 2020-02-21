@@ -212,8 +212,7 @@ def toimage(arr, high=255, low=0, cmin=None, cmax=None, pal=None,
                 image.putpalette(np.asarray(pal, dtype=np.uint8).tostring())
                 # Becomes a mode='P' automatically.
             elif mode == 'P':  # default gray-scale
-                pal = (np.arange(0, 256, 1, dtype=np.uint8)[:, np.newaxis]
-                      * np.ones((3,), dtype=np.uint8)[np.newaxis, :])
+                pal = (np.arange(0, 256, 1, dtype=np.uint8)[:, np.newaxis] * np.ones((3,), dtype=np.uint8)[np.newaxis, :])
                 image.putpalette(np.asarray(pal, dtype=np.uint8).tostring())
             return image
         if mode == '1':  # high input gives threshold for 1
