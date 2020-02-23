@@ -12,9 +12,9 @@ RUN (!(test -s /tmp/docker_script.sh) || bash /tmp/docker_script.sh)
 ####
 # establish the runtime user
 ####
-RUN useradd --create-home phovea
+RUN useradd -l -M -U -s /bin/bash phovea
 USER phovea
-WORKDIR /home/phovea
+WORKDIR /phovea
 
 ####
 # Environment mode (dev or prod)
