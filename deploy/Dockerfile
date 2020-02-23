@@ -13,12 +13,13 @@ RUN (!(test -s /tmp/docker_packages.txt) || (apt-get update && \
     (pip install --no-cache-dir -r /tmp/requirements.txt)
 RUN (!(test -s /tmp/docker_script.sh) || (bash /tmp/docker_script.sh))
 
-# establish the runtime user
-RUN useradd -l -M -U -s /bin/bash phovea
-USER phovea
 WORKDIR /phovea
-
 COPY ./build/source ./
+
+# establish the runtime user
+RUN useradd -l -M -U -s /bin/bash phovea && \
+    chown -R phovea:phovea /phovea
+USER phovea
 
 # Create separate launch file (similar to phovea_server/__main__.py from repository root), because it is not included in build files
 RUN printf "from phovea_server import launch\nlaunch.run()\n" > /phovea/launch.py
