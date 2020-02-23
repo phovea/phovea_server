@@ -14,7 +14,7 @@ RUN (!(test -s /tmp/docker_packages.txt) || (apt-get update && \
 RUN (!(test -s /tmp/docker_script.sh) || (bash /tmp/docker_script.sh))
 
 # establish the runtime user
-RUN useradd -l -g -M -U phovea phovea
+RUN useradd -l -g -M -U -s /bin/bash phovea phovea
 USER phovea
 WORKDIR /phovea
 
