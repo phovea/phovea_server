@@ -56,10 +56,7 @@ def _handle_nan_values(obj_to_convert):
           if isinstance(v, dict):
               converted_dict[k] = _handle_nan_values(v)
           elif isinstance(v, list):
-              converted_v = []
-              for elem in v:
-                  converted_v.append(_handle_nan_values(elem))
-              converted_dict[k] = converted_v
+              converted_dict[k] = _handle_nan_values(v)
           else:
               if (isinstance(v, float) and math.isnan(v)):
                   converted_dict[k] = None
