@@ -81,9 +81,7 @@ def _generate_index():
 
   for app in apps:
     text.append('<li>')
-    text.append('<a class="appinfo" href="/' + app.id + '/"><span class="title">' +
-                app.title + '</span><span class="name">' + app.name + '</span><span class="description">' +
-                app.description + '</span></a>')
+    text.append('<a class="appinfo" href="/' + app.id + '/"><span class="title">' + app.title + '</span><span class="name">' + app.name + '</span><span class="description">' + app.description + '</span></a>')
     text.append('<div class="links">')
     if app.homepage and app.homepage != '':
       text.append('<a href="' + app.homepage + '" target="_blank" class="homepage"><span>Visit homepage</span></a>')

@@ -194,8 +194,7 @@ def toimage(arr, high=255, low=0, cmin=None, cmax=None, pal=None,
     if np.iscomplexobj(data):
         raise ValueError("Cannot convert a complex-valued array.")
     shape = list(data.shape)
-    valid = len(shape) == 2 or ((len(shape) == 3) and
-                                ((3 in shape) or (4 in shape)))
+    valid = len(shape) == 2 or ((len(shape) == 3) and ((3 in shape) or (4 in shape)))
     if not valid:
         raise ValueError("'arr' does not have a suitable array shape for "
                          "any mode.")
@@ -213,8 +212,7 @@ def toimage(arr, high=255, low=0, cmin=None, cmax=None, pal=None,
                 image.putpalette(np.asarray(pal, dtype=np.uint8).tostring())
                 # Becomes a mode='P' automatically.
             elif mode == 'P':  # default gray-scale
-                pal = (np.arange(0, 256, 1, dtype=np.uint8)[:, np.newaxis] *
-                       np.ones((3,), dtype=np.uint8)[np.newaxis, :])
+                pal = (np.arange(0, 256, 1, dtype=np.uint8)[:, np.newaxis] * np.ones((3,), dtype=np.uint8)[np.newaxis, :])
                 image.putpalette(np.asarray(pal, dtype=np.uint8).tostring())
             return image
         if mode == '1':  # high input gives threshold for 1
