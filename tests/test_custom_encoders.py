@@ -19,5 +19,5 @@ class TestCustomEncoders:
 
     # make assertions
     assert test_result_simple == '{"myNum": null}'
-    assert test_result_list_simple == '{"myNum": [13, 5, 7, 12, null, 22]'
+    assert test_result_list_simple == '{"myNum": [13, 5, 7, 12, null, 22]}'
     assert test_result_list_nested == '{"myNum": [13, 5, 7, 12, "{"first": [4, 6, 2, test_var], "second": 3, "third": [test_var, 3, 78, 6, 3, 2]}", 22]}'
