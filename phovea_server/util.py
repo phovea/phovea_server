@@ -59,7 +59,7 @@ def _handle_nan_values(obj_to_convert):
     converted_dict = {}
     converted_list = []
     # primitive value
-    if (isinstance(v, float) and math.isnan(elem)):
+    if (isinstance(obj_to_convert, float) and math.isnan(obj_to_convert)):
       return None
     # convert dictionaries
     if isinstance(obj_to_convert, dict):
