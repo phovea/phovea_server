@@ -7,6 +7,7 @@
 
 from builtins import range
 import json
+from typing import Union
 
 
 class JSONExtensibleEncoder(json.JSONEncoder):
@@ -47,13 +48,13 @@ def to_json(obj, *args, **kwargs):
   return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
 
 
-def _handle_nan_values(obj_to_convert):
+def _handle_nan_values(obj_to_convert: Union[dict, list, float]) -> Union[dict, list, None]:
     """
     Convert any NaN values in the given object to None. Previously, Pandas was used to encode NaN to null. This feature has been deprecated and removed, therefore
     the standard JSON encoder is used which parses NaN instead of null. A custom JSON encoder does not work for converting these values to None because python's
     JSON encoder already knows how to serialize NaN values.
     :param obj_to_convert:
-    :return:
+    :return dict, list or None:
     """
     import math
     converted_dict = {}
