@@ -58,21 +58,29 @@ def _handle_nan_values(obj_to_convert):
     import math
     converted_dict = {}
     converted_list = []
+    # primitive value
+    if (isinstance(v, float) and math.isnan(elem)):
+      return None
+    # convert dictionaries
     if isinstance(obj_to_convert, dict):
       for k, v in obj_to_convert.items():
           # value is dictionary or list
           if isinstance(v, dict) or isinstance(v, list):
               converted_dict[k] = _handle_nan_values(v)
           else:
+              # value is NaN
               if (isinstance(v, float) and math.isnan(v)):
                   converted_dict[k] = None
               else:
                   converted_dict[k] = v
       return converted_dict
+    # convert lists
     elif isinstance(obj_to_convert, list):
       for elem in obj_to_convert:
+        # list element is dictionary
         if isinstance(elem, dict):
           converted_list.append(_handle_nan_values(elem))
+        # list element is NaN value
         elif (isinstance(elem, float) and math.isnan(elem)):
           converted_list.append(None)
         else:
