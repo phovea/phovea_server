@@ -7,6 +7,7 @@
 
 from builtins import range
 import json
+from typing import Union
 
 
 class JSONExtensibleEncoder(json.JSONEncoder):
@@ -42,7 +43,50 @@ def to_json(obj, *args, **kwargs):
   kwargs['ensure_ascii'] = False
 
   # Pandas JSON module has been deprecated and removed. UJson cannot convert numpy arrays, so it cannot be used here. The JSON used here does not support the `double_precision` keyword.
+  if isinstance(obj, float) or isinstance(obj, dict) or isinstance(obj, list):
+    obj = _handle_nan_values(obj)
   return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
+
+
+def _handle_nan_values(obj_to_convert: Union[dict, list, float]) -> Union[dict, list, None]:
+    """
+    Convert any NaN values in the given object to None. Previously, Pandas was used to encode NaN to null. This feature has been deprecated and removed, therefore
+    the standard JSON encoder is used which parses NaN instead of null. A custom JSON encoder does not work for converting these values to None because python's
+    JSON encoder already knows how to serialize NaN values.
+    :param obj_to_convert:
+    :return dict, list or None:
+    """
+    import math
+    converted_dict = {}
+    converted_list = []
+    # primitive value
+    if (isinstance(obj_to_convert, float) and math.isnan(obj_to_convert)):
+      return None
+    # convert dictionaries
+    if isinstance(obj_to_convert, dict):
+      for k, v in obj_to_convert.items():
+          # value is dictionary or list
+          if isinstance(v, dict) or isinstance(v, list):
+              converted_dict[k] = _handle_nan_values(v)
+          else:
+              # value is NaN
+              if (isinstance(v, float) and math.isnan(v)):
+                  converted_dict[k] = None
+              else:
+                  converted_dict[k] = v
+      return converted_dict
+    # convert lists
+    elif isinstance(obj_to_convert, list):
+      for elem in obj_to_convert:
+        # list element is dictionary
+        if isinstance(elem, dict):
+          converted_list.append(_handle_nan_values(elem))
+        # list element is NaN value
+        elif (isinstance(elem, float) and math.isnan(elem)):
+          converted_list.append(None)
+        else:
+          converted_list.append(elem)
+      return converted_list
 
 
 def jsonify(obj, *args, **kwargs):
