@@ -196,7 +196,7 @@ def create(parser):
                       help='server ss. certificate')
   parser.add_argument('--keyfile', '-k', default=cc.get('keyfile'),  # get default value from config.json
                       help='server keyfile for ssl certificate')
-  
+
   def _launcher(args):
     """
     Prepare the launch of the server instance
