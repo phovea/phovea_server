@@ -1,5 +1,6 @@
 FROM python:3.7-buster
 LABEL maintainer="contact@caleydo.org"
+WORKDIR /phovea
 
 ENV PHOVEA_ENV=production
 ENV PHOVEA_SERVICE=api
@@ -13,7 +14,7 @@ RUN (!(test -s /tmp/docker_packages.txt) || (apt-get update && \
     (pip install --no-cache-dir -r /tmp/requirements.txt)
 RUN (!(test -s /tmp/docker_script.sh) || (bash /tmp/docker_script.sh))
 
-WORKDIR /phovea
+
 COPY ./build/source ./
 
 # establish the runtime user
