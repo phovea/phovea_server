@@ -1,5 +1,6 @@
 FROM python:3.7-buster
 LABEL maintainer="contact@caleydo.org"
+
 WORKDIR /phovea
 
 ENV PHOVEA_ENV=production
