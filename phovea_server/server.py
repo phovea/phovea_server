@@ -195,7 +195,8 @@ def create(parser):
   parser.add_argument('--certfile', '-c', default=cc.get('certfile'),  # get default value from config.json
                       help='server ss. certificate')
   parser.add_argument('--keyfile', '-k', default=cc.get('keyfile'),  # get default value from config.json
-                      help='server keyfile for ssl certificate')                      
+                      help='server keyfile for ssl certificate')
+  
   def _launcher(args):
     """
     Prepare the launch of the server instance
@@ -211,7 +212,7 @@ def create(parser):
 
     if args.certfile and args.keyfile:
       http_server = WSGIServer((args.address, args.port), application, keyfile=args.keyfile, certfile=args.certfile, handler_class=WebSocketHandler)
-    else:  
+    else:
       http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
 
     return http_server.serve_forever  # return function name only; initialization will be done later
