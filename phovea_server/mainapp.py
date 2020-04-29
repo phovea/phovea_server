@@ -126,6 +126,10 @@ def _build_info():
   return ns.jsonify(build_info)
 
 
+def _health():
+    return 'ok', 200
+
+
 def default_app():
   # from .config import view, _initialize
   from phovea_server import config
@@ -141,4 +145,5 @@ def default_app():
   else:
     app.add_url_rule('/<path:path>', 'deliver', _deliver_production)
   app.add_url_rule('/api/buildInfo.json', 'build_info', _build_info)
+  app.add_url_rule('/health', 'health', _health)
   return app

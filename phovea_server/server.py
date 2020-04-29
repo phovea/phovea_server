@@ -192,9 +192,9 @@ def create(parser):
                       help='server port')
   parser.add_argument('--address', '-a', default=cc.get('address'),  # get default value from config.json
                       help='server address')
-  parser.add_argument('--certfile', '-a', default=cc.get('certfile'),  # get default value from config.json
+  parser.add_argument('--certfile', '-c', default=cc.get('certfile'),  # get default value from config.json
                       help='server ss. certificate')
-  parser.add_argument('--keyfile', '-a', default=cc.get('keyfile'),  # get default value from config.json
+  parser.add_argument('--keyfile', '-k', default=cc.get('keyfile'),  # get default value from config.json
                       help='server keyfile for ssl certificate')                      
   def _launcher(args):
     """
