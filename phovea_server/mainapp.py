@@ -126,6 +126,7 @@ def _build_info():
   return ns.jsonify(build_info)
 
 
+# health check for docker-compose, kubernetes
 def _health():
     return 'ok', 200
 
