@@ -1,5 +1,7 @@
-phovea_server [![Phovea][phovea-image]][phovea-url] [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+phovea_server 
 =====================
+[![Phovea][phovea-image]][phovea-url] [![Build Status][circleci-image]][circleci-url]
+
 
 Python server implementation of Phovea that provides: 
 
@@ -43,9 +45,5 @@ This repository is part of **[Phovea](http://phovea.caleydo.org/)**, a platform 
 
 [phovea-image]: https://img.shields.io/badge/Phovea-Server%20Plugin-10ACDF.svg
 [phovea-url]: https://phovea.caleydo.org
-[npm-image]: https://badge.fury.io/js/phovea_server.svg
-[npm-url]: https://npmjs.org/package/phovea_server
 [circleci-image]: https://circleci.com/gh/phovea/phovea_server.svg?style=shield
 [circleci-url]: https://circleci.com/gh/phovea/phovea_server
-[daviddm-image]: https://david-dm.org/phovea/phovea_server/status.svg
-[daviddm-url]: https://david-dm.org/phovea/phovea_server
