@@ -5,7 +5,7 @@
 ###############################################################################
 
 import logging.config
-
+from threading import Thread
 
 # set configured registry
 def _get_config():
@@ -212,24 +212,23 @@ def create(parser):
 
     # load `after_server_started` extension points which are run immediately after server started,
     # so all plugins should have been loaded at this point of time
-    # ! ATTENTION: the server is blocked when running the `after_server_started` hook. No requests will be served until the hooks have been finished
-    start = time.time()
-    _load_after_server_started_hooks()
-    _log.info("Elapsed time for server startup hooks: %d seconds", time.time() - start)
+    # the hooks are run in a separate (single) thread to not block the main execution of the server
+    t = Thread(target=_load_after_server_started_hooks)
+    t.setDaemon(True)
+    t.start()
 
     return server
 
   return _launcher
 
-
 def _load_after_server_started_hooks():
   """
     Load and run all `after_server_started` extension points.
-    ! ATTENTION: the server is blocked when running the `after_server_started` hook. No requests will be served until the hooks have been finished
     The factory method of an extension implementing this extension point should return a function which is then executed here
-    If your tasks take a long time it might be a good idea to run the task on multiple threads in your application to speed up server startup
   """
   from .plugin import list as list_plugins
+
+  start = time.time()
 
   after_server_started_hooks = [p.load().factory() for p in list_plugins('after_server_started')]
 
@@ -237,3 +236,6 @@ def _load_after_server_started_hooks():
 
   for hook in after_server_started_hooks:
     hook()
+
+  _log.info("Elapsed time for server startup hooks: %d seconds", time.time() - start)
+
