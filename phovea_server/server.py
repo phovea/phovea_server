@@ -8,6 +8,7 @@ import logging.config
 import threading
 import time
 
+
 # set configured registry
 def _get_config():
   from . import config
@@ -221,6 +222,7 @@ def create(parser):
 
   return _launcher
 
+
 def _load_after_server_started_hooks():
   """
     Load and run all `after_server_started` extension points.
@@ -238,4 +240,3 @@ def _load_after_server_started_hooks():
     hook()
 
   _log.info("Elapsed time for server startup hooks: %d seconds", time.time() - start)
-
