@@ -201,7 +201,6 @@ def create(parser):
     """
     from geventwebsocket.handler import WebSocketHandler
     from gevent.pywsgi import WSGIServer
-    import time
 
     # create phovea server application
     application = create_application()
