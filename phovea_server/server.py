@@ -5,7 +5,8 @@
 ###############################################################################
 
 import logging.config
-from threading import Thread
+import threading
+import time
 
 # set configured registry
 def _get_config():
@@ -213,7 +214,7 @@ def create(parser):
     # load `after_server_started` extension points which are run immediately after server started,
     # so all plugins should have been loaded at this point of time
     # the hooks are run in a separate (single) thread to not block the main execution of the server
-    t = Thread(target=_load_after_server_started_hooks)
+    t = threading.Thread(target=_load_after_server_started_hooks)
     t.setDaemon(True)
     t.start()
 
