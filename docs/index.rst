@@ -6,6 +6,12 @@
 Welcome to phovea_server's documentation!
 =========================================
 
+.. image:: _static/images/phovea.png
+   :width: 200
+
+.. image:: _static/images/datavisyn-logo.png
+   :width: 600
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

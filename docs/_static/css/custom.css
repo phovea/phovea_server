@@ -1,0 +1,35 @@
+.wy-nav-content {
+  max-width: 1050px;
+  background-color: #ffffff;
+}
+
+.wy-side-nav-search {
+  background-color: #2f353a;
+}
+
+.rst-content img {
+  margin-bottom: 24px;
+  margin-right: 24px;
+}
+
+.wy-nav-content a:visited {
+  color: #9851E6;
+}
+
+.wy-nav-content a{
+  color: #589CFF;
+}
+
+.wy-nav-side {
+  background-color: #2f353a;
+  color: #f0f3f5;
+}
+
+.body {
+  font-family: Monda, "Helvetica Neue",Helvetica,Arial,sans-serif;
+  color: #23282c;
+}
+
+.wy-menu-vertical a:hover {
+  background: #e4e7ea;
+}

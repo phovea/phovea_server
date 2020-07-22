@@ -16,6 +16,7 @@
 import sys
 import os
 from codecs import open
+import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -35,7 +36,8 @@ with open('../package.json', encoding='utf-8') as json_data:
 # ones.
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.intersphinx',
-              'sphinx.ext.todo']
+              'sphinx.ext.todo',
+              'sphinx_rtd_theme']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -88,7 +90,7 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -100,6 +102,12 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_logo = '_static/images/phovea.png'
+
+html_css_files = [
+    'css/custom.css',
+]
 
 # -- Options for HTMLHelp output ------------------------------------------
 
