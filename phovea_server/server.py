@@ -5,6 +5,8 @@
 ###############################################################################
 
 import logging.config
+import threading
+import time
 
 
 # set configured registry
@@ -207,6 +209,34 @@ def create(parser):
     _log.info('prepare server that will listen on %s:%s', args.address, args.port)
     http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
 
-    return http_server.serve_forever  # return function name only; initialization will be done later
+    server = http_server.serve_forever  # return function name only; initialization will be done later
+
+    # load `after_server_started` extension points which are run immediately after server started,
+    # so all plugins should have been loaded at this point of time
+    # the hooks are run in a separate (single) thread to not block the main execution of the server
+    t = threading.Thread(target=_load_after_server_started_hooks)
+    t.setDaemon(True)
+    t.start()
+
+    return server
 
   return _launcher
+
+
+def _load_after_server_started_hooks():
+  """
+    Load and run all `after_server_started` extension points.
+    The factory method of an extension implementing this extension point should return a function which is then executed here
+  """
+  from .plugin import list as list_plugins
+
+  start = time.time()
+
+  after_server_started_hooks = [p.load().factory() for p in list_plugins('after_server_started')]
+
+  _log.info("Found %d `after_server_started` extension points to run", len(after_server_started_hooks))
+
+  for hook in after_server_started_hooks:
+    hook()
+
+  _log.info("Elapsed time for server startup hooks: %d seconds", time.time() - start)

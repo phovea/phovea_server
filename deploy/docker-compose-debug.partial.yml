@@ -3,4 +3,3 @@ services:
   api:
     ports:
       - '2222:22'
-    command: /usr/sbin/sshd -D
