@@ -210,7 +210,7 @@ def create(parser):
     # create phovea server application
     application = create_application()
 
-    _log.info('prepare server that will listen on %s:%s', args.address, args.port, args.certfile, args.keyfile)
+    _log.info('prepare server that will listen on %s:%s [cert=%s, key=%s]', args.address, args.port, args.certfile, args.keyfile)
 
     if args.certfile and args.keyfile:
       http_server = WSGIServer((args.address, args.port), application, keyfile=args.keyfile, certfile=args.certfile, handler_class=WebSocketHandler)
