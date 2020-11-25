@@ -207,7 +207,6 @@ def create(parser):
     from geventwebsocket.handler import WebSocketHandler
     from gevent.pywsgi import WSGIServer
     from flask.logging import default_handler
-    import logging.handlers as handlers
     import logging
 
     # create phovea server application
