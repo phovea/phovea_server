@@ -207,6 +207,7 @@ def create(parser):
     from geventwebsocket.handler import WebSocketHandler
     from gevent.pywsgi import WSGIServer
     from flask.logging import default_handler
+    from gevent import monkey
     import logging
 
     # create phovea server application
@@ -218,7 +219,7 @@ def create(parser):
     _log.addHandler(default_handler)
 
     _log.info('prepare server that will listen on %s:%s [cert=%s, key=%s]', args.address, args.port, args.certfile, args.keyfile)
-
+    _log.warn(monkey.saved.keys())
     if args.certfile and args.keyfile:
       http_server = WSGIServer((args.address, args.port), application, keyfile=args.keyfile, certfile=args.certfile, handler_class=WebSocketHandler)
     else:

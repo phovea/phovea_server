@@ -85,12 +85,10 @@ class ExtensionDesc(AExtensionDesc):
   def load(self):
     if self._impl is None:
       import importlib
-      import gevent.monkey
       _log = logging.getLogger(__name__)
       _log.info('importing %s', self.module)
 
       m = importlib.import_module(self.module)
-      gevent.monkey.patch_all()  # ensure the standard libraries are patched
       if hasattr(m, '_plugin_initialize'):  # init method
         # import inspect
         # inspect.getcallargs()
