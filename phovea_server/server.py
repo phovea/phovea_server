@@ -215,11 +215,12 @@ def create(parser):
 
     # add handler for wsgi's logger
     logger = logging.getLogger('wsgi')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     _log.addHandler(default_handler)
 
     _log.info('prepare server that will listen on %s:%s [cert=%s, key=%s]', args.address, args.port, args.certfile, args.keyfile)
-    _log.warn(monkey.saved.keys())
+    # Test whether monkey.patch_all() has been used correctly, keys have to be set
+    # _log.warn(monkey.saved.keys())
     if args.certfile and args.keyfile:
       http_server = WSGIServer((args.address, args.port), application, keyfile=args.keyfile, certfile=args.certfile, handler_class=WebSocketHandler)
     else:
