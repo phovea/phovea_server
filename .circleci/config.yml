@@ -1,9 +1,13 @@
-version: 2
-jobs:
-  build:
+version: 2.1
+
+executors:
+  python-executor:
     working_directory: ~/phovea
     docker:
       - image: circleci/python:3.7-buster-node-browsers # for node version see Dockerfile on https://hub.docker.com/r/circleci/python
+jobs:
+  build:
+    executor: python-executor
     steps:
       - checkout
       - run:
@@ -48,8 +52,34 @@ jobs:
             npm run dist
       - store_artifacts:
           path: dist
+          destination: dist
+      - persist_to_workspace:
+          root: ~/phovea
+          paths: .
+  publish:
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: ~/phovea
+      - run:
+          name: Install twine
+          command: |
+            . ~/venv/bin/activate \
+            pip install twine \
+      - run:
+          name: Authentication
+          command:  |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "repository = $PYPI_REPOSITORY" >> ~/.pypirc
+            echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+      - run:
+          name: Publish package
+          command: |
+            . venv/bin/activate
+            twine upload dist/*
 workflows:
-  version: 2
+  version: 2.1
 #  build-nightly:
 #    triggers:
 #      - schedule:
@@ -60,15 +90,25 @@ workflows:
 #                - develop
 #    jobs:
 #      - build
-  build-branch:
+  build-branches-only:
     jobs:
       - build:
           filters:
             tags:
-              ignore: /^v.*/
-  build-tag:
+              ignore: /.*/
+  build-publish-tag:
     jobs:
       - build:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - publish:
+          context:
+              - org-public
+          requires:
+              - build
           filters:
             branches:
               ignore: /.*/
