@@ -15,3 +15,6 @@ services:
     - '9000:80'
     volumes:
     - .:/phovea
+    # Add support for PDB debugger
+    # stdin_open: true
+    # tty: true

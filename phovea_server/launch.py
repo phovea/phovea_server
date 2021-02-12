@@ -3,10 +3,13 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
+from gevent import monkey
+monkey.patch_all()
 
-import logging.config
-import logging
-from . import config
+
+import logging.config  # noqa: E402
+import logging  # noqa: E402
+from . import config  # noqa: E402
 
 
 # set configured registry

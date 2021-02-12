@@ -194,6 +194,10 @@ def create(parser):
                       help='server port')
   parser.add_argument('--address', '-a', default=cc.get('address'),  # get default value from config.json
                       help='server address')
+  parser.add_argument('--certfile', '-c', default=cc.get('certfile'),  # get default value from config.json
+                      help='ssl certificate')
+  parser.add_argument('--keyfile', '-k', default=cc.get('keyfile'),  # get default value from config.json
+                      help='keyfile for ssl certificate')
 
   def _launcher(args):
     """
@@ -202,12 +206,26 @@ def create(parser):
     """
     from geventwebsocket.handler import WebSocketHandler
     from gevent.pywsgi import WSGIServer
+    from flask.logging import default_handler
+    import logging
+    # from gevent import monkey
 
     # create phovea server application
     application = create_application()
 
-    _log.info('prepare server that will listen on %s:%s', args.address, args.port)
-    http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
+    # add handler for wsgi's logger
+    logger = logging.getLogger('wsgi')
+    logger.setLevel(logging.INFO)
+    _log.addHandler(default_handler)
+
+    _log.info('prepare server that will listen on %s:%s [cert=%s, key=%s]', args.address, args.port, args.certfile, args.keyfile)
+    # Test whether monkey.patch_all() has been used correctly,
+    # keys have to be set
+    # _log.warn(monkey.saved.keys())
+    if args.certfile and args.keyfile:
+      http_server = WSGIServer((args.address, args.port), application, keyfile=args.keyfile, certfile=args.certfile, handler_class=WebSocketHandler)
+    else:
+      http_server = WSGIServer((args.address, args.port), application, handler_class=WebSocketHandler)
 
     server = http_server.serve_forever  # return function name only; initialization will be done later
 
