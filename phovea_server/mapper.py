@@ -8,6 +8,7 @@
 from builtins import object, set
 from .plugin import list as list_plugin
 from itertools import chain
+from typing import List
 import logging
 
 _log = logging.getLogger(__name__)
@@ -80,15 +81,23 @@ class MappingManager(object):
       _log.warn('cannot find mapping from %s to %s', from_idtype, to_idtype)
       return [None for _ in ids]
 
+    def apply_mapping(mapper, ids: List[str]):
+      # Each mapper can define if it preserves the order of the incoming ids.
+      if hasattr(mapper, 'preserves_order') and mapper.preserves_order:
+        return mapper(ids)
+      else:
+        # If this is not the case, we need to map every single id separately
+        return [mapper([id])[0] for id in ids]
+
     if len(to_mappings) == 1:
       # single mapping no need for merging
-      return to_mappings[0](ids)
+      return apply_mapping(to_mappings[0], ids)
 
     # two way to preserve the order of the results
     r = [[] for _ in ids]
     rset = [set() for _ in ids]
     for mapper in to_mappings:
-      mapped_ids = mapper(ids)
+      mapped_ids = apply_mapping(mapper, ids)
       for mapped_id, rlist, rhash in zip(mapped_ids, r, rset):
         for id in mapped_id:
           if id not in rhash:

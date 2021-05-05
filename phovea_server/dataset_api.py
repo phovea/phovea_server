@@ -11,7 +11,6 @@ from .util import jsonify, to_json
 import logging
 from .dataset import list_idtypes, get_idmanager, iter, get_mappingmanager, get, list_datasets, add, remove
 from flask import abort
-from typing import List
 
 
 app = ns.Namespace(__name__)
@@ -286,13 +285,7 @@ def _do_mapping(idtype, to_idtype, to_ids):
     ns.abort(400)
     return
 
-  # we'll call the mapper for each name individually to preserve the order of the names,
-  # because otherwise it's not guaranteed that the results are in the same order as the names
-  # and since we need to merge the results on the frontend occasionally we might mix them up
-  mappers_list: List[List[List[str]]] = [mapper(idtype, to_idtype, [name]) for name in names]
-
-  # flatten the list to be 2-dimensional since this is the format we used to return
-  mapped_list: List[List[str]] = [mapping[0] for mapping in mappers_list]
+  mapped_list = mapper(idtype, to_idtype, names)
 
   if first_only:
     mapped_list = [None if a is None or len(a) == 0 else a[0] for a in mapped_list]
