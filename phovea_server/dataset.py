@@ -6,6 +6,7 @@
 
 
 from builtins import str
+from .idtype import get_mappingmanager
 import phovea_server.plugin
 import phovea_server.range
 import phovea_server.util
@@ -110,7 +111,3 @@ def list_idtypes():
 
 def get_idmanager():
   return phovea_server.plugin.lookup('idmanager')
-
-
-def get_mappingmanager():
-  return phovea_server.plugin.lookup('mappingmanager')

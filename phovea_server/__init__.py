@@ -17,9 +17,8 @@ def phovea(registry):
       'namespace': '/api/dataset',
       'factory': 'create_dataset'
   })
-  registry.append('namespace', 'caleydo-idtype', 'phovea_server.dataset_api', {
-      'namespace': '/api/idtype',
-      'factory': 'create_idtype'
+  registry.append('namespace', 'caleydo-idtype', 'phovea_server.idtype.api', {
+      'namespace': '/api/idtype'
   })
   registry.append('dataset-specific-handler', 'handler-table', 'phovea_server.dataset_specific', {
       'datatype': 'table',
@@ -74,8 +73,8 @@ def phovea(registry):
   registry.append('json-encoder', 'set-encoder', 'phovea_server.set_encoder', {})
 
   registry.append('manager', 'idmanager', 'phovea_server.assigner', dict(singleton=True))
-  registry.append('manager', 'mappingmanager', 'phovea_server.mapper', dict(singleton=True))
-  registry.append('mapping_provider', 'csv', 'phovea_server.mapping_csv')
+  registry.append('manager', 'mappingmanager', 'phovea_server.idtype.mapper', dict(singleton=True))
+  registry.append('mapping_provider', 'csv', 'phovea_server.idtype.mapping_csv')
 
   registry.append('dataset-specific-handler', 'handler-graph', 'phovea_server.graph_api', {
       'datatype': 'graph',

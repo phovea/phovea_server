@@ -161,7 +161,7 @@ def _pre_load_caches():
     get_idmanager()
 
   if c['mapping']:
-    from .dataset import get_mappingmanager
+    from .idtype import get_mappingmanager
     _log.info('initialize mapping manager')
     get_mappingmanager()
 
