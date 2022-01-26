@@ -155,11 +155,6 @@ def _pre_load_caches():
   """
   c = _get_config().coldstart
 
-  if c['assigner']:
-    from .dataset import get_idmanager
-    _log.info('initialize id assigner')
-    get_idmanager()
-
   if c['mapping']:
     from .dataset import get_mappingmanager
     _log.info('initialize mapping manager')

@@ -7,7 +7,6 @@
 
 from builtins import str
 import phovea_server.plugin
-import phovea_server.range
 import phovea_server.util
 from phovea_server.dataset_def import to_idtype_description
 import itertools
@@ -106,10 +105,6 @@ def list_idtypes():
   for idtype_id in mapping.known_idtypes():
     tmp[idtype_id] = to_idtype_description(idtype_id)
   return list(tmp.values())
-
-
-def get_idmanager():
-  return phovea_server.plugin.lookup('idmanager')
 
 
 def get_mappingmanager():
