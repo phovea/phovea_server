@@ -130,6 +130,10 @@ class MappingManager(object):
     return list(self.paths.get(from_idtype, {}).keys())
 
   def __call__(self, from_idtype, to_idtype, ids):
+    # If both id types are the same, simply return
+    if from_idtype == to_idtype:
+      return ids
+
     # Get stored path instead of calculating them "on the fly"
     # paths = self.__find_all_paths(self.graph, from_idtype, to_idtype)
     paths = self.paths.get(from_idtype, {}).get(to_idtype)
