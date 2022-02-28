@@ -9,4 +9,7 @@ pandas==1.1.4
 matplotlib==3.3.3
 Pillow==8.3.2
 json-cfg==0.4.2
+# Pin docutils to avoid AttributeError: 'Values' object has no attribute 'section_self_link'
 docutils==0.17.1
+# Pin markupsafe to avoid ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/usr/local/lib/python3.7/site-packages/markupsafe/__init__.py) 
+markupsafe==2.0.1
