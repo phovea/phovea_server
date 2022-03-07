@@ -7,34 +7,22 @@
 
 from builtins import str
 from builtins import object
+from typing import Dict, List, Union
+from flask import Flask
 from . import plugin as p
 import sys
 
-ANONYMOUS = 'anonymous'
-
 
 class User(object):
-  def __init__(self, id):
-    self.id = id
-    self.name = ANONYMOUS
-    self.roles = [ANONYMOUS]
+  def __init__(self, id: str, name: str = None, roles: List[str] = []):
+    self.id: str = id
+    self.name: str = name or id
+    self.roles: List[str] = roles
 
-  def get_id(self):
+  def get_id(self) -> str:
     return str(self.id)
 
-  @property
-  def is_authenticated(self):
-    return False
-
-  @property
-  def is_active(self):
-    return False
-
-  @property
-  def is_anonymous(self):
-    return self.name == ANONYMOUS
-
-  def has_role(self, role):
+  def has_role(self, role: str) -> bool:
     return role in self.roles
 
   def __eq__(self, other):
@@ -60,9 +48,6 @@ class User(object):
     __hash__ = object.__hash__
 
 
-ANONYMOUS_USER = User(ANONYMOUS)
-
-
 class SecurityManager(object):
   """
   a basic security manager
@@ -74,11 +59,11 @@ class SecurityManager(object):
   def login_required(self, f):
     return f
 
-  def login(self, username, extra_fields={}):
+  def login(self, username: str, extra_fields: Dict = {}) -> Union[User, None]:
     """logs the given user in
     :returns the logged in user object or None if login failed
     """
-    return User('')
+    return None
 
   def logout(self):
     """
@@ -86,28 +71,21 @@ class SecurityManager(object):
     """
     pass
 
+  def init_app(self, app: Flask):
+    """
+    initializes the security manager with the main app
+    """
+    pass
+
   @property
-  def current_user(self):
+  def current_user(self) -> Union[User, None]:
     """
     :returns the current logged in user
     """
-    return User('')
+    return None
 
-  def is_authenticated(self):
-    """whether the current user is authenticated
-    """
-    return self.current_user.is_authenticated
 
-  def has_role(self, role):
-    """whether the current use has the role
-    """
-    return self.current_user.has_role(role)
-
-  def init_app(self, app):
-    pass
-
-  def add_login_routes(self, app):
-    pass
+ANONYMOUS_USER = User('ANONYMOUS')
 
 
 class DummyManager(SecurityManager):
@@ -115,11 +93,12 @@ class DummyManager(SecurityManager):
   a dummy implementation of the security manager where everyone is authenticated
   """
 
-  def is_authenticated(self):
-    return True
+  def login(self, username: str, extra_fields={}) -> Union[User, None]:
+    return ANONYMOUS_USER
 
-  def has_role(self, role):
-    return True
+  @property
+  def current_user(self) -> Union[User, None]:
+    return ANONYMOUS_USER
 
 
 _manager = None
@@ -137,20 +116,17 @@ def manager():
   return _manager
 
 
-def is_logged_in():
-  return manager().is_authenticated()
+def is_logged_in() -> bool:
+  return manager().current_user is not None
 
 
-def current_username():
+def current_username() -> Union[str, None]:
   u = manager().current_user
-  return u.name if hasattr(u, 'name') else ANONYMOUS
+  return u.name if hasattr(u, 'name') else None
 
 
-def current_user():
-  user = manager().current_user
-  if user.is_anonymous:
-    return ANONYMOUS_USER
-  return user
+def current_user() -> User:
+  return manager().current_user
 
 
 def login_required(f):
@@ -160,22 +136,13 @@ def login_required(f):
   return manager().login_required(f)
 
 
-def init_app(app):
+def init_app(app: Flask):
   """
   initializes this app by for login mechanism
   :param app:
   :return:
   """
   manager().init_app(app)
-
-
-def add_login_routes(app):
-  """
-  initializes this flask for providing access to /login and /logout
-  :param app:
-  :return:
-  """
-  manager().add_login_routes(app)
 
 
 PERMISSION_READ = 4
@@ -242,20 +209,22 @@ def _includes(items, item):
 def can(item, permission, user=None):
   if user is None:
     user = current_user()
+    if user is None:
+      return False
 
   if not isinstance(item, dict):
     # assume we have an object
     item = {
-      'creator': getattr(item, 'creator', ANONYMOUS),
+      'creator': getattr(item, 'creator', ANONYMOUS_USER.name),
       'buddies': getattr(item, 'buddies', []),
-      'group': getattr(item, 'group', ANONYMOUS),
+      'group': getattr(item, 'group', ANONYMOUS_USER.name),
       'permissions': getattr(item, 'permissions', DEFAULT_PERMISSION)
     }
 
   owner, group, others, buddies = _decode(item.get('permissions', DEFAULT_PERMISSION))
 
   # I'm the creator
-  if _is_equal(user.name, item.get('creator', ANONYMOUS)) and permission in owner:
+  if _is_equal(user.name, item.get('creator', ANONYMOUS_USER.name)) and permission in owner:
     return True
 
   # check if I'm in the buddies list
