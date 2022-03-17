@@ -21,61 +21,10 @@ def phovea(registry):
       'namespace': '/api/idtype',
       'factory': 'create_idtype'
   })
-  registry.append('dataset-specific-handler', 'handler-table', 'phovea_server.dataset_specific', {
-      'datatype': 'table',
-      'factory': 'add_table_handler'
-  })
-  registry.append('dataset-specific-handler', 'handler-matrix', 'phovea_server.dataset_specific', {
-      'datatype': 'matrix',
-      'factory': 'add_matrix_handler'
-  })
-  registry.append('dataset-specific-handler', 'handler-vector', 'phovea_server.dataset_specific', {
-      'datatype': 'vector',
-      'factory': 'add_vector_handler'
-  })
-  registry.append('table-formatter', 'formatter-json', 'phovea_server.dataset_specific', {
-      'format': 'json',
-      'factory': 'format_json'
-  })
-  registry.append('table-formatter', 'formatter-csv', 'phovea_server.dataset_specific', {
-      'format': 'csv',
-      'factory': 'format_csv'
-  })
-  registry.append('matrix-formatter', 'formatter-json', 'phovea_server.dataset_specific', {
-      'format': 'json',
-      'factory': 'format_json'
-  })
-  registry.append('matrix-formatter', 'formatter-csv', 'phovea_server.dataset_specific', {
-      'format': 'csv',
-      'factory': 'format_csv'
-  })
-  registry.append('matrix-formatter', 'formatter-image', 'phovea_server.dataset_specific', {
-      'format': 'png',
-      'factory': 'format_image'
-  })
-  registry.append('matrix-formatter', 'formatter-image', 'phovea_server.dataset_specific', {
-      'format': 'jpeg',
-      'factory': 'format_image'
-  })
-  registry.append('matrix-formatter', 'formatter-image', 'phovea_server.dataset_specific', {
-      'format': 'jpg',
-      'factory': 'format_image'
-  })
-  registry.append('vector-formatter', 'formatter-json', 'phovea_server.dataset_specific', {
-      'format': 'json',
-      'factory': 'format_json'
-  })
-  registry.append('vector-formatter', 'formatter-csv', 'phovea_server.dataset_specific', {
-      'format': 'csv',
-      'factory': 'format_csv'
-  })
-  registry.append('dataset-provider', 'dataset-csv', 'phovea_server.dataset_csv')
   registry.append('json-encoder', 'numpy', 'phovea_server.json_encoder')
   registry.append('json-encoder', 'set-encoder', 'phovea_server.set_encoder', {})
 
-  registry.append('manager', 'idmanager', 'phovea_server.assigner', dict(singleton=True))
   registry.append('manager', 'mappingmanager', 'phovea_server.mapper', dict(singleton=True))
-  registry.append('mapping_provider', 'csv', 'phovea_server.mapping_csv')
 
   registry.append('dataset-specific-handler', 'handler-graph', 'phovea_server.graph_api', {
       'datatype': 'graph',

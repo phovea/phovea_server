@@ -16,7 +16,8 @@ _log = logging.getLogger(__name__)
 
 class MappingManager(object):
   """
-  assigns ids to object using a redis database
+  Mapping manager creating a graph of all available id-2-id mappings, allowing for transitive id-mappings.
+  This graph is traversed via shortest path when mapping from one id-(type) to another.
   """
   def __init__(self, providers):
     self.mappers = {}

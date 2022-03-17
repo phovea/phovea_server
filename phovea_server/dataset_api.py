@@ -6,11 +6,10 @@
 
 
 from builtins import str
-from . import ns, plugin, range
+from . import ns, plugin
 from .util import jsonify, to_json
 import logging
-from .dataset import list_idtypes, get_idmanager, iter, get_mappingmanager, get, list_datasets, add, remove
-from flask import abort
+from .dataset import list_idtypes, iter, get_mappingmanager, get, list_datasets, add, remove
 
 
 app = ns.Namespace(__name__)
@@ -111,10 +110,7 @@ def _get_dataset(dataset_id):
     return 'invalid dataset id "' + str(dataset_id) + '"', 404
   if not d.can_read():
     return 'not allowed', 403
-  r = ns.request.args.get('range', None)
-  if r is not None:
-    r = range.parse(r)
-  return jsonify(d.asjson(r))
+  return jsonify(d.asjson())
 
 
 @app.route('/<dataset_id>/desc')
@@ -215,24 +211,6 @@ def _list_idtypes():
   return jsonify(list_idtypes())
 
 
-@app_idtype.route('/<idtype>/map', methods=['GET', 'POST'])
-def _map_ids(idtype):
-  name = ns.request.values.get('id', None)
-  if name is not None:
-    return get_idmanager()([name], idtype)[0]
-  names = ns.request.values.getlist('ids[]')
-  return jsonify(get_idmanager()(names, idtype))
-
-
-@app_idtype.route('/<idtype>/unmap', methods=['GET', 'POST'])
-def _unmap_ids(idtype):
-  name = ns.request.values.get('id', None)
-  if name is not None:
-    return get_idmanager().unmap([int(name)], idtype)[0]
-  names = range.parse(ns.request.values.get('ids', ''))[0].tolist()
-  return jsonify(get_idmanager().unmap(names, idtype))
-
-
 @app_idtype.route('/<idtype>/')
 @ns.etag
 def _maps_to(idtype):
@@ -241,21 +219,9 @@ def _maps_to(idtype):
   return jsonify(target_id_types)
 
 
-@app_idtype.route('/<idtype>/search')
-def _search_ids(idtype):
-  query = ns.request.args.get('q', None)
-  max_results = int(ns.request.args.get('limit', 10))
-  manager = get_idmanager()
-  if query is None:
-    return abort(400, 'Parameter "q" must be defined')
-  if hasattr(manager, 'search'):
-    return jsonify(manager.search(idtype, query, max_results))
-  return jsonify([])
-
-
 @app_idtype.route('/<idtype>/<to_idtype>', methods=['GET', 'POST'])
 def _mapping_to(idtype, to_idtype):
-  return _do_mapping(idtype, to_idtype, False)
+  return _do_mapping(idtype, to_idtype)
 
 
 @app_idtype.route('/<idtype>/<to_idtype>/search')
@@ -268,16 +234,12 @@ def _mapping_to_search(idtype, to_idtype):
   return jsonify([])
 
 
-def _do_mapping(idtype, to_idtype, to_ids):
+def _do_mapping(idtype, to_idtype):
   mapper = get_mappingmanager()
   args = ns.request.values
   first_only = args.get('mode', 'all') == 'first'
 
-  if 'id' in args:
-    names = get_idmanager().unmap([int(args['id'])], idtype)
-  elif 'ids' in args:
-    names = get_idmanager().unmap(range.parse(args['ids'])[0].tolist(), idtype)
-  elif 'q' in args:
+  if 'q' in args:
     names = args['q'].split(',')
   elif 'q[]' in args:
     names = args.getlist('q[]')
@@ -290,19 +252,7 @@ def _do_mapping(idtype, to_idtype, to_ids):
   if first_only:
     mapped_list = [None if a is None or len(a) == 0 else a[0] for a in mapped_list]
 
-  if to_ids:
-    m = get_idmanager()
-    if first_only:
-      mapped_list = m(mapped_list, to_idtype)
-    else:
-      mapped_list = [m(entry, to_idtype) for entry in mapped_list]
-
   return jsonify(mapped_list)
-
-
-@app_idtype.route('/<idtype>/<to_idtype>/map', methods=['GET', 'POST'])
-def _mapping_to_id(idtype, to_idtype):
-  return _do_mapping(idtype, to_idtype, True)
 
 
 # add all specific handler

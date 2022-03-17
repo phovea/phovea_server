@@ -42,7 +42,7 @@ class AGraph(ADataSetEntry, metaclass=abc.ABCMeta):
     self.attrs = {} if attrs is None else attrs
 
   @abc.abstractmethod
-  def nodes(self, range=None):
+  def nodes(self):
     return []
 
   @property
@@ -50,7 +50,7 @@ class AGraph(ADataSetEntry, metaclass=abc.ABCMeta):
     return len(self.nodes())
 
   @abc.abstractmethod
-  def edges(self, range=None):
+  def edges(self):
     return []
 
   @property
@@ -63,9 +63,9 @@ class AGraph(ADataSetEntry, metaclass=abc.ABCMeta):
     r['attrs'] = self.attrs
     return r
 
-  def asjson(self, range=None):
-    nodes = [a.asjson() for a in self.nodes(None if range is None else range[0])]
-    edges = [a.asjson() for a in self.edges(None if range is None else range[1])]
+  def asjson(self):
+    nodes = [a.asjson() for a in self.nodes()]
+    edges = [a.asjson() for a in self.edges()]
 
     r = dict(nodes=nodes, edges=edges)
     return r
