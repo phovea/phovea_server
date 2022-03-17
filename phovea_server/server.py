@@ -131,9 +131,8 @@ def _init_app(app, namespace, is_default_app=False):
   if cc.max_file_size:
     app.config['MAX_CONTENT_LENGTH'] = cc.max_file_size
 
-  security.init_app(app)
   if is_default_app:
-    security.add_login_routes(app)
+    security.init_app(app)
 
 
 # helper to plugin in function scope
