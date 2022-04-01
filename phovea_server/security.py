@@ -10,7 +10,6 @@ from builtins import object
 from typing import Dict, List, Union
 from flask import Flask
 from . import plugin as p
-import sys
 
 
 class User(object):
@@ -19,33 +18,8 @@ class User(object):
     self.name: str = name or id
     self.roles: List[str] = roles
 
-  def get_id(self) -> str:
-    return str(self.id)
-
   def has_role(self, role: str) -> bool:
     return role in self.roles
-
-  def __eq__(self, other):
-    """
-    Checks the equality of two `UserMixin` objects using `get_id`.
-    """
-    if isinstance(other, User):
-      return self.get_id() == other.get_id()
-    return NotImplemented
-
-  def __ne__(self, other):
-    """
-    Checks the inequality of two `UserMixin` objects using `get_id`.
-    """
-    equal = self.__eq__(other)
-    if equal is NotImplemented:
-      return NotImplemented
-    return not equal
-
-  if sys.version_info[0] != 2:  # pragma: no cover
-    # Python 3 implicitly set __hash__ to None if we override __eq__
-    # We set it back to its default implementation
-    __hash__ = object.__hash__
 
 
 class SecurityManager(object):
