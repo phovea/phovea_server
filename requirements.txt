@@ -10,3 +10,4 @@ matplotlib==3.3.3
 Pillow==8.3.2
 json-cfg==0.4.2
 docutils==0.17.1
+markupsafe==2.0.1

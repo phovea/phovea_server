@@ -6,7 +6,6 @@
 
 from builtins import object
 import abc
-import numpy as np
 
 
 def to_plural(s):
@@ -87,10 +86,9 @@ class ADataSetEntry(object, metaclass=abc.ABCMeta):
     return False
 
   @abc.abstractmethod
-  def asjson(self, range=None):
+  def asjson(self):
     """
     converts this dataset to a json compatible format
-    :param range: optional sub range to deliver
     :return: a json compatible dataset representation
     """
     return dict()
@@ -102,181 +100,6 @@ class ADataSetEntry(object, metaclass=abc.ABCMeta):
   def can_write(self, user=None):
     from .security import can_write
     return can_write(self.to_description(), user)
-
-
-class AStratification(ADataSetEntry, metaclass=abc.ABCMeta):
-  """
-  A basic dataset entry
-  """
-
-  def __init__(self, name, project, type, id=None):
-    super(AStratification, self).__init__(name, project, type, id)
-    self.idtype = 'Custom'
-
-  @abc.abstractmethod
-  def rows(self, range=None):
-    return []
-
-  @abc.abstractmethod
-  def rowids(self, range=None):
-    return []
-
-  @abc.abstractmethod
-  def groups(self):
-    return []
-
-  def idtypes(self):
-    return [self.idtype]
-
-
-class AMatrix(ADataSetEntry, metaclass=abc.ABCMeta):
-  """
-  A basic dataset entry
-  """
-
-  def __init__(self, name, project, type, id=None):
-    super(AMatrix, self).__init__(name, project, type, id)
-    self.rowtype = 'Custom'
-    self.coltype = 'Custom'
-    self.shape = [0, 0]
-    self.value = 'string'
-
-  @abc.abstractmethod
-  def rows(self, range=None):
-    return []
-
-  @abc.abstractmethod
-  def rowids(self, range=None):
-    return []
-
-  @abc.abstractmethod
-  def cols(self, range=None):
-    return []
-
-  @abc.abstractmethod
-  def colids(self, range=None):
-    return []
-
-  def aslist(self, range=None):
-    return self.asnumpy(range).tolist()
-
-  @abc.abstractmethod
-  def asnumpy(self, range=None):
-    return np.array([])
-
-  def asjson(self, range=None):
-    arr = self.asnumpy(range)
-    rows = self.rows(None if range is None else range[0])
-    cols = self.cols(None if range is None else range[1])
-    rowids = self.rowids(None if range is None else range[0])
-    colids = self.colids(None if range is None else range[1])
-
-    r = dict(data=arr, rows=rows, cols=cols, rowIds=rowids, colIds=colids)
-    return r
-
-  def idtypes(self):
-    return [self.rowtype, self.coltype]
-
-
-class AVector(ADataSetEntry, metaclass=abc.ABCMeta):
-  """
-  A basic dataset entry
-  """
-
-  def __init__(self, name, project, type, id=None):
-    super(AVector, self).__init__(name, project, type, id)
-    self.idtype = 'Custom'
-    self.value = 'string'
-    self.shape = [0]
-
-  @abc.abstractmethod
-  def rows(self, range=None):
-    return []
-
-  @abc.abstractmethod
-  def rowids(self, range=None):
-    return []
-
-  def aslist(self, range=None):
-    return self.asnumpy(range).tolist()
-
-  @abc.abstractmethod
-  def asnumpy(self, range=None):
-    return np.array([])
-
-  def asjson(self, range=None):
-    arr = self.asnumpy(range)
-    rows = self.rows(None if range is None else range[0])
-    rowids = self.rowids(None if range is None else range[0])
-    r = dict(data=arr, rows=rows, rowIds=rowids)
-
-    return r
-
-  def idtypes(self):
-    return [self.idtype]
-
-
-class AColumn(object, metaclass=abc.ABCMeta):
-  def __init__(self, name, type):
-    self.name = name
-    self.type = type
-
-  def aslist(self, range=None):
-    return self.asnumpy(range).tolist()
-
-  @abc.abstractmethod
-  def asnumpy(self, range=None):
-    return np.array([])
-
-  @abc.abstractmethod
-  def dump(self):
-    return None
-
-
-class ATable(ADataSetEntry, metaclass=abc.ABCMeta):
-  """
-  A basic dataset entry
-  """
-
-  def __init__(self, name, project, type, id=None):
-    super(ATable, self).__init__(name, project, type, id)
-    self.idtype = 'Custom'
-    self.shape = [0, 0]
-    self.columns = []
-
-  @abc.abstractmethod
-  def rows(self, range=None):
-    return []
-
-  @abc.abstractmethod
-  def rowids(self, range=None):
-    return []
-
-  def aslist(self, range=None):
-    data = self.aspandas(range)
-
-    # if range is only one element, aspandas returns a Series, otherwise a Dataframe
-    # to_dict('records') throws error on Series
-    if range is not None and range.dims[0].size() == 1:
-      return data.to_dict()
-
-    return data.to_dict('records')
-
-  @abc.abstractmethod
-  def aspandas(self, range=None):
-    import pandas as pd
-    return pd.DataFrame()
-
-  def asjson(self, range=None):
-    arr = self.aslist(range)
-    rows = self.rows(None if range is None else range[0])
-    rowids = self.rowids(None if range is None else range[0])
-    r = dict(data=arr, rows=rows, rowIds=rowids)
-
-    return r
-
-  def idtypes(self):
-    return [self.idtype]
 
 
 class ADataSetProvider(object, metaclass=abc.ABCMeta):

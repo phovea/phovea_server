@@ -36,133 +36,10 @@
         }
       },
       {
-        "type": "dataset-specific-handler",
-        "id": "handler-table",
-        "module": "dataset_specific",
-        "extras": {
-          "datatype": "table",
-          "factory": "add_table_handler"
-        }
-      },
-      {
-        "type": "dataset-specific-handler",
-        "id": "handler-matrix",
-        "module": "dataset_specific",
-        "extras": {
-          "datatype": "matrix",
-          "factory": "add_matrix_handler"
-        }
-      },
-      {
-        "type": "dataset-specific-handler",
-        "id": "handler-vector",
-        "module": "dataset_specific",
-        "extras": {
-          "datatype": "vector",
-          "factory": "add_vector_handler"
-        }
-      },
-      {
-        "type": "table-formatter",
-        "id": "formatter-json",
-        "module": "dataset_specific",
-        "extras": {
-          "format": "json",
-          "factory": "format_json"
-        }
-      },
-      {
-        "type": "table-formatter",
-        "id": "formatter-csv",
-        "module": "dataset_specific",
-        "extras": {
-          "format": "csv",
-          "factory": "format_csv"
-        }
-      },
-      {
-        "type": "matrix-formatter",
-        "id": "formatter-json",
-        "module": "dataset_specific",
-        "extras": {
-          "format": "json",
-          "factory": "format_json"
-        }
-      },
-      {
-        "type": "matrix-formatter",
-        "id": "formatter-csv",
-        "module": "dataset_specific",
-        "extras": {
-          "format": "csv",
-          "factory": "format_csv"
-        }
-      },
-      {
-        "type": "matrix-formatter",
-        "id": "formatter-image",
-        "module": "dataset_specific",
-        "extras": {
-          "format": "png",
-          "factory": "format_image"
-        }
-      },
-      {
-        "type": "matrix-formatter",
-        "id": "formatter-image",
-        "module": "dataset_specific",
-        "extras": {
-          "format": "jpeg",
-          "factory": "format_image"
-        }
-      },
-      {
-        "type": "matrix-formatter",
-        "id": "formatter-image",
-        "module": "dataset_specific",
-        "extras": {
-          "format": "jpg",
-          "factory": "format_image"
-        }
-      },
-      {
-        "type": "vector-formatter",
-        "id": "formatter-json",
-        "module": "dataset_specific",
-        "extras": {
-          "format": "json",
-          "factory": "format_json"
-        }
-      },
-      {
-        "type": "vector-formatter",
-        "id": "formatter-csv",
-        "module": "dataset_specific",
-        "extras": {
-          "format": "csv",
-          "factory": "format_csv"
-        }
-      },
-      {
-        "type": "dataset-provider",
-        "id": "dataset-csv",
-        "module": "dataset_csv",
-        "extras": {}
-      },
-      {
         "type": "json-encoder",
         "id": "numpy",
         "module": "json_encoder",
         "extras": {}
-      },
-      {
-        "type": "manager",
-        "id": "idmanager",
-        "module": "assigner",
-        "extras": {
-          "factory": "create",
-          "singleton": true
-        }
       },
       {
         "type": "dataset-specific-handler",
@@ -171,15 +48,6 @@
         "extras": {
           "datatype": "graph",
           "factory": "add_graph_handler"
-        }
-      },
-      {
-        "type": "graph-formatter",
-        "id": "formatter-json",
-        "module": "graph_api",
-        "extras": {
-          "format": "json",
-          "factory": "format_json"
         }
       },
       {

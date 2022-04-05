@@ -9,13 +9,6 @@ from .util import jsonify
 from . import ns
 
 
-def asrange(r=None):
-  if r is None:
-    return None
-  from .range import parse
-  return parse(r)
-
-
 def _to_desc():
   if 'desc' in ns.request.values:
     import json
@@ -25,8 +18,8 @@ def _to_desc():
   return n
 
 
-def format_json(dataset, range, args):
-  d = dataset.asjson(range)
+def format_json(dataset, args):
+  d = dataset.asjson()
   if bool(args.get('f_pretty_print', False)):
     return jsonify(d, indent=' ')
   return jsonify(d)
@@ -44,8 +37,7 @@ def resolve_formatter(type, format):
 def _list_items(dataset_getter, name, datasetid):
   d = dataset_getter(datasetid, 'graph')
   if ns.request.method == 'GET':
-    r = asrange(ns.request.args.get('range', None))
-    return jsonify([n.asjson() for n in getattr(d, name + 's')(r[0] if r is not None else None)])
+    return jsonify([n.asjson() for n in getattr(d, name + 's')()])
 
   if ns.request.method == 'DELETE':
     if not d.can_write():
@@ -109,9 +101,8 @@ def add_graph_handler(app, dataset_getter):
   @ns.etag
   def get_graph_data(datasetid):
     d = dataset_getter(datasetid, 'graph')
-    r = asrange(ns.request.args.get('range', None))
     formatter = resolve_formatter('graph', ns.request.args.get('format', 'json'))
-    return formatter(d, r, args=ns.request.args)
+    return formatter(d, args=ns.request.args)
 
   list_nodes, handle_node = _list_type(dataset_getter, 'node')
   app.add_url_rule('/graph/<datasetid>/node', 'list_nodes', ns.etag(list_nodes), methods=['GET', 'POST', 'DELETE'])

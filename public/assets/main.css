@@ -1,5 +1,5 @@
 body {
-  font-family: Yantramanav, Helvetica, sans-serif;
+  font-family: Roboto, sans-serif;
   font-weight: 400;
   font-style: normal;
   text-rendering: optimizeLegibility;
@@ -11,7 +11,7 @@ h1, h2, h3, h4, h5, h6 {
   text-rendering: optimizeLegibility; }
 
 h1, h2, h3, h4, h5, h5 {
-  font-family: Yantramanav, Helvetica, sans-serif;
+  font-family: Roboto, sans-serif;
   font-weight: 300;
   font-style: normal;
   margin-bottom: 10px;
@@ -56,7 +56,7 @@ input[type=text]:focus, input[type=search]:focus, textarea:focus {
   padding: 0.5em;
   width: 100%;
   font-size: 1em;
-  font-family: Yantramanav, Helvetica, sans-serif;
+  font-family: Roboto, sans-serif;
   font-weight: 400; }
 
 .keyboard-navigation-hint {

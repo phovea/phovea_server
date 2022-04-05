@@ -15,6 +15,8 @@ services:
     - '9000:80'
     volumes:
     - .:/phovea
+    environment:
+    - PYTHONUNBUFFERED=1
     # Add support for PDB debugger
     # stdin_open: true
     # tty: true
