@@ -14,10 +14,10 @@ ANONYMOUS = 'anonymous'
 
 
 class User(object):
-  def __init__(self, id):
+  def __init__(self, id, name=ANONYMOUS, roles=(ANONYMOUS,)):
     self.id = id
-    self.name = ANONYMOUS
-    self.roles = [ANONYMOUS]
+    self.name = name
+    self.roles = list(roles)
 
   def get_id(self):
     return str(self.id)
